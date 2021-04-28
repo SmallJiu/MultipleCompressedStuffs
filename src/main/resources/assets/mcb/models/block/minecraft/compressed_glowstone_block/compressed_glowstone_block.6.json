@@ -1,0 +1,7 @@
+{
+    "parent": "mcb:block/overlay_model",
+	"textures": {
+        "all": "minecraft:blocks/glowstone",
+		"overlay": "mcb:blocks/compressed_7"
+    }
+}
