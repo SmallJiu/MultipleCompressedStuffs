@@ -1,7 +1,0 @@
-{
-    "parent": "mcb:block/overlay_model",
-	"textures": {
-        "all": "minecraft:blocks/gravel",
-		"overlay": "mcb:blocks/compressed_4"
-    }
-}

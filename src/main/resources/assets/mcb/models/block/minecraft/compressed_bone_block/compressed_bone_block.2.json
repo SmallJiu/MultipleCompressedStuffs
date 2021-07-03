@@ -1,9 +1,0 @@
-{
-    "parent": "mcb:block/overlay_model_side",
-	"textures": {
-        "top": "minecraft:blocks/bone_block_top",
-		"down": "minecraft:blocks/bone_block_top",
-        "side": "minecraft:blocks/bone_block_side",
-		"overlay": "mcb:blocks/compressed_3"
-    }
-}
