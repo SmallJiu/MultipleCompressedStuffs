@@ -1,0 +1,52 @@
+{
+ "variants": {
+	"type=compressed_glass_block_0": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.0"
+	},
+	"type=compressed_glass_block_1": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.1"
+	},
+	"type=compressed_glass_block_2": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.2"
+	},
+	"type=compressed_glass_block_3": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.3"
+	},
+	"type=compressed_glass_block_4": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.4"
+	},
+	"type=compressed_glass_block_5": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.5"
+	},
+	"type=compressed_glass_block_6": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.6"
+	},
+	"type=compressed_glass_block_7": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.7"
+	},
+	"type=compressed_glass_block_8": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.8"
+	},
+	"type=compressed_glass_block_9": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.9"
+	},
+	"type=compressed_glass_block_10": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.10"
+	},
+	"type=compressed_glass_block_11": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.11"
+	},
+	"type=compressed_glass_block_12": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.12"
+	},
+	"type=compressed_glass_block_13": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.13"
+	},
+	"type=compressed_glass_block_14": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.14"
+	},
+	"type=compressed_glass_block_15": {
+		"model": "mcb:minecraft/compressed_glass_block/compressed_glass_block.15"
+	}
+  }
+}

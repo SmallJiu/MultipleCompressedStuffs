@@ -1,0 +1,7 @@
+{
+    "parent": "mcb:block/overlay_model",
+	"textures": {
+        "all": "minecraft:blocks/dirt",
+		"overlay": "mcb:blocks/compressed_2"
+    }
+}

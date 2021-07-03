@@ -1,0 +1,7 @@
+{
+    "parent": "mcb:block/overlay_model",
+	"textures": {
+        "all": "minecraft:blocks/netherrack",
+		"overlay": "mcb:blocks/compressed_2"
+    }
+}
