@@ -1,0 +1,7 @@
+{
+    "parent": "mcs:block/overlay_model",
+	"textures": {
+        "all": "thermalfoundation:blocks/glass/glass_lead",
+		"overlay": "mcs:blocks/compressed_15"
+    }
+}

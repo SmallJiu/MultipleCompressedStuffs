@@ -1,0 +1,7 @@
+{
+    "parent": "mcs:block/overlay_model",
+	"textures": {
+        "all": "projecte:blocks/fuels_0",
+		"overlay": "mcs:blocks/compressed_1"
+    }
+}

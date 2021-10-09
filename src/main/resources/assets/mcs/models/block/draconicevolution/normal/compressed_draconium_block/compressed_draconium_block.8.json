@@ -1,0 +1,7 @@
+{
+    "parent": "mcs:block/overlay_model",
+	"textures": {
+        "all": "draconicevolution:blocks/draconium_block",
+		"overlay": "mcs:blocks/compressed_9"
+    }
+}

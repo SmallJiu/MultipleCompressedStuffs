@@ -1,0 +1,52 @@
+{
+ "variants": {
+	"level=level_0": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.0"
+	},
+	"level=level_1": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.1"
+	},
+	"level=level_2": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.2"
+	},
+	"level=level_3": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.3"
+	},
+	"level=level_4": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.4"
+	},
+	"level=level_5": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.5"
+	},
+	"level=level_6": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.6"
+	},
+	"level=level_7": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.7"
+	},
+	"level=level_8": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.8"
+	},
+	"level=level_9": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.9"
+	},
+	"level=level_10": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.10"
+	},
+	"level=level_11": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.11"
+	},
+	"level=level_12": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.12"
+	},
+	"level=level_13": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.13"
+	},
+	"level=level_14": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.14"
+	},
+	"level=level_15": {
+		"model": "mcs:projecte/has/compressed_low_covalence_dust_block/compressed_low_covalence_dust_block.15"
+	}
+  }
+}

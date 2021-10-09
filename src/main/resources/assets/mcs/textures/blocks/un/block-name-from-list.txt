@@ -1,0 +1,5 @@
+block_blaze_rod.png      =     skyresources:blazepowderblock
+blockc_enderpearl.png   =     actuallyadditions:block_misc:6
+block_flint.png 	     =     Better Storage:Block of Flint
+block_nether_star.png    =     extendedcrafting:storage:2
+block_charcoal.png	      =    thermalfoundation:storage_resource(Block of Charcoal)

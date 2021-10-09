@@ -1,0 +1,7 @@
+{
+    "parent": "item/generated",
+    "textures": {
+		"layer0": "draconicevolution:items/components/awakened_core",
+		"layer1": "mcs:items/compressed_6"
+    }
+}

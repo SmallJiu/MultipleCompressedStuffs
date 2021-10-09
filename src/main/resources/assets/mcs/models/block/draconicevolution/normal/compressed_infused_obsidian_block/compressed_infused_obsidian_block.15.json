@@ -1,0 +1,7 @@
+{
+    "parent": "mcs:block/overlay_model",
+	"textures": {
+        "all": "draconicevolution:blocks/animated/infused_obsidian",
+		"overlay": "mcs:blocks/compressed_16"
+    }
+}

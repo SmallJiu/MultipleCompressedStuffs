@@ -1,0 +1,7 @@
+{
+    "parent": "mcs:block/overlay_model",
+	"textures": {
+        "all": "thermalfoundation:blocks/storage/block_lumium",
+		"overlay": "mcs:blocks/compressed_3"
+    }
+}

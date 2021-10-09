@@ -1,7 +1,8 @@
 buildscript {
     repositories {
         jcenter()
-        maven { url = "http://lss233.littleservice.cn/repositories/minecraft" }
+//        maven { url = "http://lss233.littleservice.cn/repositories/minecraft" }
+        maven { url = "https://files.minecraftforge.net/maven" }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
@@ -10,10 +11,9 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-
-version = "1.0"
-group = "com.yourname.modid" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "modid"
+version = "1.12.2-2.9.1"
+group = "cat.jiu.mcs" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "MultipleCompressedStuffs"
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileJava {
@@ -33,7 +33,75 @@ minecraft {
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
+repositories {
+    mavenLocal()
+    maven {
+        name 'CurseMaven'
+        url 'https://www.cursemaven.com/'
+    }
+    maven {
+        name 'DVS1 Repo'
+        url 'https://dvs1.progwml6.com/files/maven/'
+    }
+    maven {
+        name "OpenComputers"
+        url "https://maven.cil.li"
+    }
+    maven {
+        name "CoFH Maven"
+        url "https://maven.covers1624.net"
+    }
+    maven {
+        name "Thiakil Maven"
+        url "https://maven.thiakil.com/"
+    }
+    maven {
+        name "BlameJared Maven"
+        url "https://maven.blamejared.com/"
+    }
+    maven {
+        name "Bluexin Maven"
+        url "https://maven.bluexin.be/repository/snapshots/"
+    }
+    maven {
+        name "tterrag Maven"
+        url "https://maven.tterrag.com/"
+    }
+    maven {
+        name "sfPlayer1 Maven"
+        url "https://maven.ic2.player.to/"
+    }
+    maven {
+        name "Darkhax Maven"
+        url "https://maven.mcmoddev.com"
+    }
+	maven {
+        name "Modmaven"
+        url "https://modmaven.dev/"
+    }
+}
+
 dependencies {
+	
+	compile 'cat.jiu.core:jiucore:1.12.2-1.0.0'
+	deobfCompile 'mezz.jei:jei_1.12.2:4.15.0.293'
+	deobfCompile 'cofh:ThermalFoundation:1.12.2-2.6.3.27:universal'
+	deobfCompile 'cofh:CoFHCore:1.12.2-4.6.3.27:universal'
+    deobfCompile 'curse.maven:cofhworld-271384:2920434'
+    deobfCompile 'cofh:RedstoneFlux:1.12-2.1.0.7:universal'
+	deobfCompile "curse.maven:projecte-226410:2702991" //1.4.1
+	deobfCompile 'curse.maven:baubles-227083:2518667' //1.5.2
+	deobfCompile "vazkii.botania:Botania:r1.10-363.148"
+	deobfCompile "curse.maven:codechicken-lib-1-8-242818:2779848" // 3.2.3.358
+	deobfCompile("morph.avaritia:Avaritia:1.12.2-3.3.0.33:universal") { exclude group: "codechicken" }
+	deobfCompile "slimeknights.mantle:Mantle:1.12-1.3.3.56"
+    deobfCompile "slimeknights:TConstruct:1.12.2-2.13.0.184"
+	deobfCompile "curse.maven:brandons-core-231382:3051539" // 2.4.19.214
+    deobfCompile "curse.maven:draconic-evolution-223565:3051542" // 2.3.27.353
+	deobfCompile "curse.maven:valkyrielib-245480:2691542" // 2.0.20.1
+	deobfCompile "curse.maven:environmental-tech-245453:2691536" // 2.0.20.1
+//	compileOnly "appeng:appliedenergistics2:6.0.0-stable.7:api"
+
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"

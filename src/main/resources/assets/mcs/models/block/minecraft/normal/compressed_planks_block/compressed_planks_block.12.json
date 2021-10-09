@@ -1,0 +1,7 @@
+{
+    "parent": "mcs:block/overlay_model",
+	"textures": {
+        "all": "minecraft:blocks/planks_oak",
+		"overlay": "mcs:blocks/compressed_13"
+    }
+}

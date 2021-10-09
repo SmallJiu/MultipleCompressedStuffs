@@ -1,0 +1,6 @@
+{
+    "parent": "mcs:block/normal_model",
+	"textures": {
+        "all": "mcs:blocks/un/block_nether_star"
+    }
+}

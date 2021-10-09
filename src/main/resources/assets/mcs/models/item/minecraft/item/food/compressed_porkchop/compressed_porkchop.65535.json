@@ -1,0 +1,7 @@
+{
+    "parent": "item/generated",
+    "textures": {
+		"layer0": "minecraft:items/porkchop_raw",
+		"layer1": "mcs:items/infinity"
+    }
+}

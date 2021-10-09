@@ -1,0 +1,7 @@
+{
+    "parent": "mcs:block/overlay_model",
+	"textures": {
+        "all": "thermalfoundation:blocks/storage/block_copper",
+		"overlay": "mcs:blocks/compressed_8"
+    }
+}

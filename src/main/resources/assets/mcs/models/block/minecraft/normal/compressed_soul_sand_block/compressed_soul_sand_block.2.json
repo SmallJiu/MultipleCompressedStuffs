@@ -1,0 +1,7 @@
+{
+    "parent": "mcs:block/overlay_model",
+	"textures": {
+        "all": "minecraft:blocks/soul_sand",
+		"overlay": "mcs:blocks/compressed_3"
+    }
+}

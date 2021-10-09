@@ -1,0 +1,7 @@
+{
+    "parent": "mcs:block/overlay_model",
+	"textures": {
+        "all": "minecraft:blocks/concrete_powder_lime",
+		"overlay": "mcs:blocks/compressed_5"
+    }
+}

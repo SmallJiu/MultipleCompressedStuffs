@@ -1,0 +1,7 @@
+{
+    "parent": "mcs:block/overlay_model",
+	"textures": {
+        "all": "minecraft:blocks/slime",
+		"overlay": "mcs:blocks/compressed_14"
+    }
+}

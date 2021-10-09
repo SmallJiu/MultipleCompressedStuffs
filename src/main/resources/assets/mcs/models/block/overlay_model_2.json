@@ -1,0 +1,23 @@
+{
+    "parent": "mcs:block/overlay_model",
+	"textures": {
+        "particle": "#all",
+        "all": "#all",
+		"overlay": "#overlay"
+		"overlay1": "#overlay1"
+    },
+    "elements": [
+        {
+            "from": [ 0, 0, 0 ],
+            "to": [ 16, 16, 16 ],
+            "faces": {
+                "down": { "uv": [ 0, 0, 16, 16 ], "texture": "#overlay1", "cullface": "down" },
+                "up": { "uv": [ 0, 0, 16, 16 ], "texture": "#overlay1", "cullface": "up" },
+                "north": { "uv": [ 0, 0, 16, 16 ], "texture": "#overlay1", "cullface": "north" },
+                "south": { "uv": [ 0, 0, 16, 16 ], "texture": "#overlay1", "cullface": "south" },
+                "west": { "uv": [ 0, 0, 16, 16 ], "texture": "#overlay1", "cullface": "west" },
+                "east": { "uv": [ 0, 0, 16, 16 ], "texture": "#overlay1", "cullface": "east" }
+            }
+        }
+    ]
+}

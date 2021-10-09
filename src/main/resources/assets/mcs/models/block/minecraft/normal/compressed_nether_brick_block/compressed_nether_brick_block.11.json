@@ -1,0 +1,7 @@
+{
+    "parent": "mcs:block/overlay_model",
+	"textures": {
+        "all": "minecraft:blocks/nether_brick",
+		"overlay": "mcs:blocks/compressed_12"
+    }
+}

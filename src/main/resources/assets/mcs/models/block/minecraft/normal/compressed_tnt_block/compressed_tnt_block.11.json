@@ -1,0 +1,9 @@
+{
+    "parent": "mcs:block/overlay_model_side",
+	"textures": {
+        "top": "minecraft:blocks/tnt_top",
+		"down": "minecraft:blocks/tnt_bottom",
+        "side": "minecraft:blocks/tnt_side",
+		"overlay": "mcs:blocks/compressed_12"
+    }
+}

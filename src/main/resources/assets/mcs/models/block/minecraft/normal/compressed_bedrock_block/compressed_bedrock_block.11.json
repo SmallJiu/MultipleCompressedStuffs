@@ -1,0 +1,7 @@
+{
+    "parent": "mcs:block/overlay_model",
+	"textures": {
+        "all": "minecraft:blocks/bedrock",
+		"overlay": "mcs:blocks/compressed_12"
+    }
+}

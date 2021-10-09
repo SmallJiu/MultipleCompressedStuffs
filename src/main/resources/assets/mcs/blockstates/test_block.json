@@ -1,0 +1,5 @@
+{
+    "variants": {
+        "normal": { "model": "mcs:mcs/test/test_block" }
+    }
+}

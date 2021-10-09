@@ -1,0 +1,7 @@
+{
+    "parent": "mcs:block/overlay_model",
+	"textures": {
+        "all": "minecraft:blocks/end_stone",
+		"overlay": "mcs:blocks/compressed_16"
+    }
+}

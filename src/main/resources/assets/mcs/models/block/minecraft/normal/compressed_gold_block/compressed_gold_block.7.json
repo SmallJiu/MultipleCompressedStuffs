@@ -1,0 +1,7 @@
+{
+    "parent": "mcs:block/overlay_model",
+	"textures": {
+        "all": "minecraft:blocks/gold_block",
+		"overlay": "mcs:blocks/compressed_8"
+    }
+}
