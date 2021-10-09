@@ -11,7 +11,7 @@ import com.valkyrieofnight.et.m_resources.features.ETRBlocks;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.BlockTest;
 import cat.jiu.mcs.config.Configs;
-import cat.jiu.mcs.util.JiuUtils;
+import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.base.BaseBlock;
 import cat.jiu.mcs.util.base.BaseBlockNormal;
 import cat.jiu.mcs.util.base.BaseBlockSub;

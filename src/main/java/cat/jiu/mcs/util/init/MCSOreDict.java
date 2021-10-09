@@ -2,8 +2,8 @@ package cat.jiu.mcs.util.init;
 
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.config.Configs;
-import cat.jiu.mcs.util.JiuUtils;
-import cat.jiu.mcs.util.JiuUtils.ItemUtils;
+import cat.jiu.core.util.JiuUtils;
+import cat.jiu.core.util.JiuUtils.ItemUtils;
 import cofh.thermalfoundation.block.BlockGlass;
 import cofh.thermalfoundation.block.BlockGlassAlloy;
 import cofh.thermalfoundation.block.BlockRockwool;

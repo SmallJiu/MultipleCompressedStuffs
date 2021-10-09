@@ -1,5 +1,6 @@
 package cat.jiu.mcs.command;
-import cat.jiu.mcs.util.JiuUtils;
+
+import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.base.BaseCommand;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;

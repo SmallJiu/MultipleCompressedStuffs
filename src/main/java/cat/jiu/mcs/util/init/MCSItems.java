@@ -9,7 +9,7 @@ import com.brandon3055.draconicevolution.DEFeatures;
 
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.items.*;
-import cat.jiu.mcs.util.JiuUtils;
+import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.base.BaseItemFood;
 import cat.jiu.mcs.util.base.BaseItemNormal;
 import cat.jiu.mcs.util.base.BaseItemSub;
@@ -55,10 +55,10 @@ public class MCSItems {
 	
 	public static final void registerOreDict() {
 		for(BaseItemFood food : FOODS) {
-			JiuUtils.item.registerCompressedOre(food.getUnCompressedName(), food);
+			JiuUtils.item.registerCompressedOre(food.getUnCompressedName(), food, false);
 		}
 		for(BaseItemSub item : SUB_ITEMS) {
-			JiuUtils.item.registerCompressedOre(item.getUnCompressedName(), item);
+			JiuUtils.item.registerCompressedOre(item.getUnCompressedName(), item, false);
 		}
 	}
 	

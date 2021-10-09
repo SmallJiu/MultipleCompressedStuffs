@@ -2,6 +2,7 @@ package cat.jiu.mcs.util;
 
 import cat.jiu.core.api.events.entity.IEntityJoinWorldEvent;
 import cat.jiu.core.api.events.entity.IEntityTickEvent;
+import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;

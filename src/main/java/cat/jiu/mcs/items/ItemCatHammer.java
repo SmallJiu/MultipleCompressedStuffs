@@ -4,7 +4,7 @@ import java.util.List;
 
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.core.util.JiuRandom;
-import cat.jiu.mcs.util.JiuUtils;
+import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.base.BaseItemNormal;
 import cat.jiu.mcs.util.init.MCSBlocks;
 import net.minecraft.block.Block;

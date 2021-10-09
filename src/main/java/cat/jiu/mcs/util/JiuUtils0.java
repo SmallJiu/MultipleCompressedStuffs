@@ -32,7 +32,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
 
-public final class JiuUtils {
+public final class JiuUtils0 {
 	
 	public static final ItemUtils item = new ItemUtils();
 	public static final EntityUtils entity = new EntityUtils();

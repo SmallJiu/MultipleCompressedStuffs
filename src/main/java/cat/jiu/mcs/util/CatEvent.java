@@ -3,6 +3,7 @@ package cat.jiu.mcs.util;
 import cat.jiu.core.api.events.entity.IEntityDeathEvent;
 import cat.jiu.core.api.events.entity.IEntityTickEvent;
 import cat.jiu.core.util.JiuRandom;
+import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.util.init.MCSItems;
 import net.minecraft.entity.Entity;

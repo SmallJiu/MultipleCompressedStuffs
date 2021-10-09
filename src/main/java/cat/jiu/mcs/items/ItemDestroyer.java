@@ -6,7 +6,7 @@ import java.util.List;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.core.util.JiuRandom;
-import cat.jiu.mcs.util.JiuUtils;
+import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.base.BaseItemNormal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;

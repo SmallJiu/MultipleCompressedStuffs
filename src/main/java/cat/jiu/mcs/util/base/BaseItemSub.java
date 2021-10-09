@@ -8,7 +8,7 @@ import cat.jiu.core.util.RegisterModel;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.interfaces.IHasModel;
-import cat.jiu.mcs.util.JiuUtils;
+import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.ModSubtypes;
 import cat.jiu.mcs.util.init.MCSItems;
 import net.minecraft.client.util.ITooltipFlag;

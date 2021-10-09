@@ -1,7 +1,7 @@
 package cat.jiu.mcs.command;
 
 import cat.jiu.mcs.blocks.BlockTest;
-import cat.jiu.mcs.util.JiuUtils;
+import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.base.BaseBlockSub;
 import cat.jiu.mcs.util.base.BaseCommand;
 import cat.jiu.mcs.util.init.MCSBlocks;
