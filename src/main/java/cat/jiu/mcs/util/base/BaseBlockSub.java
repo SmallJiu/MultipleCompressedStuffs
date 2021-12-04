@@ -14,6 +14,7 @@ import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.ModSubtypes;
 import cat.jiu.mcs.util.TileEntityChangeBlock;
 import cat.jiu.mcs.util.init.MCSBlocks;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
@@ -30,6 +31,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
@@ -49,14 +51,15 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 	protected final boolean isBlock;
 	protected final Block unCompressedBlock;
 	protected final IBlockState unCompressedState;
+	protected final String langModID;
 	protected final RegisterModel model = new RegisterModel(MCS.MODID);
 	
 	public BaseBlockSub isUnUse() {
 		return null;
 	}
-
+	
 	private static final PropertyEnum<ModSubtypes> VARIANT = PropertyEnum.create("level", ModSubtypes.class);
-	protected final String langModID;
+	
 	
 	public static BaseBlockSub register(String nameIn, ItemStack unCompressedItem,  String langModID, Material materialIn, SoundType soundIn, CreativeTabs tabIn, float hardnessIn) {
 		if(Loader.isModLoaded(langModID)) {
@@ -116,11 +119,11 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 	}
 	
 	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String langModID, Material materialIn, SoundType soundIn, CreativeTabs tabIn) {
-		this(nameIn, unCompressedItem,  langModID, materialIn, soundIn, tabIn, 4.0F);
+		this(nameIn, unCompressedItem, langModID, materialIn, soundIn, tabIn, 4.0F);
 	}
 	
 	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String langModID, Material materialIn,  CreativeTabs tabIn) {
-		this(nameIn, unCompressedItem,  langModID, materialIn, SoundType.METAL, tabIn);
+		this(nameIn, unCompressedItem, langModID, materialIn, SoundType.METAL, tabIn);
 	}
 	
 	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String langModID, SoundType soundIn, CreativeTabs tabIn) {
@@ -151,37 +154,15 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 		this(nameIn, unCompressedItem, "minecraft");
 	}
 	
-	boolean custem = false;
-	
-	public BaseBlockSub isOreDictCustem() {
-		this.custem = !this.custem;
-		return this;
-	}
-	
 	public String getUnCompressedName() {
-		String[] names = JiuUtils.other.custemSplitString(this.name, "_");
-		
-		if(this.isBlock) {
-			if(names.length == 4) {
-				return JiuUtils.other.upperCaseToFistLetter(names[1]) + JiuUtils.other.upperCaseToFistLetter(names[2]) + JiuUtils.other.upperCaseToFistLetter(names[3]);
-			}else {
-				return JiuUtils.other.upperCaseToFistLetter(names[1]) + JiuUtils.other.upperCaseToFistLetter(names[2]);
-			}
-		}else {
-			List<String> name = new ArrayList<String>();
-			for(int i = 1; i < names.length; ++i) {
-				name.add(JiuUtils.other.upperCaseToFistLetter(names[i]));
-			}
-			if(names.length == 3) {
-				if(this.custem) {
-					return String.format("%s", name.toArray(new String[0]));
-				}else {
-					return String.format("%s%s", name.toArray(new String[0]));
-				}
-			}else {
-				return String.format("%s", name.toArray(new String[0]));
+		String[] unNames = JiuUtils.other.custemSplitString(this.name, "_");
+		String i = "";
+		for(String s : unNames) {
+			if(!"compressed".equals(s)) {
+				i += JiuUtils.other.upperCaseToFistLetter(s);
 			}
 		}
+		return i;
 	}
 	
 	public boolean isHasBlock() {
@@ -401,7 +382,11 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 	}
 	
 	public boolean canSetBurnTime() {
-		return this.getUnCompressedBurnTime() > 0;
+		if(this.unCompressedItem != null) {
+			return this.getUnCompressedBurnTime() > 0;
+		}else {
+			return false;
+		}
 	}
 	
 	List<String[]> infos = new ArrayList<String[]>();
@@ -412,7 +397,14 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 		}
 		return this;
 	}
-
+	
+	ItemStack infoStack = null;
+	
+	public BaseBlockSub setInfoStack(ItemStack stack) {
+		this.infoStack = stack;
+		return this;
+	}
+	
 	@Override
 	@SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced){
@@ -472,13 +464,17 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 		}
 		
 		if(MCS.instance.test_model) {
+			NBTTagCompound nbt = stack.getTagCompound();
 			tooltip.add("unCompressedItem: " + this.unCompressedItem.getItem().getRegistryName() + "." + this.unCompressedItem.getItemDamage());
+			
+			if(nbt != null) {
+				tooltip.add("ChangeTime: " + nbt.getInteger("ChangeM") + "/" + nbt.getInteger("ChangeS") + "/" + nbt.getInteger("ChangeTick"));
+			}
 			
 			String[] names = JiuUtils.other.custemSplitString(this.name, "_");
 			tooltip.add(names.length + "");
 			tooltip.add(this.getUnCompressedName());
 		}
-		
 		
 		if(Configs.tooltip_information.show_owner_mod) {
 			tooltip.add("Owner Mod: \'" + this.getOwnerMod() + "\'");
@@ -503,7 +499,11 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 			}
 		}
 		
-		this.unCompressedItem.getItem().addInformation(this.unCompressedItem, world, tooltip, advanced);
+		if(this.infoStack != null) {
+			this.infoStack.getItem().addInformation(this.infoStack, world, tooltip, advanced);
+		}else {
+			this.unCompressedItem.getItem().addInformation(this.unCompressedItem, world, tooltip, advanced);
+		}
 		
 		if(Configs.tooltip_information.custem_info.block.length != 1) {
 			try {

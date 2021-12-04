@@ -16,7 +16,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class MCSRecipe {
-	
 	private static final Recipe recipe = new Recipe(MCS.MODID);
 	
 	public static void register() {
@@ -101,20 +100,20 @@ public class MCSRecipe {
 					
 					//物品压缩
 					{
-						recipe.add3x3AllRecipesWithOreDictionary(new ItemStack(item), unCompressedItem);
+						recipe.add3x3AllRecipes(new ItemStack(item), unCompressedItem);
 						
 						for(int meta = 1; meta < 16; ++meta) {
-							recipe.add3x3AllRecipesWithOreDictionary(new ItemStack(item, 1, meta), new ItemStack(item, 1, (meta - 1)));
+							recipe.add3x3AllRecipes(new ItemStack(item, 1, meta), new ItemStack(item, 1, (meta - 1)));
 						}
 					}
 					
 					//物品解压
 					{
-						recipe.add1x1RecipesWithOreDictionary(JiuUtils.item.copyStack(unCompressedItem, 9, false), new ItemStack(item));
+						recipe.add1x1Recipes(JiuUtils.item.copyStack(unCompressedItem, 9, false), new ItemStack(item));
 						
 						for(int meta = 0; meta < 15; ++meta) {
 							ItemStack stack = new ItemStack(item, 1, (meta + 1));
-							recipe.add1x1RecipesWithOreDictionary(new ItemStack(item, 9, meta), stack);
+							recipe.add1x1Recipes(new ItemStack(item, 9, meta), stack);
 						}
 					}
 				}
@@ -125,19 +124,19 @@ public class MCSRecipe {
 						
 						//食物压缩
 						{
-							recipe.add3x3AllRecipesWithOreDictionary(new ItemStack(food), unCompressedItem);
+							recipe.add3x3AllRecipes(new ItemStack(food), unCompressedItem);
 							
 							for(int meta = 1; meta < 16; ++meta) {
-								recipe.add3x3AllRecipesWithOreDictionary(new ItemStack(food, 1, meta), new ItemStack(food, 1, (meta - 1)));
+								recipe.add3x3AllRecipes(new ItemStack(food, 1, meta), new ItemStack(food, 1, (meta - 1)));
 							}
 						}
 						
 						//食物解压
 						{
-							recipe.add1x1RecipesWithOreDictionary(JiuUtils.item.copyStack(unCompressedItem, 9, false), new ItemStack(food));
+							recipe.add1x1Recipes(JiuUtils.item.copyStack(unCompressedItem, 9, false), new ItemStack(food));
 							
 							for(int meta = 0; meta < 15; ++meta) {
-								recipe.add1x1RecipesWithOreDictionary(new ItemStack(food, 9, meta), new ItemStack(food, 1, (meta + 1)));
+								recipe.add1x1Recipes(new ItemStack(food, 9, meta), new ItemStack(food, 1, (meta + 1)));
 							}
 						}
 					}
@@ -147,19 +146,19 @@ public class MCSRecipe {
 						
 						//物品压缩
 						{
-							recipe.add3x3AllRecipesWithOreDictionary(new ItemStack(item), unCompressedItem);
+							recipe.add3x3AllRecipes(new ItemStack(item), unCompressedItem);
 							
 							for(int meta = 1; meta < 16; ++meta) {
-								recipe.add3x3AllRecipesWithOreDictionary(new ItemStack(item, 1, meta), new ItemStack(item, 1, (meta - 1)));
+								recipe.add3x3AllRecipes(new ItemStack(item, 1, meta), new ItemStack(item, 1, (meta - 1)));
 							}
 						}
 						
 						//物品解压
 						{
-							recipe.add1x1RecipesWithOreDictionary(JiuUtils.item.copyStack(unCompressedItem, 9, false), new ItemStack(item));
+							recipe.add1x1Recipes(JiuUtils.item.copyStack(unCompressedItem, 9, false), new ItemStack(item));
 							
 							for(int meta = 0; meta < 15; ++meta) {
-								recipe.add1x1RecipesWithOreDictionary(new ItemStack(item, 9, meta), new ItemStack(item, 1, (meta + 1)));
+								recipe.add1x1Recipes(new ItemStack(item, 9, meta), new ItemStack(item, 1, (meta + 1)));
 							}
 						}
 					}
@@ -169,19 +168,19 @@ public class MCSRecipe {
 						
 						//食物压缩
 						{
-							recipe.add2x2AllRecipesWithOreDictionary(new ItemStack(food), unCompressedItem);
+							recipe.add2x2AllRecipes(new ItemStack(food), unCompressedItem);
 							
 							for(int meta = 1; meta < 16; ++meta) {
-								recipe.add2x2AllRecipesWithOreDictionary(new ItemStack(food, 1, meta), new ItemStack(food, 1, (meta - 1)));
+								recipe.add2x2AllRecipes(new ItemStack(food, 1, meta), new ItemStack(food, 1, (meta - 1)));
 							}
 						}
 						
 						//食物解压
 						{
-							recipe.add1x1RecipesWithOreDictionary(JiuUtils.item.copyStack(unCompressedItem, 4, false), new ItemStack(food));
+							recipe.add1x1Recipes(JiuUtils.item.copyStack(unCompressedItem, 4, false), new ItemStack(food));
 							
 							for(int meta = 0; meta < 15; ++meta) {
-								recipe.add1x1RecipesWithOreDictionary(new ItemStack(food, 4, meta), new ItemStack(food, 1, (meta + 1)));
+								recipe.add1x1Recipes(new ItemStack(food, 4, meta), new ItemStack(food, 1, (meta + 1)));
 							}
 						}
 					}
@@ -191,19 +190,19 @@ public class MCSRecipe {
 						
 						//物品压缩
 						{
-							recipe.add2x2AllRecipesWithOreDictionary(new ItemStack(item), unCompressedItem);
+							recipe.add2x2AllRecipes(new ItemStack(item), unCompressedItem);
 							
 							for(int meta = 1; meta < 16; ++meta) {
-								recipe.add2x2AllRecipesWithOreDictionary(new ItemStack(item, 1, meta), new ItemStack(item, 1, (meta - 1)));
+								recipe.add2x2AllRecipes(new ItemStack(item, 1, meta), new ItemStack(item, 1, (meta - 1)));
 							}
 						}
 						
 						//物品解压
 						{
-							recipe.add1x1RecipesWithOreDictionary(JiuUtils.item.copyStack(unCompressedItem, 4, false), new ItemStack(item));
+							recipe.add1x1Recipes(JiuUtils.item.copyStack(unCompressedItem, 4, false), new ItemStack(item));
 							
 							for(int meta = 0; meta < 15; ++meta) {
-								recipe.add1x1RecipesWithOreDictionary(new ItemStack(item, 4, meta), new ItemStack(item, 1, (meta + 1)));
+								recipe.add1x1Recipes(new ItemStack(item, 4, meta), new ItemStack(item, 1, (meta + 1)));
 							}
 						}
 					}
@@ -219,19 +218,19 @@ public class MCSRecipe {
 				if(lag) {
 					// 方块压缩
 					{
-						recipe.add3x3AllRecipesWithOreDictionary(new ItemStack(block), unCompressedItem);
+						recipe.add3x3AllRecipes(new ItemStack(block), unCompressedItem);
 						
 						for(int meta = 1; meta < 16; ++meta) {
-							recipe.add3x3AllRecipesWithOreDictionary(new ItemStack(block, 1, meta), new ItemStack(block, 1, (meta - 1)));
+							recipe.add3x3AllRecipes(new ItemStack(block, 1, meta), new ItemStack(block, 1, (meta - 1)));
 						}
 					}
 					
 					// 方块解压
 					{
-						recipe.add1x1RecipesWithOreDictionary(JiuUtils.item.copyStack(unCompressedItem, 9, false), new ItemStack(block));
+						recipe.add1x1Recipes(JiuUtils.item.copyStack(unCompressedItem, 9, false), new ItemStack(block));
 						
 						for(int meta = 1; meta < 16; ++meta) {
-								recipe.add1x1RecipesWithOreDictionary(new ItemStack(block, 9, meta - 1), new ItemStack(block, 1, meta));
+								recipe.add1x1Recipes(new ItemStack(block, 9, meta - 1), new ItemStack(block, 1, meta));
 							
 						}
 					}
@@ -239,38 +238,38 @@ public class MCSRecipe {
 					if(Configs.use_3x3_recipes) {
 						// 方块压缩
 						{
-							recipe.add3x3AllRecipesWithOreDictionary(new ItemStack(block), unCompressedItem);
+							recipe.add3x3AllRecipes(new ItemStack(block), unCompressedItem);
 							
 							for(int meta = 1; meta < 16; ++meta) {
-								recipe.add3x3AllRecipesWithOreDictionary(new ItemStack(block, 1, meta), new ItemStack(block, 1, (meta - 1)));
+								recipe.add3x3AllRecipes(new ItemStack(block, 1, meta), new ItemStack(block, 1, (meta - 1)));
 							}
 						}
 						
 						// 方块解压
 						{
-							recipe.add1x1RecipesWithOreDictionary(JiuUtils.item.copyStack(unCompressedItem, 9, false), new ItemStack(block));
+							recipe.add1x1Recipes(JiuUtils.item.copyStack(unCompressedItem, 9, false), new ItemStack(block));
 							
 							for(int meta = 1; meta < 16; ++meta) {
-								recipe.add1x1RecipesWithOreDictionary(new ItemStack(block, 9, meta - 1), new ItemStack(block, 1, meta));
+								recipe.add1x1Recipes(new ItemStack(block, 9, meta - 1), new ItemStack(block, 1, meta));
 								
 							}
 						}
 					}else {
 						//方块压缩
 						{
-							recipe.add2x2AllRecipesWithOreDictionary(new ItemStack(block), unCompressedItem);
+							recipe.add2x2AllRecipes(new ItemStack(block), unCompressedItem);
 							
 							for(int meta = 1; meta < 16; ++meta) {
-								recipe.add2x2AllRecipesWithOreDictionary(new ItemStack(block, 1, meta), new ItemStack(block, 1, (meta - 1)));
+								recipe.add2x2AllRecipes(new ItemStack(block, 1, meta), new ItemStack(block, 1, (meta - 1)));
 							}
 						}
 						
 						//方块解压
 						{
-							recipe.add1x1RecipesWithOreDictionary(JiuUtils.item.copyStack(unCompressedItem, 4, false), new ItemStack(block));
+							recipe.add1x1Recipes(JiuUtils.item.copyStack(unCompressedItem, 4, false), new ItemStack(block));
 							
 							for(int meta = 1; meta < 15; ++meta) {
-								recipe.add1x1RecipesWithOreDictionary(new ItemStack(block, 4, meta - 1), new ItemStack(block, 1, meta));
+								recipe.add1x1Recipes(new ItemStack(block, 4, meta - 1), new ItemStack(block, 1, meta));
 								
 							}
 						}

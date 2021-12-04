@@ -21,7 +21,6 @@ public class CommandHelp extends BaseCommand.CommandNormal {
 			JiuUtils.entity.sendMessage(sender, "> /mcs getore   | get you held item OreDictionary");
 			JiuUtils.entity.sendMessage(sender, "> /mcs loadmod  | get minecraft load mod name");
 			JiuUtils.entity.sendMessage(sender, "> /mcs help     | get this helper");
-			
 		}
     }
 }

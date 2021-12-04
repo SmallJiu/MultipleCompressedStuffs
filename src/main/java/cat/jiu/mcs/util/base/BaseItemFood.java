@@ -55,8 +55,8 @@ public class BaseItemFood extends ItemFood implements IHasModel{
 		this.setNoRepair();
 		MCSItems.ITEMS.add((Item)this);
 		MCSItems.ITEMS_NAME.add(this.name);
-		MCSItems.FOODS_NAME.add(this.name);
 		MCSItems.FOODS.add(this);
+		MCSItems.FOODS_NAME.add(this.name);
 		MCSItems.FOODS_MAP.put(this.name, this);
 	}
 	
@@ -142,16 +142,17 @@ public class BaseItemFood extends ItemFood implements IHasModel{
 		return this.makeRecipe;
 	}
 	
-	boolean custem = false;
-	int index = 1;
-	
-	public BaseItemFood isOreDictCustem(int index) {
-		this.custem = !this.custem;
-		this.index = index;
-		return this;
-	}
-	
 	public String getUnCompressedName() {
+		String[] unNames = JiuUtils.other.custemSplitString(this.name, "_");
+		String i = "";
+		for(String s : unNames) {
+			if(!"compressed".equals(s)) {
+				i += JiuUtils.other.upperCaseToFistLetter(s);
+			}
+		}
+		return i;
+		
+		/*
 		String[] names = JiuUtils.other.custemSplitString(this.name, "_");
 		
 		if(names.length == 4) {
@@ -161,6 +162,7 @@ public class BaseItemFood extends ItemFood implements IHasModel{
 		}else {
 			return JiuUtils.other.upperCaseToFistLetter(names[1]);
 		}
+		*/
 	}
 	
 	@SideOnly(Side.CLIENT)

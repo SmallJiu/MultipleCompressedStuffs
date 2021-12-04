@@ -51,7 +51,7 @@ public class TileEntityChangeBlock extends TileEntity implements ITickable {
 	boolean i = true;
 	boolean makeLog = true;
 	boolean t = true;
-	String log;
+	String log = "null";
 	Date date = new Date();
 	
 	private int tick = 0;
@@ -94,17 +94,15 @@ public class TileEntityChangeBlock extends TileEntity implements ITickable {
 				}
 			}
 			
-			if(this.tick == 20) {
-				this.markDirty();
-//				System.out.println("continue all tick:" + this.continueAllTick + " tick: " + tick + " s: " + s + " m: " + m + " now tick: " + this.allTick);
-				
+			if(this.tick >= 20) {
 				this.tick = 0;
-				this.s = this.s + 1;
+				this.s += 1;
+				this.markDirty();
 			}
 			
-			if(this.s == 60) {
+			if(this.s >= 60) {
 				this.s = 0;
-				this.m = this.m + 1;
+				this.m += 1;
 			}
 			
 			if(this.allTick == this.continueAllTick / 5) {
@@ -145,7 +143,7 @@ public class TileEntityChangeBlock extends TileEntity implements ITickable {
 								this.world.setBlockState(this.pos, this.newState);
 							}
 						}else {
-							this.world.playSound(null, this.pos, SoundEvents.BLOCK_CHEST_OPEN, SoundCategory.BLOCKS, 1.0F, 1.0F);
+							this.world.playSound(null, this.pos, SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS, 1.0F, 1.0F);
 							Block.spawnAsEntity(this.world, this.pos, this.newStack);
 							this.world.setBlockState(this.pos, Blocks.AIR.getDefaultState());
 						}
@@ -173,4 +171,35 @@ public class TileEntityChangeBlock extends TileEntity implements ITickable {
 		return "OldState: " + this.oldState + ",NewState: " + this.newState + "," + ", continue all tick:" + this.continueAllTick + ", tick: " + tick + ", s: " + s + ", m: " + m;
 	}
 	
+	@Override
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+		nbt.setBoolean("MakeLog", this.makeLog);
+		nbt.setBoolean("I", this.i);
+		nbt.setBoolean("T", this.t);
+		
+		nbt.setString("Log", this.log);
+		
+		nbt.setInteger("ChangeTick", this.tick);
+		nbt.setInteger("ChangeS", this.s);
+		nbt.setInteger("ChangeM", this.m);
+		nbt.setInteger("AllTick", this.allTick);
+		
+		return super.writeToNBT(nbt);
+	}
+	
+	@Override
+	public void readFromNBT(NBTTagCompound nbt) {
+		super.readFromNBT(nbt);
+		
+		this.makeLog = nbt.getBoolean("MakeLog");
+		this.i = nbt.getBoolean("I");
+		this.t = nbt.getBoolean("T");
+		
+		this.log = nbt.getString("Log");
+		
+		this.tick = nbt.getInteger("ChangeTick");
+		this.s = nbt.getInteger("ChangeS");
+		this.m = nbt.getInteger("ChangeM");
+		this.allTick = nbt.getInteger("AllTick");
+	}
 }

@@ -24,6 +24,7 @@ public class RegisterModel {
 		MultipleCompressedStuffs.startmodel = System.currentTimeMillis();
 		modelRegisterHelper(MCSItems.ITEMS);
 		modelRegisterHelper(MCSBlocks.BLOCKS);
+		modelRegisterHelper(MCSBlocks.BLOCKS0);
 		for (Item item : MCSItems.ITEMS) {
 			if (item instanceof IHasModel) {
 				((IHasModel) item).registerItemModel();
@@ -35,6 +36,13 @@ public class RegisterModel {
 				((IHasModel) block).registerItemModel();
 			}
 		}
+		
+		for (Block block : MCSBlocks.BLOCKS0) {
+			if (block instanceof cat.jiu.core.api.IHasModel) {
+				((cat.jiu.core.api.IHasModel) block).getItemModel();
+			}
+		}
+		
 		MultipleCompressedStuffs.startmodel = (System.currentTimeMillis() - MultipleCompressedStuffs.startmodel);
 	}
 	
@@ -42,6 +50,12 @@ public class RegisterModel {
 		for (T element : list) {
 			if (element instanceof IHasModel) {
 				((IHasModel) element).registerItemModel();
+			}
+		}
+		
+		for (T element : list) {
+			if (element instanceof cat.jiu.core.api.IHasModel) {
+				((cat.jiu.core.api.IHasModel) element).getItemModel();
 			}
 		}
 	}

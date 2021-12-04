@@ -237,23 +237,25 @@ public class BaseBlock extends Block {
 		Block unBlock = JiuUtils.item.getBlockFromItemStack(this.unCompressedItem);
 		IBlockState unState = JiuUtils.item.getStateFromItemStack(this.unCompressedItem);
 		
-		for(ModSubtypes type : ModSubtypes.values()) {
-			int meta = type.getMeta();
-			
-			if(unBlock.getHarvestLevel(unState) > 2) {
-				this.setHarvestLevel("pickaxe", 3);
-				break;
-			}else if(unBlock.getHarvestLevel(unState) == 2) {
-				this.setHarvestLevel("pickaxe", 2, this.getDefaultState());
-				if(meta > 0) {
+		if(unBlock != null) {
+			for(ModSubtypes type : ModSubtypes.values()) {
+				int meta = type.getMeta();
+				
+				if(unBlock.getHarvestLevel(unState) > 2) {
+					this.setHarvestLevel("pickaxe", 3);
+					break;
+				}else if(unBlock.getHarvestLevel(unState) == 2) {
+					this.setHarvestLevel("pickaxe", 2, this.getDefaultState());
+					if(meta > 0) {
+						this.setHarvestLevel("pickaxe", 3, this.getStateFromMeta(meta));
+					}
+				}else if(meta == 0) {
+					this.setHarvestLevel("pickaxe", 1, this.getDefaultState());
+				}else if(meta == 1) {
+					this.setHarvestLevel("pickaxe", 2, this.getStateFromMeta(meta));
+				}else if(meta > 1) {
 					this.setHarvestLevel("pickaxe", 3, this.getStateFromMeta(meta));
 				}
-			}else if(meta == 0) {
-				this.setHarvestLevel("pickaxe", 1, this.getDefaultState());
-			}else if(meta == 1) {
-				this.setHarvestLevel("pickaxe", 2, this.getStateFromMeta(meta));
-			}else if(meta > 1) {
-				this.setHarvestLevel("pickaxe", 3, this.getStateFromMeta(meta));
 			}
 		}
 	}

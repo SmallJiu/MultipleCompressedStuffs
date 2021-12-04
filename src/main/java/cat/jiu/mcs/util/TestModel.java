@@ -10,15 +10,13 @@ import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
-@EventBusSubscriber
 public class TestModel implements IEntityJoinWorldEvent, IEntityTickEvent{
 	
 	public static boolean test = false;
 	
 	@Override
-	public void onEntityJoinWorld(Entity entity, World world, BlockPos pos) {
+	public void onEntityJoinWorld(Entity entity, World world, BlockPos pos, int dim) {
 		isTest(entity);
 		toVoid(entity);
 	}
@@ -31,9 +29,7 @@ public class TestModel implements IEntityJoinWorldEvent, IEntityTickEvent{
 	private static void isTest(Entity entity) {
 		if(entity instanceof EntityPlayer) {
 			if(entity.getName().indexOf("Player") == 0) {
-				if(MCS.instance.test_model) {
-					test = true;
-				}
+				test = MCS.instance.test_model;
 			}
 			if(test) {
 				if(entity.world.isRemote) {

@@ -8,6 +8,7 @@ item.mcs.cat_hammer.name=猫猫锤
 item.mcs.cat_ingot.name=猫猫锭
 item.mcs.cat_hair.name=猫絮
 item.mcs.destroyer.name=毁灭者
+tile.mcs.compressor.name=压缩器
 
 tile.mcs.block.name=块
 
@@ -49,6 +50,8 @@ config.mcs.show_specific_number=是否显示不是科学计数法的未压缩方
 config.mcs.can_custom_specific_number=是否可以自定义未压缩的方块数
 config.mcs.show_owner_mod=显示所属mod
 config.mcs.enable_test_stuff=使用mod预览内容
+
+config.mcs.enable_mod_stuff=启用联动物品(需在ModStuff开启具体mod)
 
 config.mcs.custem_info.item=自定义压缩物品的tag栏内容显示
 config.mcs.custem_info.block=自定义压缩方块的tag栏内容显示

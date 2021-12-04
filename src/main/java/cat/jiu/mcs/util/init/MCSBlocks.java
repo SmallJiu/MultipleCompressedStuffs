@@ -9,6 +9,7 @@ import com.brandon3055.draconicevolution.DEFeatures;
 import com.valkyrieofnight.et.m_resources.features.ETRBlocks;
 
 import cat.jiu.mcs.MCS;
+import cat.jiu.mcs.blocks.BlockCompressor;
 import cat.jiu.mcs.blocks.BlockTest;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.core.util.JiuUtils;
@@ -18,21 +19,15 @@ import cat.jiu.mcs.util.base.BaseBlockSub;
 import cofh.thermalfoundation.init.TFBlocks;
 import moze_intel.projecte.gameObjs.ObjHandler;
 
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import slimeknights.tconstruct.shared.TinkerCommons;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 import vazkii.botania.common.block.ModFluffBlocks;
 
 @SuppressWarnings("static-access")
-@EventBusSubscriber(modid = MCS.MODID)
 public class MCSBlocks {
 	
 	public static final Map<String, BaseBlock> BLOCKS_MAP = new HashMap<String, BaseBlock>();
@@ -40,11 +35,13 @@ public class MCSBlocks {
 	public static final Map<String, BaseBlockNormal> NORMAL_BLOCKS_MAP = new HashMap<String, BaseBlockNormal>();
 	
 	public static final List<BaseBlock> BLOCKS = new ArrayList<BaseBlock>();
+	public static final List<cat.jiu.core.util.base.BaseBlock.Base> BLOCKS0 = new ArrayList<cat.jiu.core.util.base.BaseBlock.Base>();
 	public static final List<String> BLOCKS_NAME = new ArrayList<String>();
 	public static final List<BaseBlockSub> SUB_BLOCKS = new ArrayList<BaseBlockSub>();
 	public static final List<String> SUB_BLOCKS_NAME = new ArrayList<String>();
 	public static final List<BaseBlockNormal> NORMAL_BLOCKS = new ArrayList<BaseBlockNormal>();
 	
+	public static BlockCompressor COMPRESSOR = new BlockCompressor();
 	public static BaseBlockNormal TEST_BLOCK = null;
 	static {
 		if(MCS.instance.test_model) {
@@ -53,20 +50,31 @@ public class MCSBlocks {
 	}
 	
 	public static final MinecraftBlock minecraft = new MinecraftBlock();
-	public static final ThermalFoundationBlock thermal_foundation = new ThermalFoundationBlock();
-	public static final EnderIOBlock enderio = new EnderIOBlock();
+	public static ThermalFoundationBlock thermal_foundation = null;
+	public static EnderIOBlock enderio = null;
 	public static ProjectEBlock projecte = null;
-	public static final DraconicEvolutionBlock draconic_evolution = new DraconicEvolutionBlock();
+	public static DraconicEvolutionBlock draconic_evolution;
 	public static EnvironmentalTechBlock environmental_tech = null;
-	public static final AvaritiaBlock avaritia = new AvaritiaBlock();
+	public static AvaritiaBlock avaritia = null;
 	public static TconstructBlock tconstruct = null;
 	public static BotaniaBlock botania = null;
 	static {
-		if(Configs.custom.enable_test_stuff) {
-			projecte = new ProjectEBlock();
-			environmental_tech = new EnvironmentalTechBlock();
-			tconstruct = new TconstructBlock();
-			botania = new BotaniaBlock();
+		if(Configs.custom.Enable_Mod_Stuff) {
+			try {
+				thermal_foundation = Configs.custom.ModStuff.ThermalFoundation ? new ThermalFoundationBlock() : null;
+				enderio = Configs.custom.ModStuff.EnderIO ? new EnderIOBlock() : null;
+				draconic_evolution = Configs.custom.ModStuff.DraconicEvolution ? new DraconicEvolutionBlock() : null;
+				avaritia = Configs.custom.ModStuff.Avaritia ? new AvaritiaBlock() : null;
+				projecte = Configs.custom.ModStuff.ProjectE ? new ProjectEBlock() : null;
+				if(Configs.custom.enable_test_stuff) {
+					environmental_tech = Configs.custom.ModStuff.EnvironmentalTech ? new EnvironmentalTechBlock() : null;
+					tconstruct = Configs.custom.ModStuff.Tconstruct ? new TconstructBlock() : null;
+					botania = Configs.custom.ModStuff.Botania ? new BotaniaBlock() : null;
+				}
+			} catch (Exception e) {
+				MCS.instance.log.error("Has a error, this is message: ");
+				MCS.instance.log.error(e.getMessage());
+			}
 		}
 	}
 	
@@ -143,7 +151,7 @@ public class MCSBlocks {
 		public class Has {
 			public final BaseBlockSub C_NETHER_STAR_B		= new BaseBlockSub("compressed_nether_star", new ItemStack(Items.NETHER_STAR));
 			public final BaseBlockSub C_CHAR_COAL_B 		= new BaseBlockSub("compressed_charcoal", new ItemStack(Items.COAL, 1, 1));
-			public final BaseBlockSub C_BLAZE_ROD_B 		= new BaseBlockSub("compressed_blaze_rod", new ItemStack(Items.BLAZE_ROD)).isOreDictCustem();
+			public final BaseBlockSub C_BLAZE_B 			= new BaseBlockSub("compressed_blaze", new ItemStack(Items.BLAZE_ROD));
 			public final BaseBlockSub C_CHORUS_FRUIT_B 		= new BaseBlockSub("compressed_chorus_fruit", new ItemStack(Items.CHORUS_FRUIT));
 			public final BaseBlockSub C_ENDER_PEARL_B 		= new BaseBlockSub("compressed_ender_pearl", new ItemStack(Items.ENDER_PEARL));
 			public final BaseBlockSub C_FLINT_B 			= new BaseBlockSub("compressed_flint", new ItemStack(Items.FLINT));
@@ -361,7 +369,6 @@ public class MCSBlocks {
 			public static BaseBlockSub C_PLADIUM_BLOCK_B = null;
 			public static BaseBlockSub C_IONITE_BLOCK_B = null;
 			
-			
 			static {
 				try {
 					C_AETHIUM_BLOCK_B 	= register("compressed_aethium_block", new ItemStack(Item.getByNameOrId("environmentaltech:aethium")));
@@ -406,9 +413,9 @@ public class MCSBlocks {
 			
 			static {
 				try {
-					C_NEUTRONIUM_BLOCK_B 		= register("compressed_neutronium_block", new ItemStack(blocks.resource));
-					C_INFINITY_BLOCK_B 	 		= register("compressed_infinity_block", new ItemStack(blocks.resource, 1, 1));
-					C_CRYSTAL_MATRIX_BLOCK_B 	= register("compressed_crystal_matrix_block", new ItemStack(blocks.resource, 1, 2));
+					C_NEUTRONIUM_BLOCK_B 		= register("compressed_neutronium_block", new ItemStack(blocks.resource)).setInfoStack(new ItemStack(items.resource, 1, 4));
+					C_INFINITY_BLOCK_B 	 		= register("compressed_infinity_block", new ItemStack(blocks.resource, 1, 1)).setInfoStack(new ItemStack(items.resource, 1, 6));
+					C_CRYSTAL_MATRIX_BLOCK_B 	= register("compressed_crystal_matrix_block", new ItemStack(blocks.resource, 1, 2)).setInfoStack(new ItemStack(items.resource, 1, 1));
 					
 				}catch(Exception e) {}
 			}
@@ -419,7 +426,7 @@ public class MCSBlocks {
 			
 			static {
 				try {
-					C_INFINITY_CATALYST_B = register("compressed_infinity_catalyst", items.infinity_catalyst).setIsOpaqueCube();
+					C_INFINITY_CATALYST_B = register("compressed_infinity_catalyst", items.infinity_catalyst).setIsOpaqueCube().setInfoStack(items.infinity_catalyst);
 					
 				}catch(Exception e) {}
 			}
@@ -549,10 +556,5 @@ public class MCSBlocks {
 		private static BaseBlockSub register(String nameIn, ItemStack unCompressedItem) {
 			return BaseBlockSub.register(nameIn, unCompressedItem, "botania");
 		}
-	}
-	
-	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public static void onBlockRegister(RegistryEvent.Register<Block> event) {
-		event.getRegistry().registerAll(BLOCKS.toArray(new Block[0]));
 	}
 }

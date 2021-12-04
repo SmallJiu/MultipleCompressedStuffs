@@ -42,7 +42,11 @@ public class BaseItemSub extends Item implements IHasModel{
 	
 	public static BaseItemSub register(String name, ItemStack baseItem, String langModId, CreativeTabs tab, boolean hasSubtypes) {
 		if(Loader.isModLoaded(langModId)) {
-			return new BaseItemSub(name, baseItem, langModId, tab, hasSubtypes);
+			if(baseItem != null) {
+				return new BaseItemSub(name, baseItem, langModId, tab, hasSubtypes);
+			}else {
+				return null;
+			}
 		}else {
 			return null;
 		}
@@ -103,6 +107,15 @@ public class BaseItemSub extends Item implements IHasModel{
 	}
 	
 	public String getUnCompressedName() {
+		String[] unNames = JiuUtils.other.custemSplitString(this.name, "_");
+		String i = "";
+		for(String s : unNames) {
+			if(!"compressed".equals(s)) {
+				i += JiuUtils.other.upperCaseToFistLetter(s);
+			}
+		}
+		return i;
+		/*
 		String[] names = JiuUtils.other.custemSplitString(this.name, "_");
 		
 		if(names.length == 4) {
@@ -112,6 +125,7 @@ public class BaseItemSub extends Item implements IHasModel{
 		}else {
 			return JiuUtils.other.upperCaseToFistLetter(names[1]);
 		}
+		*/
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -161,6 +175,13 @@ public class BaseItemSub extends Item implements IHasModel{
 		}else{
 			super.getSubItems(tab, items);
 		}
+	}
+	
+	ItemStack infoStack = null;
+	
+	public BaseItemSub setCustemInformationItemStack(ItemStack stack) {
+		this.infoStack = stack;
+		return this;
 	}
 	
 	@Override
@@ -231,6 +252,7 @@ public class BaseItemSub extends Item implements IHasModel{
 		}
 		
 		if(Configs.tooltip_information.show_burn_time) {
+			tooltip.add("UnCompressedItemBurnTime: " + ForgeEventFactory.getItemBurnTime(this.baseItemStack));
 			tooltip.add("BurnTime: " + ForgeEventFactory.getItemBurnTime(stack));
 		}
 		
@@ -242,6 +264,12 @@ public class BaseItemSub extends Item implements IHasModel{
 		}
 		
 		if(meta == 65535) { tooltip.add("感谢喵呜玖大人的恩惠！"); }
+		
+		if(this.infoStack != null) {
+			this.baseItemStack.getItem().addInformation(this.infoStack, world, tooltip, advanced);
+		}else {
+			this.baseItemStack.getItem().addInformation(this.baseItemStack, world, tooltip, advanced);
+		}
 		
 		if(Configs.tooltip_information.custem_info.item.length != 1) {
 			try {

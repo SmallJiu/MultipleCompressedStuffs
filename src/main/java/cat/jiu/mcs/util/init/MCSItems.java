@@ -8,6 +8,7 @@ import java.util.Map;
 import com.brandon3055.draconicevolution.DEFeatures;
 
 import cat.jiu.mcs.MCS;
+import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.items.*;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.base.BaseItemFood;
@@ -19,13 +20,9 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.Loader;
 
 @SuppressWarnings("static-access")
-@EventBusSubscriber(modid = MCS.MODID)
 public class MCSItems {
 	public static final int UNBREAK = -1;
 	public static final int INT_MAX = Integer.MAX_VALUE;
@@ -46,8 +43,20 @@ public class MCSItems {
 	public static final MCSItems instance = new MCSItems();
 	public static final MCSItem normal = new MCSItem();
 	public static final MinecraftItem minecraft = new MinecraftItem();
-	public static final ThermalFoundationItem thermal_foundation = new ThermalFoundationItem();
-	public static final DraconicEvolutionItems draconic_evolution = new DraconicEvolutionItems();
+	public static ThermalFoundationItem thermal_foundation = null;
+	public static DraconicEvolutionItems draconic_evolution = null;
+	
+	static {
+		if(Configs.custom.Enable_Mod_Stuff) {
+			try {
+				thermal_foundation = Configs.custom.ModStuff.ThermalFoundation ? new ThermalFoundationItem() : null;
+				draconic_evolution = Configs.custom.ModStuff.DraconicEvolution ? new DraconicEvolutionItems() : null;
+			} catch (Exception e) {
+				MCS.instance.log.error("Has a error, this is message: ");
+				MCS.instance.log.error(e.getMessage());
+			}
+		}
+	}
 	
 	public MCSItems() {
 		
@@ -193,65 +202,66 @@ public class MCSItems {
 			
 			static {
 				try {
-					C_DYE_I 				= register("compressed_dye", TFItems.itemDye.dyeWhite);
-					
-					// Crystal 络合物
-					C_CRYSTAL_ENDER_I 		= register("compressed_crystal_ender", TFItems.itemMaterial.crystalEnder);
-					C_CRYSTAL_GLOWSTONE_I 	= register("compressed_crystal_glowstone", TFItems.itemMaterial.crystalGlowstone);
-					C_CRYSTAL_REDSTONE_I 	= register("compressed_crystal_redstone", TFItems.itemMaterial.crystalRedstone);
-					
-					//Rod 棒子
-					C_ROD_BASALZ_I 			= register("compressed_rod_basalz", TFItems.itemMaterial.rodBasalz);
-					C_ROD_BLITZ_I 			= register("compressed_rod_blitz", TFItems.itemMaterial.rodBlitz);
-					C_ROD_BLIZZ_I 			= register("compressed_rod_blizz", TFItems.itemMaterial.rodBlizz);
-					
-					// Plate 板子
-					C_PLATE_ALUMINUM_I 		= register("compressed_plate_aluminum", TFItems.itemMaterial.plateAluminum).setModelMaterial("plate");
-					C_PLATE_BRONZE_I 		= register("compressed_plate_bronze", TFItems.itemMaterial.plateBronze).setModelMaterial("plate");
-					C_PLATE_CONSTANTAN_I 	= register("compressed_plate_constantan", TFItems.itemMaterial.plateConstantan).setModelMaterial("plate");
-					C_PLATE_COPPER_I 		= register("compressed_plate_copper", TFItems.itemMaterial.plateCopper).setModelMaterial("plate");
-					C_PLATE_ELECTRUM_I 		= register("compressed_plate_electrum", TFItems.itemMaterial.plateElectrum).setModelMaterial("plate");
-					C_PLATE_ENDERIUM_I 		= register("compressed_plate_enderium", TFItems.itemMaterial.plateEnderium).setModelMaterial("plate");
-					C_PLATE_GOLD_I 			= register("compressed_plate_gold", TFItems.itemMaterial.plateGold).setModelMaterial("plate");
-					C_PLATE_INVAR_I 		= register("compressed_plate_invar", TFItems.itemMaterial.plateInvar).setModelMaterial("plate");
-					C_PLATE_IRIDIUM_I 		= register("compressed_plate_iridium", TFItems.itemMaterial.plateIridium).setModelMaterial("plate");
-					C_PLATE_IRON_I 			= register("compressed_plate_iron", TFItems.itemMaterial.plateIron).setModelMaterial("plate");
-					C_PLATE_LEAD_I 			= register("compressed_plate_lead", TFItems.itemMaterial.plateLead).setModelMaterial("plate");
-					C_PLATE_LUMIUM_I 		= register("compressed_plate_lumium", TFItems.itemMaterial.plateLumium).setModelMaterial("plate");
-					C_PLATE_MITHRIL_I 		= register("compressed_plate_mithri", TFItems.itemMaterial.plateMithril).setModelMaterial("plate");
-					C_PLATE_NICKL_I 		= register("compressed_plate_nickel", TFItems.itemMaterial.plateNickel).setModelMaterial("plate");
-					C_PLATE_PLATINUM_I 		= register("compressed_plate_platinum", TFItems.itemMaterial.platePlatinum).setModelMaterial("plate");
-					C_PLATE_SIGNALUM_I 		= register("compressed_plate_signalum", TFItems.itemMaterial.plateSignalum).setModelMaterial("plate");
-					C_PLATE_SILVER_I 		= register("compressed_plate_silver", TFItems.itemMaterial.plateSilver).setModelMaterial("plate");
-					C_PLATE_STEEL_I 		= register("compressed_plate_steel", TFItems.itemMaterial.plateSteel).setModelMaterial("plate");
-					C_PLATE_TIN_I 			= register("compressed_plate_tin", TFItems.itemMaterial.plateTin).setModelMaterial("plate");
-					
-					// Gear 齿轮
-					C_GEAR_ALUMINUM_I 		= register("compressed_gear_aluminum", TFItems.itemMaterial.gearAluminum).setModelMaterial("gear");
-					C_GEAR_BRONZE_I 		= register("compressed_gear_bronze", TFItems.itemMaterial.gearBronze).setModelMaterial("gear");
-					C_GEAR_CONSTANTAN_I 	= register("compressed_gear_constantan", TFItems.itemMaterial.gearConstantan).setModelMaterial("gear");
-					C_GEAR_COPPER_I 		= register("compressed_gear_copper", TFItems.itemMaterial.gearCopper).setModelMaterial("gear");
-					C_GEAR_DIAMOND_I 		= register("compressed_gear_diamond", TFItems.itemMaterial.gearDiamond).setModelMaterial("gear");
-					C_GEAR_ELECTRUM_I 		= register("compressed_gear_electrum", TFItems.itemMaterial.gearElectrum).setModelMaterial("gear");
-					C_GEAR_EMERALD_I 		= register("compressed_gear_emerald", TFItems.itemMaterial.gearEmerald).setModelMaterial("gear");
-					C_GEAR_ENDERIUM_I 		= register("compressed_gear_enderium", TFItems.itemMaterial.gearEnderium).setModelMaterial("gear");
-					C_GEAR_GOLD_I 			= register("compressed_gear_gold", TFItems.itemMaterial.gearGold).setModelMaterial("gear");
-					C_GEAR_INVAR_I 			= register("compressed_gear_invar", TFItems.itemMaterial.gearInvar).setModelMaterial("gear");
-					C_GEAR_IRIDIUM_I 		= register("compressed_gear_iridium", TFItems.itemMaterial.gearIridium).setModelMaterial("gear");
-					C_GEAR_IRON_I 			= register("compressed_gear_iron", TFItems.itemMaterial.gearIron).setModelMaterial("gear");
-					C_GEAR_LEAD_I 			= register("compressed_gear_lead", TFItems.itemMaterial.gearLead).setModelMaterial("gear");
-					C_GEAR_LUMIUM_I 		= register("compressed_gear_lumium", TFItems.itemMaterial.gearLumium).setModelMaterial("gear");
-					C_GEAR_MITHRIL_I 		= register("compressed_gear_mithril", TFItems.itemMaterial.gearMithril).setModelMaterial("gear");
-					C_GEAR_NICKEL_I 		= register("compressed_gear_nickel", TFItems.itemMaterial.gearNickel).setModelMaterial("gear");
-					C_GEAR_PLATINUM_I 		= register("compressed_gear_platinum", TFItems.itemMaterial.gearPlatinum).setModelMaterial("gear");
-					C_GEAR_SIGNALUM_I 		= register("compressed_gear_signalum", TFItems.itemMaterial.gearSignalum).setModelMaterial("gear");
-					C_GEAR_SILVER_I 		= register("compressed_gear_silver", TFItems.itemMaterial.gearSilver).setModelMaterial("gear");
-					C_GEAR_STEEL_I 			= register("compressed_gear_steel", TFItems.itemMaterial.gearSteel).setModelMaterial("gear");
-					C_GEAR_STONE_I 			= register("compressed_gear_stone", TFItems.itemMaterial.gearStone).setModelMaterial("gear");
-					C_GEAR_TIN_I 			= register("compressed_gear_tin", TFItems.itemMaterial.gearTin).setModelMaterial("gear");
-					C_GEAR_WOOD_I 			= register("compressed_gear_wood", TFItems.itemMaterial.gearWood).setModelMaterial("gear");
-					
-				} catch (Exception e) {}
+					if(Loader.isModLoaded("thermalfoundation")) {
+						C_DYE_I 				= register("compressed_tf_dye", TFItems.itemDye.dyeWhite);
+						
+						// Crystal 络合物
+						C_CRYSTAL_ENDER_I 		= register("compressed_crystal_ender", TFItems.itemMaterial.crystalEnder);
+						C_CRYSTAL_GLOWSTONE_I 	= register("compressed_crystal_glowstone", TFItems.itemMaterial.crystalGlowstone);
+						C_CRYSTAL_REDSTONE_I 	= register("compressed_crystal_redstone", TFItems.itemMaterial.crystalRedstone);
+						
+						//Rod 棒子
+						C_ROD_BASALZ_I 			= register("compressed_rod_basalz", TFItems.itemMaterial.rodBasalz);
+						C_ROD_BLITZ_I 			= register("compressed_rod_blitz", TFItems.itemMaterial.rodBlitz);
+						C_ROD_BLIZZ_I 			= register("compressed_rod_blizz", TFItems.itemMaterial.rodBlizz);
+						
+						// Plate 板子
+						C_PLATE_ALUMINUM_I 		= register("compressed_plate_aluminum", TFItems.itemMaterial.plateAluminum).setModelMaterial("plate");
+						C_PLATE_BRONZE_I 		= register("compressed_plate_bronze", TFItems.itemMaterial.plateBronze).setModelMaterial("plate");
+						C_PLATE_CONSTANTAN_I 	= register("compressed_plate_constantan", TFItems.itemMaterial.plateConstantan).setModelMaterial("plate");
+						C_PLATE_COPPER_I 		= register("compressed_plate_copper", TFItems.itemMaterial.plateCopper).setModelMaterial("plate");
+						C_PLATE_ELECTRUM_I 		= register("compressed_plate_electrum", TFItems.itemMaterial.plateElectrum).setModelMaterial("plate");
+						C_PLATE_ENDERIUM_I 		= register("compressed_plate_enderium", TFItems.itemMaterial.plateEnderium).setModelMaterial("plate");
+						C_PLATE_GOLD_I 			= register("compressed_plate_gold", TFItems.itemMaterial.plateGold).setModelMaterial("plate");
+						C_PLATE_INVAR_I 		= register("compressed_plate_invar", TFItems.itemMaterial.plateInvar).setModelMaterial("plate");
+						C_PLATE_IRIDIUM_I 		= register("compressed_plate_iridium", TFItems.itemMaterial.plateIridium).setModelMaterial("plate");
+						C_PLATE_IRON_I 			= register("compressed_plate_iron", TFItems.itemMaterial.plateIron).setModelMaterial("plate");
+						C_PLATE_LEAD_I 			= register("compressed_plate_lead", TFItems.itemMaterial.plateLead).setModelMaterial("plate");
+						C_PLATE_LUMIUM_I 		= register("compressed_plate_lumium", TFItems.itemMaterial.plateLumium).setModelMaterial("plate");
+						C_PLATE_MITHRIL_I 		= register("compressed_plate_mithri", TFItems.itemMaterial.plateMithril).setModelMaterial("plate");
+						C_PLATE_NICKL_I 		= register("compressed_plate_nickel", TFItems.itemMaterial.plateNickel).setModelMaterial("plate");
+						C_PLATE_PLATINUM_I 		= register("compressed_plate_platinum", TFItems.itemMaterial.platePlatinum).setModelMaterial("plate");
+						C_PLATE_SIGNALUM_I 		= register("compressed_plate_signalum", TFItems.itemMaterial.plateSignalum).setModelMaterial("plate");
+						C_PLATE_SILVER_I 		= register("compressed_plate_silver", TFItems.itemMaterial.plateSilver).setModelMaterial("plate");
+						C_PLATE_STEEL_I 		= register("compressed_plate_steel", TFItems.itemMaterial.plateSteel).setModelMaterial("plate");
+						C_PLATE_TIN_I 			= register("compressed_plate_tin", TFItems.itemMaterial.plateTin).setModelMaterial("plate");
+						
+						// Gear 齿轮
+						C_GEAR_ALUMINUM_I 		= register("compressed_gear_aluminum", TFItems.itemMaterial.gearAluminum).setModelMaterial("gear");
+						C_GEAR_BRONZE_I 		= register("compressed_gear_bronze", TFItems.itemMaterial.gearBronze).setModelMaterial("gear");
+						C_GEAR_CONSTANTAN_I 	= register("compressed_gear_constantan", TFItems.itemMaterial.gearConstantan).setModelMaterial("gear");
+						C_GEAR_COPPER_I 		= register("compressed_gear_copper", TFItems.itemMaterial.gearCopper).setModelMaterial("gear");
+						C_GEAR_DIAMOND_I 		= register("compressed_gear_diamond", TFItems.itemMaterial.gearDiamond).setModelMaterial("gear");
+						C_GEAR_ELECTRUM_I 		= register("compressed_gear_electrum", TFItems.itemMaterial.gearElectrum).setModelMaterial("gear");
+						C_GEAR_EMERALD_I 		= register("compressed_gear_emerald", TFItems.itemMaterial.gearEmerald).setModelMaterial("gear");
+						C_GEAR_ENDERIUM_I 		= register("compressed_gear_enderium", TFItems.itemMaterial.gearEnderium).setModelMaterial("gear");
+						C_GEAR_GOLD_I 			= register("compressed_gear_gold", TFItems.itemMaterial.gearGold).setModelMaterial("gear");
+						C_GEAR_INVAR_I 			= register("compressed_gear_invar", TFItems.itemMaterial.gearInvar).setModelMaterial("gear");
+						C_GEAR_IRIDIUM_I 		= register("compressed_gear_iridium", TFItems.itemMaterial.gearIridium).setModelMaterial("gear");
+						C_GEAR_IRON_I 			= register("compressed_gear_iron", TFItems.itemMaterial.gearIron).setModelMaterial("gear");
+						C_GEAR_LEAD_I 			= register("compressed_gear_lead", TFItems.itemMaterial.gearLead).setModelMaterial("gear");
+						C_GEAR_LUMIUM_I 		= register("compressed_gear_lumium", TFItems.itemMaterial.gearLumium).setModelMaterial("gear");
+						C_GEAR_MITHRIL_I 		= register("compressed_gear_mithril", TFItems.itemMaterial.gearMithril).setModelMaterial("gear");
+						C_GEAR_NICKEL_I 		= register("compressed_gear_nickel", TFItems.itemMaterial.gearNickel).setModelMaterial("gear");
+						C_GEAR_PLATINUM_I 		= register("compressed_gear_platinum", TFItems.itemMaterial.gearPlatinum).setModelMaterial("gear");
+						C_GEAR_SIGNALUM_I 		= register("compressed_gear_signalum", TFItems.itemMaterial.gearSignalum).setModelMaterial("gear");
+						C_GEAR_SILVER_I 		= register("compressed_gear_silver", TFItems.itemMaterial.gearSilver).setModelMaterial("gear");
+						C_GEAR_STEEL_I 			= register("compressed_gear_steel", TFItems.itemMaterial.gearSteel).setModelMaterial("gear");
+						C_GEAR_STONE_I 			= register("compressed_gear_stone", TFItems.itemMaterial.gearStone).setModelMaterial("gear");
+						C_GEAR_TIN_I 			= register("compressed_gear_tin", TFItems.itemMaterial.gearTin).setModelMaterial("gear");
+						C_GEAR_WOOD_I 			= register("compressed_gear_wood", TFItems.itemMaterial.gearWood).setModelMaterial("gear");
+					}
+				}catch (Throwable e) {e.fillInStackTrace();}
 			}
 		}
 		
@@ -278,18 +288,19 @@ public class MCSItems {
 			
 			static {
 				try {
-					C_CORE_DRACONIC_I 			= register("compressed_core_draconic", new ItemStack(DEFeatures.draconicCore));
-					C_CORE_WYVERN_I 			= register("compressed_core_wyvern", new ItemStack(DEFeatures.wyvernCore));
-					C_CORE_AWAKENED_I 			= register("compressed_core_awakened", new ItemStack(DEFeatures.awakenedCore));
-					C_CORE_CHAOTIC_I 			= register("compressed_core_chaotic", new ItemStack(DEFeatures.chaoticCore));
-					
-					C_CORE_ENERGY_WYVERN_I 		= register("compressed_energy_core_wyvern", new ItemStack(DEFeatures.wyvernEnergyCore));
-					C_CORE_ENERGY_AWAKENED_I 	= register("compressed_energy_core_awakened", new ItemStack(DEFeatures.draconicEnergyCore));
-					
-					C_CHAOS_SHARD_I 			= register("compressed_chaos_shard", new ItemStack(DEFeatures.chaosShard));
-					C_DRAGON_HEART_I			= register("compressed_dragon_heart", new ItemStack(DEFeatures.dragonHeart));
-					
-				}catch(Exception e) {}
+					if(Loader.isModLoaded("draconicevolution")) {
+						C_CORE_DRACONIC_I 			= register("compressed_core_draconic", new ItemStack(DEFeatures.draconicCore));
+						C_CORE_WYVERN_I 			= register("compressed_core_wyvern", new ItemStack(DEFeatures.wyvernCore));
+						C_CORE_AWAKENED_I 			= register("compressed_core_awakened", new ItemStack(DEFeatures.awakenedCore));
+						C_CORE_CHAOTIC_I 			= register("compressed_core_chaotic", new ItemStack(DEFeatures.chaoticCore));
+						
+						C_CORE_ENERGY_WYVERN_I 		= register("compressed_energy_core_wyvern", new ItemStack(DEFeatures.wyvernEnergyCore));
+						C_CORE_ENERGY_AWAKENED_I 	= register("compressed_energy_core_awakened", new ItemStack(DEFeatures.draconicEnergyCore));
+						
+						C_CHAOS_SHARD_I 			= register("compressed_chaos_shard", new ItemStack(DEFeatures.chaosShard));
+						C_DRAGON_HEART_I			= register("compressed_dragon_heart", new ItemStack(DEFeatures.dragonHeart));
+					}
+				} catch (Throwable e) {e.fillInStackTrace();}
 			}
 		}
 		
@@ -314,11 +325,5 @@ public class MCSItems {
 		public final BaseItemNormal CAT_INGOT 			= new BaseItemNormal("cat_ingot", MCS.COMPERESSED_ITEMS);
 		public final BaseItemNormal CAT_HAMMER 			= new ItemCatHammer("cat_hammer", MCS.COMPERESSED_ITEMS);
 		public final BaseItemNormal DESTROYER			= new ItemDestroyer("destroyer", MCS.COMPERESSED_ITEMS);
-	}
-	
-	// 创建/注册所有在ModItems(物品集合)里的物品对象
-	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public static void onItemRegister(RegistryEvent.Register<Item> event) {
-		event.getRegistry().registerAll(ITEMS.toArray(new Item[0]));
 	}
 }

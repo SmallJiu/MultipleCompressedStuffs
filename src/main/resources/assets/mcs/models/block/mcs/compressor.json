@@ -1,0 +1,9 @@
+{
+  "parent": "block/orientable",
+  "textures": {
+    "top": "mcs:blocks/compressor_top",
+    "front": "mcs:blocks/compressor_side",
+    "side": "mcs:blocks/compressor_side",
+    "down": "mcs:blocks/compressor_down"
+  }
+}

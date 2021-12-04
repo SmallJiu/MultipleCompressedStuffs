@@ -3,7 +3,7 @@ package cat.jiu.mcs.config;
 import java.util.Collections;
 import java.util.Set;
 
-import cat.jiu.mcs.MultipleCompressedStuffs;
+import cat.jiu.mcs.MCS;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.config.ConfigElement;
@@ -22,7 +22,7 @@ public class ConfigGuiFactory implements IModGuiFactory{
 
 	@Override
 	public GuiScreen createConfigGui(GuiScreen parent) {
-		return new GuiConfig(parent, ConfigElement.from(Configs.class).getChildElements(), MultipleCompressedStuffs.MODID, false, false, "MultipleCompressedStuffs");
+		return new GuiConfig(parent, ConfigElement.from(Configs.class).getChildElements(), MCS.MODID, false, false, "MultipleCompressedStuffs");
 	}
 
 	@Override

@@ -2,7 +2,7 @@ package cat.jiu.mcs.util.init;
 
 import java.util.Random;
 
-import cat.jiu.mcs.MultipleCompressedStuffs;
+import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.config.Configs;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
@@ -18,7 +18,7 @@ public class CreativeTabCompressedStuffsItems extends CreativeTabs{
 	@Override
 	public ResourceLocation getBackgroundImage() {
 		if(Configs.tooltip_information.can_custom_creative_tab_background) {
-			return new ResourceLocation(MultipleCompressedStuffs.MODID + ":textures/gui/container/creative_inventory/tab_items.png");
+			return new ResourceLocation(MCS.MODID + ":textures/gui/container/creative_inventory/tab_items.png");
 		}else {
 			return super.getBackgroundImage();
 		}
