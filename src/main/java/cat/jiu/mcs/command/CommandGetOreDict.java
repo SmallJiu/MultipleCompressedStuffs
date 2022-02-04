@@ -1,3 +1,5 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
 package cat.jiu.mcs.command;
 import java.util.List;
 
@@ -8,13 +10,14 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextComponentKeybind;
 
 public class CommandGetOreDict extends BaseCommand.CommandNormal {
 
 	public CommandGetOreDict(String name, boolean checkPermission, int level) {
 		super(name, checkPermission, level);
 	}
-
+	
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(sender.getCommandSenderEntity() instanceof EntityPlayer) {
@@ -23,15 +26,15 @@ public class CommandGetOreDict extends BaseCommand.CommandNormal {
 			
 			if(!heldItem.isEmpty()) {
 				List<String> ores = JiuUtils.item.getOreDict(heldItem);
-
+				
 				if(!ores.isEmpty()) {
-					JiuUtils.entity.sendMessage(sender, "OreDict Entries:");
-					JiuUtils.entity.sendMessage(sender, " " + heldItem.getItem().getRegistryName() + "@" + heldItem.getItemDamage() + ":");
+					player.sendMessage(new TextComponentKeybind("OreDict Entries:"));
+					player.sendMessage(new TextComponentKeybind(" " + heldItem.getItem().getRegistryName() + "@" + heldItem.getItemDamage() + ":"));
 					for(String ore : ores) {
-						JiuUtils.entity.sendMessage(sender, "  - <ore:" + ore + ">");
+						player.sendMessage(new TextComponentKeybind("  - <ore:" + ore + ">"));
 					}
 				} else {
-					JiuUtils.entity.sendMessage(sender, "No OreDict Entries");
+					player.sendMessage(new TextComponentKeybind("No OreDict Entries"));
 				}
 			}
 		}

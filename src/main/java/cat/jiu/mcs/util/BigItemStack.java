@@ -1,3 +1,5 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
 package cat.jiu.mcs.util;
 
 import java.math.BigInteger;
@@ -16,8 +18,7 @@ public class BigItemStack {
 	private NBTTagCompound nbt;
 
 	public BigItemStack(ItemStack stack) {
-		this(stack.getItem(), new BigInteger(Integer.toString(stack.getCount())), stack.getMetadata(),
-				stack.getTagCompound());
+		this(stack.getItem(), new BigInteger(Integer.toString(stack.getCount())), stack.getMetadata(), stack.getTagCompound());
 	}
 
 	public BigItemStack(Block block, long amout) {

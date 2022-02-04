@@ -1,14 +1,17 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
 package cat.jiu.mcs.command;
 
 import cat.jiu.mcs.blocks.BlockTest;
-import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.base.BaseBlockSub;
 import cat.jiu.mcs.util.base.BaseCommand;
 import cat.jiu.mcs.util.init.MCSBlocks;
+
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextComponentKeybind;
 
 public class CommandGetMCSBlocks extends BaseCommand.CommandNormal {
 	public CommandGetMCSBlocks(String name, boolean checkPermission, int level) {
@@ -20,18 +23,18 @@ public class CommandGetMCSBlocks extends BaseCommand.CommandNormal {
 		for(BaseBlockSub sub_block : MCSBlocks.SUB_BLOCKS) {
 			for(Block normal_block : MCSBlocks.NORMAL_BLOCKS) {
 				if(!(normal_block instanceof BlockTest)) {
-					JiuUtils.entity.sendMessage(sender, normal_block.getLocalizedName());
+					sender.sendMessage(new TextComponentKeybind(normal_block.getLocalizedName()));
 				}
 			}
-			JiuUtils.entity.sendMessage(sender, sub_block.getLocalizedName());
+			sender.sendMessage(new TextComponentKeybind(sub_block.getLocalizedName()));
 		}
 		
 		long regBlocks = 0L;
 		
 		for(int i = 0; i < MCSBlocks.SUB_BLOCKS.size(); ++i) {
-			regBlocks = ((i + 1) * 16) + regBlocks;
+			regBlocks += ((i + 1) * 16);
 		}
 		
-		JiuUtils.entity.sendMessage(sender, "Has " + regBlocks + " Register Compressed");
+		sender.sendMessage(new TextComponentKeybind("Has " + regBlocks + " Register Compressed"));
 	}
 }

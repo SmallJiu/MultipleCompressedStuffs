@@ -1,7 +1,7 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
 package cat.jiu.mcs.util.base;
 
-import cat.jiu.mcs.MCS;
-import cat.jiu.core.util.JiuUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Items;
@@ -38,7 +38,7 @@ public class BaseBlockItem extends ItemBlock {
 	@SideOnly(Side.CLIENT)
 	@Override
 	public String getItemStackDisplayName(ItemStack stack) {
-		if(this.unCompressedItem.equals(new ItemStack(Items.AIR))) {
+		if(this.unCompressedItem.getItem() == Items.AIR) {
 			return super.getItemStackDisplayName(stack);
 		}else {
 			if(this.getBlock() instanceof BaseBlockNormal) {
@@ -57,16 +57,10 @@ public class BaseBlockItem extends ItemBlock {
 	
 	@SideOnly(Side.CLIENT)
 	public String getUnCompressedItemLocalizedName() {
-		if(!this.unCompressedItem.equals(new ItemStack(Items.AIR))) {
-			String itemmodid = this.unCompressedItem.getItem().getCreatorModId(this.unCompressedItem);
-			
-			if(JiuUtils.other.containKey(MCS.other_mod, itemmodid)) {
-				return I18n.format(this.unCompressedItem.getUnlocalizedName() + ".name", 1).trim();
-			}else {
-				return I18n.format(this.unCompressedItem.getUnlocalizedName(), 1).trim();
-			}
+		if(!(this.unCompressedItem.getItem() == Items.AIR)) {
+			return this.unCompressedItem.getDisplayName();
 		}else {
-			return "\'Unknown Item\'";
+			return "<Unknown Item>";
 		}
 	}
 }

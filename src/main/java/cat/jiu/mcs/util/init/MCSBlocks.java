@@ -1,35 +1,61 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
 package cat.jiu.mcs.util.init;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.brandon3055.draconicevolution.DEFeatures;
-import com.valkyrieofnight.et.m_resources.features.ETRBlocks;
+
+import com.google.common.collect.Maps;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.BlockCompressor;
+import cat.jiu.mcs.blocks.BlockCreativeEnergy;
 import cat.jiu.mcs.blocks.BlockTest;
+import cat.jiu.mcs.blocks.compressed.*;
 import cat.jiu.mcs.config.Configs;
+import cat.jiu.mcs.exception.JsonException;
+import cat.jiu.mcs.exception.NonItemException;
+import cat.jiu.mcs.exception.UnknownTypeException;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.base.BaseBlock;
 import cat.jiu.mcs.util.base.BaseBlockNormal;
 import cat.jiu.mcs.util.base.BaseBlockSub;
+import cat.jiu.mcs.util.base.BaseBlockSub.HarvestType;
+import cat.jiu.mcs.util.type.ChangeBlockType;
+import cat.jiu.mcs.util.type.CustomType;
+
 import cofh.thermalfoundation.init.TFBlocks;
+
 import moze_intel.projecte.gameObjs.ObjHandler;
 
+import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+
+import net.minecraftforge.fml.common.Loader;
+
 import slimeknights.tconstruct.shared.TinkerCommons;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
+
 import vazkii.botania.common.block.ModFluffBlocks;
 
 @SuppressWarnings("static-access")
 public class MCSBlocks {
-	
 	public static final Map<String, BaseBlock> BLOCKS_MAP = new HashMap<String, BaseBlock>();
 	public static final Map<String, BaseBlockSub> SUB_BLOCKS_MAP = new HashMap<String, BaseBlockSub>();
 	public static final Map<String, BaseBlockNormal> NORMAL_BLOCKS_MAP = new HashMap<String, BaseBlockNormal>();
@@ -42,6 +68,8 @@ public class MCSBlocks {
 	public static final List<BaseBlockNormal> NORMAL_BLOCKS = new ArrayList<BaseBlockNormal>();
 	
 	public static BlockCompressor COMPRESSOR = new BlockCompressor();
+	public static BlockCreativeEnergy CREATIVE_ENERGY = new BlockCreativeEnergy();
+	public static final BaseBlockSub C_CREATIVE_ENERGY_B	= new CompressedCreativeEnergy("compressed_creative_energy", new ItemStack(CREATIVE_ENERGY));
 	public static BaseBlockNormal TEST_BLOCK = null;
 	static {
 		if(MCS.instance.test_model) {
@@ -59,17 +87,18 @@ public class MCSBlocks {
 	public static TconstructBlock tconstruct = null;
 	public static BotaniaBlock botania = null;
 	static {
-		if(Configs.custom.Enable_Mod_Stuff) {
+		if(Configs.Custom.Enable_Mod_Stuff) {
 			try {
-				thermal_foundation = Configs.custom.ModStuff.ThermalFoundation ? new ThermalFoundationBlock() : null;
-				enderio = Configs.custom.ModStuff.EnderIO ? new EnderIOBlock() : null;
-				draconic_evolution = Configs.custom.ModStuff.DraconicEvolution ? new DraconicEvolutionBlock() : null;
-				avaritia = Configs.custom.ModStuff.Avaritia ? new AvaritiaBlock() : null;
-				projecte = Configs.custom.ModStuff.ProjectE ? new ProjectEBlock() : null;
-				if(Configs.custom.enable_test_stuff) {
-					environmental_tech = Configs.custom.ModStuff.EnvironmentalTech ? new EnvironmentalTechBlock() : null;
-					tconstruct = Configs.custom.ModStuff.Tconstruct ? new TconstructBlock() : null;
-					botania = Configs.custom.ModStuff.Botania ? new BotaniaBlock() : null;
+				thermal_foundation = Configs.Custom.ModStuff.ThermalFoundation ? new ThermalFoundationBlock() : null;
+				draconic_evolution = Configs.Custom.ModStuff.DraconicEvolution ? new DraconicEvolutionBlock() : null;
+				avaritia = Configs.Custom.ModStuff.Avaritia ? new AvaritiaBlock() : null;
+				
+				if(Configs.Custom.Enable_Test_Stuff) {
+					enderio = Configs.Custom.ModStuff.EnderIO ? new EnderIOBlock() : null;
+					projecte = Configs.Custom.ModStuff.ProjectE ? new ProjectEBlock() : null;
+					environmental_tech = Configs.Custom.ModStuff.EnvironmentalTech ? new EnvironmentalTechBlock() : null;
+					tconstruct = Configs.Custom.ModStuff.Tconstruct ? new TconstructBlock() : null;
+					botania = Configs.Custom.ModStuff.Botania ? new BotaniaBlock() : null;
 				}
 			} catch (Exception e) {
 				MCS.instance.log.error("Has a error, this is message: ");
@@ -81,8 +110,6 @@ public class MCSBlocks {
 	public MCSBlocks() {
 		
 	}
-	
-	public static final MCSBlocks instance = new MCSBlocks();
 	
 	public static final void registerOreDict() {
 		for(BaseBlockSub block : SUB_BLOCKS) {
@@ -103,7 +130,7 @@ public class MCSBlocks {
 			public final BaseBlockSub C_GLOW_STONE_B 		= new BaseBlockSub("compressed_glowstone_block", new ItemStack(Blocks.GLOWSTONE));
 			public final BaseBlockSub C_GOLD_B 				= new BaseBlockSub("compressed_gold_block", new ItemStack(Blocks.GOLD_BLOCK));
 			public final BaseBlockSub C_GRAVEL_B 			= new BaseBlockSub("compressed_gravel_block", new ItemStack(Blocks.GRAVEL));
-			public final BaseBlockSub C_ICE_B 				= new BaseBlockSub("compressed_ice_block", new ItemStack(Blocks.ICE)).setIsOpaqueCube();
+			public final BaseBlockSub C_ICE_B 				= new BaseBlockSub("compressed_ice_block", new ItemStack(Blocks.ICE)).setIsTransparentCube();
 			public final BaseBlockSub C_IRON_B 				= new BaseBlockSub("compressed_iron_block", new ItemStack(Blocks.IRON_BLOCK));
 			public final BaseBlockSub C_MELON_B 			= new BaseBlockSub("compressed_melon_block", new ItemStack(Blocks.MELON_BLOCK));
 			public final BaseBlockSub C_MAGMA_B 			= new BaseBlockSub("compressed_magma_block", new ItemStack(Blocks.MAGMA));
@@ -118,13 +145,11 @@ public class MCSBlocks {
 			public final BaseBlockSub C_RED_MUSHROOM_B 		= new BaseBlockSub("compressed_red_mushroom_block", new ItemStack(Blocks.RED_MUSHROOM));
 			public final BaseBlockSub C_BROWN_MUSHROOM_B 	= new BaseBlockSub("compressed_brown_mushroom_block", new ItemStack(Blocks.BROWN_MUSHROOM));
 			public final BaseBlockSub C_PRISMARINE_B	 	= new BaseBlockSub("compressed_prismarine_block", new ItemStack(Blocks.PRISMARINE));
-			public final BaseBlockSub C_TNT_B 				= new BaseBlockSub("compressed_tnt_block", new ItemStack(Blocks.TNT));
 			public final BaseBlockSub C_BRICK_BLOCK_B 		= new BaseBlockSub("compressed_brick_block", new ItemStack(Blocks.BRICK_BLOCK));
 			public final BaseBlockSub C_SOUL_SAND_B 		= new BaseBlockSub("compressed_soul_sand_block", new ItemStack(Blocks.SOUL_SAND));
 			public final BaseBlockSub C_STONE_BRICK_B 		= new BaseBlockSub("compressed_stone_brick_block", new ItemStack(Blocks.STONEBRICK));
 			public final BaseBlockSub C_CLAY_B 				= new BaseBlockSub("compressed_clay_block", new ItemStack(Blocks.CLAY));
 			public final BaseBlockSub C_PURPUR_BLOCK_B 		= new BaseBlockSub("compressed_purpur_block", new ItemStack(Blocks.PURPUR_BLOCK));
-			public final BaseBlockSub C_SLIME_BLOCK_B 		= new BaseBlockSub("compressed_slime_block", new ItemStack(Blocks.SLIME_BLOCK));
 			public final BaseBlockSub C_CONCRETE_POWDER_B 	= new BaseBlockSub("compressed_concrete_powder_block", new ItemStack(Blocks.CONCRETE_POWDER));
 			public final BaseBlockSub C_CONCRETE_B 			= new BaseBlockSub("compressed_concrete_block", new ItemStack(Blocks.CONCRETE));
 			public final BaseBlockSub C_HARDENED_CLAY_B 	= new BaseBlockSub("compressed_hardened_clay_block", new ItemStack(Blocks.HARDENED_CLAY));
@@ -136,16 +161,17 @@ public class MCSBlocks {
 			public final BaseBlockSub C_PLANKS_B 			= new BaseBlockSub("compressed_planks_block", new ItemStack(Blocks.PLANKS));
 			public final BaseBlockSub C_LOG_B 				= new BaseBlockSub("compressed_log_block", new ItemStack(Blocks.LOG));
 			public final BaseBlockSub C_OBSIDIAN_B 			= new BaseBlockSub("compressed_obsidian_block", new ItemStack(Blocks.OBSIDIAN));
+			public final BaseBlockSub C_LAPIS_B 			= new BaseBlockSub("compressed_lapis_block", new ItemStack(Blocks.LAPIS_BLOCK));
 			
 			public final BaseBlockSub C_BEDROCK_B	 		= new BaseBlockSub("compressed_bedrock_block", new ItemStack(Blocks.BEDROCK))
-					.canChangeBlock(true, false)
-					.setChangeBlock(7, new ItemStack(Blocks.COMMAND_BLOCK), 0, 0, 30);
+					.addChangeBlock(7, new int[] {0, 0, 30}, true, new ItemStack(Blocks.COMMAND_BLOCK));
 			public final BaseBlockSub C_COAL_B 	 			= new BaseBlockSub("compressed_coal_block",new ItemStack(Blocks.COAL_BLOCK))
-					.canChangeBlock(true, false)
-					.setChangeBlock(7, new ItemStack(C_DIAMOND_B, 1, 6), 0, 0, 10);
+					.addChangeBlock(7, new int[] {0, 0, 10}, true, new ItemStack(C_DIAMOND_B, 1, 6));
 			public final BaseBlockSub C_COBBLE_STONE_B 		= new BaseBlockSub("compressed_cobblestone_block", new ItemStack(Blocks.COBBLESTONE))
-					.canChangeBlock(true, true)
-					.setChangeBlock(15, new ItemStack(C_DIAMOND_B, 1, 8), 0, 20, 0);
+					.addChangeBlock(15, new int[] {0, 20, 0}, true, new ItemStack(C_BEDROCK_B, 1, 6));
+			
+			public final BaseBlockSub C_SLIME_BLOCK_B 		= new CompressedSlimeBlock("compressed_slime_block", new ItemStack(Blocks.SLIME_BLOCK));
+			public final BaseBlockSub C_TNT_B 				= new CompressedTNT("compressed_tnt_block", new ItemStack(Blocks.TNT));
 		}
 		
 		public class Has {
@@ -191,7 +217,7 @@ public class MCSBlocks {
 			static {
 				try {
 					C_ROCKWOOL_B	= register("compressed_rockwool_block", TFBlocks.blockRockwool.rockwoolWhite);
-				C_HARDENED_GLASS_B	= (BaseBlockSub) register("compressed_hardened_glass_block", TFBlocks.blockGlass.glassLead).canUseWrenchBreak(true);
+				C_HARDENED_GLASS_B	= ((BaseBlockSub) register("compressed_hardened_glass_block", TFBlocks.blockGlass.glassLead).canUseWrenchBreak(true)).setIsTransparentCube();
 					C_FUEL_COKE_B	= register("compressed_fuel_coke_block", TFBlocks.blockStorageResource.blockCoke);
 					
 					C_ALUMINUM_B	= register("compressed_aluminum_block", TFBlocks.blockStorage.blockAluminum);
@@ -329,12 +355,14 @@ public class MCSBlocks {
 			public static BaseBlockSub C_DRACONIUM_BLOCK_B = null;
 			public static BaseBlockSub C_DRACONIC_BLOCK_B = null;
 			public static BaseBlockSub C_INFUSED_OBSIDIAN_BLOCK_B = null;
+			public static BaseBlockSub C_CREATIVE_RF_SOURCE_B = null;
 			
 			static {
 				try {
 					C_DRACONIUM_BLOCK_B 		= register("compressed_draconium_block", new ItemStack(DEFeatures.draconiumBlock, 1, 0));
 					C_DRACONIC_BLOCK_B 			= register("compressed_draconic_block", new ItemStack(DEFeatures.draconicBlock));
 					C_INFUSED_OBSIDIAN_BLOCK_B 	= register("compressed_infused_obsidian_block", new ItemStack(DEFeatures.infusedObsidian));
+					C_CREATIVE_RF_SOURCE_B 		= Loader.isModLoaded("draconicevolution") ? new CompressedCreativeRFSource("compressed_creative_rf_source", new ItemStack(DEFeatures.creativeRFSource)) : null;
 					
 				}catch(Exception e) {}
 			}
@@ -360,6 +388,19 @@ public class MCSBlocks {
 		public final Normal normal = new Normal();
 		public final Has has = new Has();
 		
+
+		public static class Has {
+			
+			
+			static {
+				try {
+					
+					
+				}catch(Exception e) {}
+			}
+		}
+		
+		
 		public static class Normal {
 			public static BaseBlockSub C_AETHIUM_BLOCK_B = null;
 			public static BaseBlockSub C_MICA_BLOCK_B = null;
@@ -371,28 +412,24 @@ public class MCSBlocks {
 			
 			static {
 				try {
-					C_AETHIUM_BLOCK_B 	= register("compressed_aethium_block", new ItemStack(Item.getByNameOrId("environmentaltech:aethium")));
-					C_MICA_BLOCK_B 		= register("compressed_mica_block", new ItemStack(ETRBlocks.MICA));
-					C_LITHERITE_BLOCK_B = register("compressed_litherite_block", new ItemStack(ETRBlocks.LITHERITE_BLOCK));
-					C_ERODIUM_BLOCK_B 	= register("compressed_erodium_block", new ItemStack(ETRBlocks.ERODIUM_BLOCK));
-					C_KYRONITE_BLOCK_B 	= register("compressed_kyronite_block", new ItemStack(ETRBlocks.KYRONITE_BLOCK));
-					C_PLADIUM_BLOCK_B 	= register("compressed_pladium_block", new ItemStack(ETRBlocks.PLADIUM_BLOCK));
-					C_IONITE_BLOCK_B 	= register("compressed_ionite_block", new ItemStack(ETRBlocks.IONITE_BLOCK));
-					
+					C_AETHIUM_BLOCK_B 	= register("compressed_aethium_block", "environmentaltech:aethium");
+					C_MICA_BLOCK_B 		= register("compressed_mica_block", "environmentaltech:mica");
+					C_LITHERITE_BLOCK_B = register("compressed_litherite_block", "environmentaltech:litherite");
+					C_ERODIUM_BLOCK_B 	= register("compressed_erodium_block", "environmentaltech:erodium");
+					C_KYRONITE_BLOCK_B 	= register("compressed_kyronite_block", "environmentaltech:kyronite");
+					C_PLADIUM_BLOCK_B 	= register("compressed_pladium_block", "environmentaltech:pladium");
+					C_IONITE_BLOCK_B 	= register("compressed_ionite_block", "environmentaltech:ionite");
 					
 				}catch(Exception e) {}
 			}
 		}
 		
-		public static class Has {
-			
-			
-			static {
-				try {
-					
-					
-				}catch(Exception e) {}
-			}
+		private static BaseBlockSub register(String nameIn, String unCompressedItem) {
+			return register(nameIn, unCompressedItem, 0);
+		}
+		
+		private static BaseBlockSub register(String nameIn, String unCompressedItem, int meta) {
+			return register(nameIn, new ItemStack(Block.getBlockFromName(unCompressedItem), 1, meta));
 		}
 		
 		private static BaseBlockSub register(String nameIn, ItemStack unCompressedItem) {
@@ -426,7 +463,7 @@ public class MCSBlocks {
 			
 			static {
 				try {
-					C_INFINITY_CATALYST_B = register("compressed_infinity_catalyst", items.infinity_catalyst).setIsOpaqueCube().setInfoStack(items.infinity_catalyst);
+					C_INFINITY_CATALYST_B = register("compressed_infinity_catalyst", items.infinity_catalyst).setIsTransparentCube().setInfoStack(items.infinity_catalyst);
 					
 				}catch(Exception e) {}
 			}
@@ -556,5 +593,187 @@ public class MCSBlocks {
 		private static BaseBlockSub register(String nameIn, ItemStack unCompressedItem) {
 			return BaseBlockSub.register(nameIn, unCompressedItem, "botania");
 		}
+	}
+	
+	public static void registerCustom() {
+		File config = new File("./config/jiu/mcs/custom.json");
+		if(config.exists()) {
+			try {
+				JsonObject file = new JsonParser().parse(new FileReader(config)).getAsJsonObject();
+				
+				for(Map.Entry<String, JsonElement> fileObject : file.entrySet()) {
+					JsonArray mainArray = fileObject.getValue().getAsJsonArray();// 主清�?
+					for(int i = 0; i < mainArray.size(); ++i) {
+						JsonObject subObject = mainArray.get(i).getAsJsonObject();//子清�?
+						
+						String type_tmp = subObject.get("type").getAsString();
+						String[] main_type = type_tmp.indexOf(":") != -1 ? JiuUtils.other.custemSplitString(type_tmp, ":") : new String[]{type_tmp};
+						
+						CustomType type = CustomType.getType(main_type);
+						if(type == CustomType.UNKNOWN) {
+							String crashMsg = "\n\ncustom.json -> nunknown type: \n -> " + fileObject.getKey() + ": \n  -> (" + i + "):\n   -> \"type\": \"" + type_tmp + "\"\n";
+//							MCS.proxy.makeCrashReport(crashMsg, new UnknownTypeException("nunknown type"));
+							throw new UnknownTypeException(crashMsg);
+						}else if(type == CustomType.BLOCK) {
+							JsonArray entries = subObject.get("entries").getAsJsonArray();// 方块清单
+							for(int m = 0; m < entries.size(); ++m) {
+								JsonObject blockObject = entries.get(m).getAsJsonObject();
+								
+								String name = blockObject.get("id").getAsString();
+								ItemStack unItem = InitChangeBlock.getStack(blockObject.get("unItem").getAsString());
+								if(unItem == null || unItem.getItem() == Items.AIR || unItem == ItemStack.EMPTY) {
+									String crashMsg = "\n\ncustom.json -> unknown item:\n -> " + fileObject.getKey() + ":\n  -> (" + i + "): \n   -> \"unItem\": \"" + blockObject.get("unItem").getAsString() + "\"\n";
+//									MCS.proxy.makeCrashReport(crashMsg, new NonItemException("unknown item"));
+									throw new NonItemException(crashMsg);
+								}
+//								CreativeTabs tab = getTab(blockObject);
+								CreativeTabs tab = MCS.COMPERESSED_BLOCKS;
+								BaseBlockSub block =  BaseBlockSub.register(name, unItem, "custom", tab);
+								
+								if(blockObject.has("enableDefaultRecipe")) {
+									block.setMakeDefaultStackRecipe(blockObject.get("enableDefaultRecipe").getAsBoolean());
+								}
+								
+								Map<Integer, ItemStack> InfoStackMap = InitCustomBlock.initInfoStack(blockObject);
+								if(InfoStackMap != null) {
+									block.setInfoStack(InfoStackMap);
+								}
+								
+								Map<Integer, List<String>> infos = InitCustomBlock.initInfos(blockObject);
+								if(infos != null) {
+									block.addCustemInformation(infos);
+								}
+								
+								Map<Integer, List<String>> shiftInfos = InitCustomBlock.initShiftInfos(blockObject);
+								if(shiftInfos != null) {
+									block.addCustemShiftInformation(shiftInfos);
+								}
+								
+								Map<Integer, HarvestType> HarvestMap = InitCustomBlock.initHarvest(blockObject);
+								if(HarvestMap != null) {
+									block.setHarvestMap(HarvestMap);
+								}
+								
+								Map<Integer, Float> HardnessMap = InitCustomBlock.initHardness(blockObject);
+								if(HardnessMap != null) {
+									block.setHardnessMap(HardnessMap);
+								}
+								
+								Map<Integer, Boolean> BeaconBaseMap = InitCustomBlock.initBeaconBase(blockObject);
+								if(BeaconBaseMap != null) {
+									block.setBeaconBaseMap(BeaconBaseMap);
+								}
+								
+								Map<Integer, Integer> LightValueMap = InitCustomBlock.initLightValue(blockObject);
+								if(LightValueMap != null) {
+									block.setLightValueMap(LightValueMap);
+								}
+								
+								Map<Integer, Float> ExplosionResistanceMap = InitCustomBlock.initExplosionResistance(blockObject);
+								if(ExplosionResistanceMap != null) {
+									block.setExplosionResistanceMap(ExplosionResistanceMap);
+								}
+								
+								Map<Integer, Boolean> UseWrenchBreakMap = InitCustomBlock.initUseWrenchBreak(blockObject);
+								if(UseWrenchBreakMap != null) {
+									block.canUseWrenchBreak(UseWrenchBreakMap);
+								}
+								
+								MCSBlocks.SUB_BLOCKS_NAME.add(name);
+								MCSBlocks.SUB_BLOCKS.add(block);
+								MCSBlocks.SUB_BLOCKS_MAP.put(name, block);
+							}
+						}
+					}
+				}
+			}catch(JsonIOException | JsonSyntaxException | FileNotFoundException e) {
+				e.printStackTrace();
+				throw new JsonException("custom.json -> " + e.getLocalizedMessage().substring(e.getLocalizedMessage().indexOf(":")+2));
+			}
+		}
+	}
+	
+	public static CreativeTabs getTab(JsonObject blockObject) {
+		CreativeTabs tab = null;
+		if(blockObject.has("tab")) {
+			try {
+				tab = getCreativeTabs(blockObject.get("tab").getAsString());
+			} catch (Exception e) {
+				e.printStackTrace();
+				tab = MCS.COMPERESSED_BLOCKS;
+			}
+		}else {
+			tab = MCS.COMPERESSED_BLOCKS;
+		}
+		return tab;
+	}
+	
+	public static CreativeTabs getCreativeTabs(String name) {
+		for(CreativeTabs tab : CreativeTabs.CREATIVE_TAB_ARRAY) {
+//			Field f = tab.getClass().getDeclaredField("tabLabel");
+//			f.setAccessible(true);
+//			String tabName = (String) f.get(tab);
+			
+			if(tab.getTabLabel().toLowerCase().equals(name.toLowerCase())) {
+				return tab;
+			}
+		}
+		return null;
+	}
+	
+	private static final Map<String, Map<Integer,ChangeBlockType>> CHANGE_BLOCK_MAP = Maps.newHashMap();
+	
+	public static final Map<String, Map<Integer,ChangeBlockType>> CHANGE_MCS_BLOCK_MAP = Maps.newHashMap();
+	public static final Map<String, Map<Integer,ChangeBlockType>> CHANGE_OTHER_BLOCK_MAP = Maps.newHashMap();
+	
+	public static void reinitChangeBlock() throws JsonIOException, JsonSyntaxException, FileNotFoundException {
+		for(int i = 0; i < CHANGE_BLOCK_MAP.size()+2; i++) {
+			CHANGE_BLOCK_MAP.clear();
+			CHANGE_MCS_BLOCK_MAP.clear();
+			CHANGE_OTHER_BLOCK_MAP.clear();
+		}
+		
+		initChangeBlock();
+	}
+	
+	public static void initChangeBlock() throws JsonIOException, JsonSyntaxException, FileNotFoundException, NumberFormatException {		
+		File config = new File("./config/jiu/mcs/changed.json");
+		if(config.exists()) {
+			JsonObject file = new JsonParser().parse(new FileReader(config)).getAsJsonObject();
+			for(Map.Entry<String, JsonElement> jobj : file.entrySet()) {
+				
+				JsonArray arr = (JsonArray) jobj.getValue();// 主清�?
+				for(int i = 0; i < arr.size(); ++i) {
+					JsonObject obj = (JsonObject) arr.get(i);//子清�?
+					
+					String name = obj.get("block").getAsString();
+					int[] metas = parseMeta("meta", obj);
+					Map<Integer,ChangeBlockType> typeMap = Maps.newHashMap();
+					
+					InitChangeBlock.init(typeMap, obj, name, metas);
+					CHANGE_BLOCK_MAP.put(name, typeMap);
+				}
+			}
+		}
+		
+		for(String name : CHANGE_BLOCK_MAP.keySet()) {
+			if(SUB_BLOCKS_NAME.contains(name)) {
+				CHANGE_MCS_BLOCK_MAP.put(name, CHANGE_BLOCK_MAP.get(name));
+			}else {
+				CHANGE_OTHER_BLOCK_MAP.put(name, CHANGE_BLOCK_MAP.get(name));
+			}
+		}
+	}
+	
+	private static int[] parseMeta(String times, JsonObject obj) {
+		int[] metas = {0};
+		if(obj.has("meta")) {
+			JsonArray metas0 = obj.get("meta").getAsJsonArray();
+			metas = new int[metas0.size()];
+			for(int meta = 0; meta < metas0.size(); ++meta) {
+				metas[meta] = metas0.get(meta).getAsInt();
+			}
+		}
+		return metas;
 	}
 }

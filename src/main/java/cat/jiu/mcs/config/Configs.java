@@ -32,14 +32,12 @@ public class Configs {
 			"clathrateOil"
 	};
 	
-	public static final CustomCompressedBlock custom = new CustomCompressedBlock();
+	public static final CustomCompressedBlock Custom = new CustomCompressedBlock();
 	
-	public static TooltipInformation tooltip_information = new TooltipInformation(); 
+	public static TooltipInformation TooltipInformation = new TooltipInformation(); 
 	
 	public static class TooltipInformation {
-		
-		public final CustemnInformation custem_info = new CustemnInformation();
-		
+		public final CustemnInformation CustemInfo = new CustemnInformation();
 		@Config.RequiresMcRestart
 		@Config.LangKey("config.mcs.can_custom_tab_background")
 		@Config.Comment("set can custom creative_tab background")
@@ -47,7 +45,7 @@ public class Configs {
 		
 		@Config.LangKey("config.mcs.show_food_amount")
 		@Config.Comment("show Food Amount in Tooltip Information")
-		public boolean show_food_amount = true;
+		public boolean show_food_amount = false;
 		
 		@Config.RequiresMcRestart
 		@Config.LangKey("config.mcs.get_real_food_amout")
@@ -56,7 +54,7 @@ public class Configs {
 		
 		@Config.LangKey("config.mcs.show_oredict")
 		@Config.Comment("show oredict in Tooltip Information")
-		public boolean show_oredict = true;
+		public boolean show_oredict = false;
 		
 		@Config.LangKey("config.mcs.show_burn_time")
 		@Config.Comment("Show Burn Time in Tooltip Information")

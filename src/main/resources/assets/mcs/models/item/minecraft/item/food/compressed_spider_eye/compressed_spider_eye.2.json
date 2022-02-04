@@ -1,0 +1,7 @@
+{
+"parent":"item/generated",
+	"textures": {
+		"layer0": "minecraft:items/spider_eye",
+		"layer1": "mcs:items/compressed_3"
+	}
+}

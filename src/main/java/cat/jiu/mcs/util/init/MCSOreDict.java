@@ -1,14 +1,15 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
 package cat.jiu.mcs.util.init;
 
-import cat.jiu.mcs.MCS;
-import cat.jiu.mcs.config.Configs;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.core.util.helpers.ItemUtils;
+import cat.jiu.mcs.MCS;
+import cat.jiu.mcs.config.Configs;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
-
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -18,7 +19,7 @@ public class MCSOreDict {
 	public static void register() {
 		try {
 			mcBlock();
-			if(Configs.custom.Enable_Mod_Stuff) {
+			if(Configs.Custom.Enable_Mod_Stuff) {
 				itemThermalFoundation();
 				blockThermalFoundation();
 				blockBotania();
@@ -36,7 +37,7 @@ public class MCSOreDict {
 	}
 	
 	private static void itemThermalFoundation() {
-		if(Configs.custom.Enable_Mod_Stuff) {
+		if(Configs.Custom.Enable_Mod_Stuff) {
 			if(Loader.isModLoaded("thermalfoundation")) {
 				item.registerOre("tfDyes", JiuUtils.item.getItemByNameOrId("thermalfoundation:dye"), OreDictionary.WILDCARD_VALUE);
 			}
@@ -44,34 +45,29 @@ public class MCSOreDict {
 	}
 	
 	private static void blockThermalFoundation() {
-		if(Configs.custom.Enable_Mod_Stuff) {
+		if(Configs.Custom.Enable_Mod_Stuff) {
 			if(Loader.isModLoaded("thermalfoundation")) {
-				
-//				PropertyEnum propertyEnum = (PropertyEnum) JiuUtils.item.getBlockFromName("thermalfoundation:galss").getBlockState().getProperty("type");
-//				for() {
-					
+//				String[] types = new String[] {"copper", "tin", "silver", "lead", "aluminum", "nickel", "platinum", "iridium", "mithril"};
+//				for(int i = 0; i < types.length; i++) {
+//					item.registerOre("hardenGlass", JiuUtils.item.getItemByNameOrId("thermalfoundation:glass"), i);
+//					item.registerOre(types[i] + "HardenedGlass", JiuUtils.item.getItemByNameOrId("thermalfoundation:glass"), i);
 //				}
-				
-//				for(BlockGlass.Type type : BlockGlass.Type.values()) {
-//					item.registerOre("hardenGlass", TFBlocks.blockGlass, type.getMetadata());
-//					item.registerOre(type.getName() + "HardenedGlass", TFBlocks.blockGlass, type.getMetadata());
+//				types = new String[] {"steel", "electrum", "invar", "bronze", "constantan", "signalum", "lumium", "enderium"};
+//				for(int i = 0; i < types.length; i++) {
+//					item.registerOre("hardenGlass", JiuUtils.item.getItemByNameOrId("thermalfoundation:glass_alloy"), i);
+//					item.registerOre(types[i] + "HardenedGlass", JiuUtils.item.getItemByNameOrId("thermalfoundation:glass_alloy"), i);
 //				}
-//				
-//				for(BlockGlassAlloy.Type type : BlockGlassAlloy.Type.values()) {
-////					item.registerOre("hardenGlass", TFBlocks.blockGlassAlloy, type.getMetadata());
-//					item.registerOre(type.getName() + "HardenedGlass", TFBlocks.blockGlassAlloy, type.getMetadata());
-//				}
-//				
-//				for(BlockRockwool.Type type : BlockRockwool.Type.values()) {
-//					item.registerOre("rockWool", TFBlocks.blockRockwool, type.getMetadata());
-//					item.registerOre(type.getName() + "RockWool", TFBlocks.blockRockwool, type.getMetadata());
+//				types = new String[] {"black", "red", "green", "brown", "blue", "purple", "cyan", "silver", "gray", "pink", "lime", "yellow", "light_blue", "magenta", "orange", "white"};
+//				for(int i = 0; i < types.length; i++) {
+//					item.registerOre("rockWool", JiuUtils.item.getItemByNameOrId("thermalfoundation:rockwool"), i);
+//					item.registerOre(types[i] + "RockWool", JiuUtils.item.getItemByNameOrId("thermalfoundation:rockwool"), i);
 //				}
 			}
 		}
 	}
 	
 	private static void blockBotania() {
-		if(Configs.custom.Enable_Mod_Stuff) {
+		if(Configs.Custom.Enable_Mod_Stuff) {
 			if(Loader.isModLoaded("botania")) {
 				for(EnumDyeColor type : EnumDyeColor.values()) {
 					String name = type.getUnlocalizedName();
@@ -87,8 +83,8 @@ public class MCSOreDict {
 	}
 	
 	private static void custom() {
-		String[] ore = Configs.custom.register_ore.ore_dict_register;
-		for(int i = 1; i < Configs.custom.register_ore.ore_dict_register.length; ++i) {
+		String[] ore = Configs.Custom.ore_dict_register;
+		for(int i = 1; i < Configs.Custom.ore_dict_register.length; ++i) {
 			String[] strore = JiuUtils.other.custemSplitString(ore[i], "|");
 			
 			if(strore.length == 3) {

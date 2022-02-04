@@ -1,8 +1,10 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
 package cat.jiu.mcs.util.base;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 
-public class BaseCreativeTab extends CreativeTabs{
+public class BaseCreativeTab extends CreativeTabs {
 	
 	protected final ItemStack icon; 
 	protected final boolean hasSearchBar;

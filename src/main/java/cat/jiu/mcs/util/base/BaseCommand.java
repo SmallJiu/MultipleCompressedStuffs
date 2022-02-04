@@ -1,3 +1,5 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
 package cat.jiu.mcs.util.base;
 
 import net.minecraft.command.CommandBase;
@@ -16,18 +18,18 @@ public class BaseCommand {
 		public CommandNormal(String name){
 			this(name, true, 0);
 		}
-
+		
 		public CommandNormal(String name, boolean checkPermission, int level){
 			this.name = name;
 			this.checkPermission = checkPermission;
 			this.level = level;
 		}
-
+		
 		@Override
 		public String getName(){
 			return this.name;
 		}
-
+		
 		@Override
 		public String getUsage(ICommandSender sender) {
 			return "command.mcs." + this.getName() +".info";
@@ -37,12 +39,12 @@ public class BaseCommand {
 		public int getRequiredPermissionLevel() {
 			return this.level;
 		}
-
+		
 		@Override
 		public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-			return this.checkPermission;
+			return super.checkPermission(server, sender);
 		}
-
+		
 		@Override
 		public abstract void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException;
 	}

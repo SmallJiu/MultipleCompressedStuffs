@@ -1,3 +1,5 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
 package cat.jiu.mcs.util.init;
 
 import java.util.Random;
@@ -17,7 +19,7 @@ public class CreativeTabCompressedStuffsBlocks extends CreativeTabs{
 
 	@Override
 	public ResourceLocation getBackgroundImage() {
-		if(Configs.tooltip_information.can_custom_creative_tab_background) {
+		if(Configs.TooltipInformation.can_custom_creative_tab_background) {
 			return new ResourceLocation(MCS.MODID + ":textures/gui/container/creative_inventory/tab_items.png");
 		}else {
 			return super.getBackgroundImage();

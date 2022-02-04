@@ -1,3 +1,5 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
 package cat.jiu.mcs.util;
 
 import cat.jiu.core.api.events.entity.IEntityJoinWorldEvent;
@@ -33,7 +35,7 @@ public class TestModel implements IEntityJoinWorldEvent, IEntityTickEvent{
 			}
 			if(test) {
 				if(entity.world.isRemote) {
-					JiuUtils.entity.sendMessage(entity, "TestMode Is: " + test);
+					JiuUtils.entity.sendClientMessage(entity, "TestMode Is: " + test);
 				}
 			}
 		}

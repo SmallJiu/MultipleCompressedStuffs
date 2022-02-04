@@ -10,7 +10,8 @@ public class MCSCommand extends BaseCommand.CommandTree {
 				new CommandGetModList("mods", true, 0),
 				new CommandGetOreDict("ore", true, 2),
 				new CommandHelp("help", true, 0),
-				new CommandTestMode("test", true, 4)
+				new CommandTestMode("test", true, 4),
+				new CommandReinitChangeBlock("recb", true, 2)
 		}, "mcs", false, true, 2);
 	}
 }

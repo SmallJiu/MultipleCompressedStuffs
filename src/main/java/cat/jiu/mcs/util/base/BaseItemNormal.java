@@ -1,3 +1,5 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
 package cat.jiu.mcs.util.base;
 
 import cat.jiu.mcs.MCS;
@@ -6,12 +8,13 @@ import cat.jiu.core.util.RegisterModel;
 import cat.jiu.mcs.util.init.MCSItems;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BaseItemNormal extends Item implements IHasModel {
 	
 	protected String name;
 	protected CreativeTabs tab;
-	protected final RegisterModel model = new RegisterModel(MCS.MODID);
 	
 	public BaseItemNormal(String name, CreativeTabs tab) {
 		this.name = name;
@@ -24,8 +27,9 @@ public class BaseItemNormal extends Item implements IHasModel {
 		MCSItems.ITEMS_NAME.add(this.name);
 	}
 	
+	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerItemModel() {
-		model.registerItemModel(this, "normal/items", this.name);
+		new RegisterModel(MCS.MODID).registerItemModel(this, "normal/items", this.name);
 	}
 }

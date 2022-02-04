@@ -6,8 +6,7 @@ import cat.jiu.mcs.config.Configs;
 import net.minecraft.item.ItemStack;
 import cat.jiu.core.util.crafting.Recipes;
 
-public class Recipe extends Recipes{
-
+public class Recipe extends Recipes {
 	public Recipe(String modid) {
 		super(modid);
 	}

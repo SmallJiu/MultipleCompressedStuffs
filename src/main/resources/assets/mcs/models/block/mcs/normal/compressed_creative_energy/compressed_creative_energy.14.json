@@ -1,0 +1,8 @@
+{
+    "parent": "mcs:block/overlay_model_2",
+	"textures": {
+        "all": "minecraft:blocks/obsidian",
+		"overlay_1": "minecraft:items/ender_eye",
+		"overlay_2": "mcs:blocks/compressed_15"
+    }
+}

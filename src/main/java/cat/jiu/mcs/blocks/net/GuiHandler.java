@@ -1,14 +1,19 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
 package cat.jiu.mcs.blocks.net;
 
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import cat.jiu.mcs.MCS;
+import cat.jiu.mcs.blocks.net.client.gui.GUICompressor;
+import cat.jiu.mcs.blocks.net.container.ContainerCompressor;
+import cat.jiu.mcs.blocks.tileentity.TileEntityCompressor;
 import net.minecraft.util.math.BlockPos;
 
 public class GuiHandler implements IGuiHandler {
-	
 	public static final int COMPRESSOR = 1;
 	
 	public static void register() {
@@ -18,18 +23,28 @@ public class GuiHandler implements IGuiHandler {
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		BlockPos pos = new BlockPos(x,y,z);
+		TileEntity te = world.getTileEntity(pos);
 		switch (ID) {
-			default:return null;
-			case COMPRESSOR: return new ContainerCompressor(player, world, pos);
+			case COMPRESSOR:
+				if(te instanceof TileEntityCompressor) {
+					return new ContainerCompressor(player, world, pos);
+				}
 		}
+		
+		return null;
 	}
 	
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		BlockPos pos = new BlockPos(x,y,z);
+		TileEntity te = world.getTileEntity(pos);
 		switch (ID) {
-			default:return null;
-			case COMPRESSOR: return new GUICompressor(player, world, pos);
+			case COMPRESSOR:
+				if(te instanceof TileEntityCompressor) {
+					return new GUICompressor(player, world, pos);
+				}
 		}
+		
+		return null;
 	}
 }

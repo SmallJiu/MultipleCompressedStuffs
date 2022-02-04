@@ -1,0 +1,7 @@
+{
+    "parent": "item/generated",
+    "textures": {
+		"layer0": "minecraft:items/bowl",
+		"layer1": "mcs:items/compressed_4"
+    }
+}

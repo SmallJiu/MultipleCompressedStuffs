@@ -1,0 +1,7 @@
+{
+"parent":"item/generated",
+	"textures": {
+		"layer0": "avaritia:items/cosmic_meatballs/layer_0",
+		"layer1": "mcs:items/compressed_4"
+	}
+}

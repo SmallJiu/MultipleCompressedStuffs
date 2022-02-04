@@ -8,5 +8,5 @@ public class CustemAlreadyStuff {
 	
 	@Config.LangKey("config.mcs.logging_give_food")
 	@Config.Comment("Player loggedIn give a random food")
-	public boolean logging_give_food = true;
+	public boolean logging_give_food = false;
 }

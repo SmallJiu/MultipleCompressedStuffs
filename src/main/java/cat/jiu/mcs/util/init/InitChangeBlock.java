@@ -1,0 +1,273 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
+package cat.jiu.mcs.util.init;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import cat.jiu.core.util.JiuUtils;
+import cat.jiu.mcs.util.type.ChangeBlockType;
+
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+
+public class InitChangeBlock {
+	public static void init(Map<Integer, ChangeBlockType> typeMap, JsonObject obj, String name, int[] metas) throws NumberFormatException {
+		if(obj.has("drops")) {
+			List<Integer> loadMeta = new ArrayList<>();
+			for(Map.Entry<String, JsonElement> dropobj : obj.getAsJsonObject("drops").entrySet()) {
+				JsonElement dropE = dropobj.getValue();
+				List<ItemStack> drop = new ArrayList<>();
+				int meta = Integer.parseInt(dropobj.getKey());
+				boolean canDrop = true;
+				int[] time = new int[3];
+				loadMeta.add(meta);
+				
+				if(dropE instanceof JsonObject) {
+					JsonObject dropo = (JsonObject) dropE;
+					if(dropo.has("time")) {
+						time = parseTime(dropo.get("time").getAsString());
+					}else {
+						time = parseTime(obj.get("time").getAsString());
+					}
+					if(dropo.has("item")) {
+						JsonArray dropa = dropo.getAsJsonArray("item");
+						for(int k=0;k<dropa.size();++k) {
+							drop.add(getStack(dropa.get(k).getAsString()));
+						}
+					}else {
+						drop.add(new ItemStack(Item.getByNameOrId("mcs:" + name), 1, meta));
+					}
+					
+					if(dropo.has("canDrop")) {
+						canDrop = dropo.get("canDrop").getAsBoolean();
+					}else if(obj.has("canDrop")) {
+						canDrop = obj.get("canDrop").getAsBoolean();
+					}
+				}else if(dropE instanceof JsonArray) {
+					JsonArray dropa = (JsonArray) dropE;
+					time = parseTime(dropa.get(0).getAsString());
+					
+					if(dropa.size() == 1) {
+						if(MCSBlocks.BLOCKS_NAME.contains(name)) {
+							drop.add(new ItemStack(Item.getByNameOrId("mcs:" + name), 1, meta));
+						}else {
+							drop.add(new ItemStack(Item.getByNameOrId(name), 1, meta));
+						}
+					}else if(dropa.size() == 2) {
+						drop.add(getStack(dropa.get(1).getAsString()));
+					}else {
+						for(int k=1;k<dropa.size();++k) {
+							drop.add(getStack(dropa.get(k).getAsString()));
+						}
+					}
+				}else {
+					drop.add(getStack(dropE.getAsString()));
+				}
+				
+				typeMap.put(meta, new ChangeBlockType(drop, time, canDrop));
+			}
+			
+			int[] time = parseTime(obj.get("time").getAsString());
+			boolean canDrop = true;
+			if(obj.has("canDrop")) {
+				canDrop = obj.get("canDrop").getAsBoolean();
+			}
+			for(int meta : metas) {
+				if(!loadMeta.contains(meta)) {
+					List<ItemStack> drop = new ArrayList<>();
+					if(MCSBlocks.BLOCKS_NAME.contains(name)) {
+						drop.add(new ItemStack(Item.getByNameOrId("mcs:" + name), 1, meta));
+					}else {
+						drop.add(new ItemStack(Item.getByNameOrId(name), 1, meta));
+					}
+					typeMap.put(meta, new ChangeBlockType(drop, time, canDrop));
+				}
+			}
+		}else {
+			int[] time = parseTime(obj.get("time").getAsString());
+			boolean canDrop = true;
+			if(obj.has("canDrop")) {
+				canDrop = obj.get("canDrop").getAsBoolean();
+			}
+			for(int meta : metas) {
+				List<ItemStack> drop = new ArrayList<>();
+				if(MCSBlocks.BLOCKS_NAME.contains(name)) {
+					drop.add(new ItemStack(Item.getByNameOrId("mcs:" + name), 1, meta));
+				}else {
+					drop.add(new ItemStack(Item.getByNameOrId(name), 1, meta));
+				}
+				typeMap.put(meta, new ChangeBlockType(drop, time, canDrop));
+			}
+		}
+	}
+	
+	public static ItemStack getStack(String stack) throws NumberFormatException {
+		if(stack.indexOf("@") != -1) {
+			String[] name = JiuUtils.other.custemSplitString(stack.toLowerCase(), "@");
+			Item item = null;
+			int meta = 0;
+			int amount = 1;
+			
+			if(name.length == 3) {
+				item = Item.getByNameOrId(name[0]);
+				amount = Integer.parseInt(name[1]);
+				meta = Integer.parseInt(name[2]);
+			}else if(name.length == 2) {
+				item = Item.getByNameOrId(name[0]);
+				amount = Integer.parseInt(name[1]);
+			}else {
+				item = Item.getByNameOrId(name[0]);
+			}
+			if(item != null) {
+				return new ItemStack(item, amount, meta);
+			}
+		}else {
+			return new ItemStack(Item.getByNameOrId(stack));
+		}
+		
+		return null;
+	}
+	
+	private static int[] parseTime(String times) throws NumberFormatException {
+		String[] name = JiuUtils.other.custemSplitString(times, ":");
+		int tick_temp = Integer.parseInt(name[2]);
+		int tick = tick_temp > 20 ? 19 : tick_temp;
+		int s = Integer.parseInt(name[1]) > 60 ? 59 : Integer.parseInt(name[1]);
+		int m = Integer.parseInt(name[0]);
+		int[] time = {tick, s, m};
+		
+		return time;
+	}
+	
+//	public static void initDrops(String name, JsonObject obj, int[] metas, Map<Integer, List<ItemStack>> drops, Map<Integer, Boolean> canDrop) {
+//		if(obj.has("drops")) {
+//			List<Integer> loadMeta = new ArrayList<>();
+//			for(Map.Entry<String, JsonElement> dropobj : obj.getAsJsonObject("drops").entrySet()) {
+//				JsonElement drop = dropobj.getValue();
+//				List<ItemStack> drop0 = new ArrayList<>();
+//				int meta = Integer.parseInt(dropobj.getKey());
+//				loadMeta.add(meta);
+//				
+//				if(JiuUtils.other.containKey(metas, meta)) {
+//					if(drop instanceof JsonObject) {
+//						JsonObject dropo = (JsonObject) drop;
+//						
+//						if(dropo.has("item")) {
+//							JsonArray dropa = dropo.getAsJsonArray("item");
+//							for(int k=0;k<dropa.size();++k) {
+//								drop0.add(getStack(dropa.get(k).getAsString()));
+//							}
+//						}else {
+//							drop0.add(new ItemStack(Item.getByNameOrId("mcs:" + name), 1, meta));
+//						}
+//						
+//						if(dropo.has("canDrop")) {
+//							canDrop.put(meta, dropo.get("canDrop").getAsBoolean());
+//						}else if(obj.has("canDrop")) {
+//							canDrop.put(meta, obj.get("canDrop").getAsBoolean());
+//						}else {
+//							canDrop.put(meta, true);
+//						}
+//						
+//					}else if(drop instanceof JsonArray) {
+//						JsonArray dropa = (JsonArray) drop;
+//						if(dropa.size() == 1) {
+//							drop0.add(getStack(dropa.get(1).getAsString()));
+//						}else {
+//							for(int k=1;k<dropa.size();++k) {
+//								drop0.add(getStack(dropa.get(k).getAsString()));
+//							}
+//						}
+//					}else {
+//						drop0.add(getStack(drop.getAsString()));
+//					}
+//				}else {
+//					drop0.add(new ItemStack(Item.getByNameOrId(name), 1, meta));
+//				}
+//				drops.put(meta, drop0);
+//			}
+//			for(int meta : metas) {
+//				if(!loadMeta.contains(meta)) {
+//					List<ItemStack> drop = new ArrayList<>();
+//					
+//					if(MCSBlocks.BLOCKS_NAME.contains(name)) {
+//						drop.add(new ItemStack(Item.getByNameOrId("mcs:" + name), 1, meta));
+//					}else {
+//						drop.add(new ItemStack(Item.getByNameOrId(name), 1, meta));
+//					}
+//					
+//					drops.put(meta, drop);
+//					
+//					if(obj.has("canDrop")) {
+//						canDrop.put(meta, obj.get("canDrop").getAsBoolean());
+//					}else {
+//						canDrop.put(meta, true);
+//					}
+//				}
+//			}
+//		}else {
+//			for(int meta : metas) {
+//				List<ItemStack> drop = new ArrayList<>();
+//				
+//				if(MCSBlocks.BLOCKS_NAME.contains(name)) {
+//					drop.add(new ItemStack(Item.getByNameOrId("mcs:" + name), 1, meta));
+//				}else {
+//					drop.add(new ItemStack(Item.getByNameOrId(name), 1, meta));
+//				}
+//				
+//				drops.put(meta, drop);
+//				
+//				if(obj.has("canDrop")) {
+//					canDrop.put(meta, obj.get("canDrop").getAsBoolean());
+//				}else {
+//					canDrop.put(meta, true);
+//				}
+//			}
+//		}
+//	}
+//	
+
+//	
+//	public static void initTime(int[] metas, JsonObject obj, Map<Integer, Integer[]> times) {
+//		if(obj.has("drops")) {
+//			List<Integer> loadMeta = new ArrayList<>();
+//			for(Map.Entry<String, JsonElement> metas0 : obj.getAsJsonObject("drops").entrySet()) {
+//				JsonElement o = metas0.getValue();
+//				int meta = Integer.parseInt(metas0.getKey());
+//				loadMeta.add(meta);
+//				Integer[] time = new Integer[3];
+//				
+//				if(o instanceof JsonObject) {
+//					JsonObject metaObj = (JsonObject) o;
+//					if(metaObj.has("time")) {
+//						time = parseTime(metaObj.get("time").getAsString());
+//					}else {
+//						time = parseTime(obj.get("time").getAsString());
+//					}
+//				}else if(o instanceof JsonArray) {
+//					JsonArray metaArray = (JsonArray) o;
+//					time = parseTime(metaArray.get(0).getAsString());
+//				}
+//				
+//				times.put(meta, time);
+//			}
+//			for(int meta : metas) {
+//				if(!loadMeta.contains(meta)) {
+//					Integer[] time = parseTime(obj.get("time").getAsString());
+//					times.put(meta, time);
+//				}
+//			}
+//		}else {
+//			Integer[] time = parseTime(obj.get("time").getAsString());
+//			for(int meta : metas) {
+//				times.put(meta, time);
+//			}
+//		}
+//	}
+}

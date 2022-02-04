@@ -1,11 +1,17 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
 package cat.jiu.mcs.util.base;
 
-import cat.jiu.mcs.MCS;
-import cat.jiu.mcs.config.Configs;
+import java.util.Map;
+
+import javax.annotation.Nonnull;
+
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.ModSubtypes;
 import cat.jiu.mcs.util.init.MCSBlocks;
+
 import cofh.api.item.IToolHammer;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -23,12 +29,12 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional.*;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import stanhebben.zenscript.annotations.NotNull;
 
 @SuppressWarnings("deprecation")
 @InterfaceList({
@@ -37,7 +43,6 @@ import stanhebben.zenscript.annotations.NotNull;
 	@Interface(iface = "cofh.api.item.IToolHammer", modid = "cofhcore") 
 })
 public class BaseBlock extends Block {
-
 	protected final String name;
 	protected final CreativeTabs tab;
 	private final boolean hasSubtypes;
@@ -70,8 +75,8 @@ public class BaseBlock extends Block {
 			ForgeRegistries.ITEMS.register(new BaseBlockItem(this, hasSubType).setRegistryName(this.name));
 		}
 	}
-
-	public BaseBlock(String name, @NotNull ItemStack unCompressedItem, Material materialIn, SoundType soundType, CreativeTabs tab, float hardness, boolean hasSubType) {
+	
+	public BaseBlock(String name, @Nonnull ItemStack unCompressedItem, Material materialIn, SoundType soundType, CreativeTabs tab, float hardness, boolean hasSubType) {
 		super(materialIn);
 		this.name = name;
 		this.tab = tab;
@@ -122,7 +127,7 @@ public class BaseBlock extends Block {
 		return this.unCompressedItem.getItem();
 	}
 	
-	public final ItemStack getUnCompressedItemStack(){
+	public final ItemStack getUnCompressedItemStack() {
 		return this.unCompressedItem;
 	}
 	
@@ -142,13 +147,7 @@ public class BaseBlock extends Block {
 	@SideOnly(Side.CLIENT)
 	public final String getUnCompressedItemLocalizedName() {
 		if(!this.unCompressedItem.equals(new ItemStack(Items.AIR)) || this.unCompressedItem != null) {
-			String itemmodid = this.unCompressedItem.getItem().getCreatorModId(this.unCompressedItem);
-			
-			if(JiuUtils.other.containKey(MCS.other_mod, itemmodid)) {
-				return I18n.format(this.unCompressedItem.getUnlocalizedName() + ".name", 1).trim();
-			}else {
-				return I18n.format(this.unCompressedItem.getUnlocalizedName(), 1).trim();
-			}
+			return this.unCompressedItem.getDisplayName();
 		}else {
 			return "\'Unknown Item\'";
 		}
@@ -163,50 +162,29 @@ public class BaseBlock extends Block {
 		return this;
 	}
 	
+	Map<Integer, Boolean> canUseWrenchBreaks = null;
+	
+	public BaseBlock canUseWrenchBreak(Map<Integer, Boolean> canbe) {
+		if(Loader.isModLoaded("thermalfoundation") || Loader.isModLoaded("buildcraftcore") || Loader.isModLoaded("enderio")) {
+			this.canUseWrenchBreaks = canbe;
+		}
+		return this;
+	}
+	
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		boolean lag = false;
 		if(this.canUseWrenchBreak) {
-			return this.useWrenchBreak(world, pos, state, player, hand);
-		}else {
-			if(Configs.custom.custem_already_stuff.block.custem_can_use_wrench_break.length != 0) {
-				try {
-					String[] spt0 = Configs.custom.custem_already_stuff.block.custem_can_use_wrench_break;
-					for(int i = 1; i < spt0.length; ++i) {
-						String[] str = JiuUtils.other.custemSplitString(spt0[i], "|");
-						String name = str[0];
-						
-						try {
-							int meta = new Integer(str[1]);
-							
-							if(MCSBlocks.BLOCKS_NAME.contains(name)) {
-								if(!(meta > 15)) {
-									if(JiuUtils.item.getMetaFormBlockState(state) == meta) {
-										return this.useWrenchBreak(world, pos, state, player, hand);
-									}
-								}else {
-									if(world.isRemote) {
-										MCS.instance.log.fatal("\"" + name +  "\": "+ "\"" + meta + "\"" + " It's too large! It must be >=15");
-									}
-								}
-							}else {
-								if(world.isRemote) {
-									MCS.instance.log.fatal("\"" + name +  "\": "+ "\"" + name + "\"" + " is not belong to MCS's Block!");
-								}
-							}
-						} catch (Exception e) {
-							if(world.isRemote) {
-								MCS.instance.log.fatal("\"" + name +  "\": "+ e.getMessage() + " is not Number!");
-							}
-						}
-					}
-				} catch (Exception e) { }
+			return this.useWrenchBreak(world, pos, state, player, hand, false);
+		}else if(this.canUseWrenchBreaks != null) {
+			if(this.canUseWrenchBreaks.containsKey(JiuUtils.item.getMetaFormBlockState(state))) {
+				return this.useWrenchBreak(world, pos, state, player, hand, true);
 			}
 		}
 		return lag;
 	}
 	
-	private boolean useWrenchBreak(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand) {
+	private boolean useWrenchBreak(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, boolean useMap) {
 		boolean lag = false;
 		ItemStack handitem = player.getHeldItem(hand);
 		
@@ -214,19 +192,25 @@ public class BaseBlock extends Block {
 			if(Loader.isModLoaded("thermalfoundation") || Loader.isModLoaded("buildcraftcore") || Loader.isModLoaded("enderio")) {
 				if(Loader.isModLoaded("thermalfoundation")) {
 					if (handitem.getItem() instanceof IToolHammer) {
-						JiuUtils.item.spawnAsEntity(world, pos, JiuUtils.item.getStackFormBlockState(state));
-						world.setBlockState(pos, Blocks.AIR.getDefaultState());
-						return true;
+						if(!useMap) {
+							JiuUtils.item.spawnAsEntity(world, pos, JiuUtils.item.getStackFormBlockState(state));
+							world.setBlockState(pos, Blocks.AIR.getDefaultState());
+							return true;
+						}else {
+							int meta = JiuUtils.item.getMetaFormBlockState(state);
+							if(this.canUseWrenchBreaks.containsKey(meta)) {
+								if(this.canUseWrenchBreaks.get(meta)) {
+									JiuUtils.item.spawnAsEntity(world, pos, JiuUtils.item.getStackFormBlockState(state));
+									world.setBlockState(pos, Blocks.AIR.getDefaultState());
+									return true;
+								}
+							}
+						}
 					}
 				}
 			}
 		}
 		return lag;
-	}
-	
-	protected boolean isInCreativeTab(CreativeTabs targetTab) {
-		CreativeTabs creativetabs = this.getCreativeTabToDisplayOn();
-		return creativetabs != null && (targetTab == CreativeTabs.SEARCH || targetTab == creativetabs);
 	}
 	
 	public boolean getHasSubtypes() {
@@ -241,6 +225,9 @@ public class BaseBlock extends Block {
 			for(ModSubtypes type : ModSubtypes.values()) {
 				int meta = type.getMeta();
 				
+				if(unBlock.getHarvestLevel(unState) == 0) {
+					break;
+				}
 				if(unBlock.getHarvestLevel(unState) > 2) {
 					this.setHarvestLevel("pickaxe", 3);
 					break;
@@ -249,8 +236,6 @@ public class BaseBlock extends Block {
 					if(meta > 0) {
 						this.setHarvestLevel("pickaxe", 3, this.getStateFromMeta(meta));
 					}
-				}else if(meta == 0) {
-					this.setHarvestLevel("pickaxe", 1, this.getDefaultState());
 				}else if(meta == 1) {
 					this.setHarvestLevel("pickaxe", 2, this.getStateFromMeta(meta));
 				}else if(meta > 1) {

@@ -1,9 +1,15 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
 package cat.jiu.mcs.util.base;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
+
+import com.google.common.collect.Maps;
 
 import cat.jiu.core.util.RegisterModel;
 import cat.jiu.mcs.MCS;
@@ -12,95 +18,77 @@ import cat.jiu.mcs.interfaces.IHasModel;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.ModSubtypes;
 import cat.jiu.mcs.util.init.MCSItems;
+import cat.jiu.mcs.util.type.PotionEffectType;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
+import net.minecraftforge.common.IRarity;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SuppressWarnings("deprecation")
-public class BaseItemFood extends ItemFood implements IHasModel{
-
+public class BaseItemFood extends ItemFood implements IHasModel {
+	public static BaseItemFood register(String name, ItemStack baseItem, String langModId, CreativeTabs tab) {
+		if(Loader.isModLoaded(langModId) || langModId.equals("custom")) {
+			if(baseItem != null) {
+				return new BaseItemFood(name, baseItem.getItem(), baseItem.getMetadata(), langModId, tab, true);
+			}else {
+				return null;
+			}
+		}else {
+			return null;
+		}
+	}
+	
+	public static BaseItemFood register(String name, ItemStack baseItem, String langModId) {
+		return register(name, baseItem, langModId, MCS.COMPERESSED_ITEMS);
+	}
+	
 	protected final String name;
 	protected final CreativeTabs tab;
 	protected Item baseFoodItem = null;
 	protected ItemFood baseFood = null;
-	protected final ItemStack baseFoodStack;
+	protected final ItemStack unCompressedItem;
 	protected final String langModId;
-	protected boolean baseItemIsNotFood;
+	protected final boolean baseItemIsNotFood;
 	protected final RegisterModel model = new RegisterModel(MCS.MODID);
-	
-	public BaseItemFood(String name, Item baseFood, int amount, float saturation, boolean isWolfFood, boolean baseItemIsNotFood, int meta, String langModId, CreativeTabs tab, boolean hasSubtypes) {
-		super(amount, saturation, isWolfFood);
-		this.baseItemIsNotFood = baseItemIsNotFood;
-		this.name = name;
-		this.tab = tab;
-		this.baseFoodItem = baseFood;
-		this.langModId = langModId;
-		this.baseFoodStack = new ItemStack(this.baseFoodItem, 1, meta);
-		this.setHasSubtypes(hasSubtypes);
-		this.setUnlocalizedName("mcs." + this.name);
-		this.setCreativeTab(this.tab);
-		this.setRegistryName(this.name);
-		this.setNoRepair();
-		MCSItems.ITEMS.add((Item)this);
-		MCSItems.ITEMS_NAME.add(this.name);
-		MCSItems.FOODS.add(this);
-		MCSItems.FOODS_NAME.add(this.name);
-		MCSItems.FOODS_MAP.put(this.name, this);
-	}
-	
-	public BaseItemFood(String name, Item baseFood, int amount, float saturation, boolean isWolfFood, boolean baseItemIsNotFood, int meta, String langModId, CreativeTabs tab) {
-		this(name, baseFood, amount, saturation, isWolfFood, baseItemIsNotFood, meta, langModId, tab, true);
-	}
-	
-	public BaseItemFood(String name, Item baseFood, int amount, float saturation, boolean isWolfFood, boolean baseItemIsNotFood, int meta, String langModId) {
-		this(name, baseFood, amount, saturation, isWolfFood, baseItemIsNotFood, meta, langModId, MCS.COMPERESSED_ITEMS);
-	}
-	
-	public BaseItemFood(String name, Item baseFood, int amount, float saturation, boolean isWolfFood, boolean baseItemIsNotFood, int meta) {
-		this(name, baseFood, amount, saturation, isWolfFood, baseItemIsNotFood, meta, "minecraft");
-	}
-	
-	public BaseItemFood(String name, Item baseFood, int amount, float saturation, boolean isWolfFood, boolean baseItemIsNotFood) {
-		this(name, baseFood, amount, saturation, isWolfFood, baseItemIsNotFood, 0);
-	}
-	
-	public BaseItemFood(String name, Item baseFood, int amount, float saturation, boolean isWolfFood) {
-		this(name, baseFood, amount, saturation, isWolfFood, true);
-	}
-	
-	public BaseItemFood(String name, Item baseFood, int amount, float saturation) {
-		this(name, baseFood, amount, saturation, false);
-	}
 	
 	public BaseItemFood(String name, Item baseFood, int meta, String langModId, CreativeTabs tab, float saturation, boolean isWolfFood, boolean hasSubtypes) {
 		super(8, saturation, isWolfFood);
 		this.name = name;
 		this.tab = tab;
-		this.baseFood = baseFood instanceof ItemFood ? (ItemFood)baseFood : (ItemFood)Items.COOKED_BEEF;
+		this.baseItemIsNotFood = !(baseFood instanceof ItemFood);
+		
+		if(this.baseItemIsNotFood) {
+			this.baseFoodItem = baseFood;
+			this.unCompressedItem = new ItemStack(this.baseFoodItem, 1, meta);
+		}else {
+			this.baseFood = (ItemFood)baseFood;
+			this.unCompressedItem = new ItemStack(this.baseFood, 1, meta);
+		}
+		
 		this.langModId = langModId;
-		this.baseFoodStack = new ItemStack(this.baseFood, 1, meta);
 		this.setHasSubtypes(hasSubtypes);
 		this.setUnlocalizedName("mcs." + this.name);
 		this.setCreativeTab(this.tab);
 		this.setNoRepair();
 		this.setRegistryName(this.name);
-		MCSItems.ITEMS_NAME.add(name);
-		MCSItems.FOODS_NAME.add(name);
-		MCSItems.ITEMS.add((Item)this);
-		MCSItems.FOODS.add(this);
-		MCSItems.FOODS_MAP.put(this.name, this);
+		if(!langModId.equals("custom")) {
+			MCSItems.ITEMS_NAME.add(name);
+			MCSItems.FOODS_NAME.add(name);
+			MCSItems.ITEMS.add((Item)this);
+			MCSItems.FOODS.add(this);
+			MCSItems.FOODS_MAP.put(this.name, this);
+		}
 	}
 	
 	public BaseItemFood(String name, Item baseFood, int meta, String langModId, CreativeTabs tab,  boolean isWolfFood, boolean hasSubtypes) {
@@ -111,7 +99,7 @@ public class BaseItemFood extends ItemFood implements IHasModel{
 		this(name, baseFood, meta, langModId, tab, false, hasSubtypes);
 	}
 	
-	public BaseItemFood(String name, Item baseFood, int meta, String langModId,  CreativeTabs tab) {
+	public BaseItemFood(String name, Item baseFood, int meta, String langModId, CreativeTabs tab) {
 		this(name, baseFood, meta, langModId, tab, true);
 	}
 	
@@ -127,110 +115,190 @@ public class BaseItemFood extends ItemFood implements IHasModel{
 		this(name, baseFood, 0);
 	}
 	
+	public static boolean isFood(ItemStack stack) {
+		return isFood(stack.getItem());
+	}
+	
+	public static boolean isFood(Item item) {
+		return item instanceof ItemFood;
+	}
+	
 	public String getOwnerMod() {
 		return this.langModId;
 	}
 	
 	private boolean makeRecipe = true;
 	
-	public BaseItemFood setMakeRecipe(boolean makeRecipe) {
+	public BaseItemFood setMakeDefaultStackRecipe(boolean makeRecipe) {
 		this.makeRecipe = makeRecipe;
 		return this;
 	}
 	
-	public boolean getMakeRecipe() {
+	public boolean canMakeDefaultStackRecipe() {
 		return this.makeRecipe;
 	}
 	
 	public String getUnCompressedName() {
 		String[] unNames = JiuUtils.other.custemSplitString(this.name, "_");
-		String i = "";
+		StringBuffer sb = new StringBuffer();
 		for(String s : unNames) {
 			if(!"compressed".equals(s)) {
-				i += JiuUtils.other.upperCaseToFistLetter(s);
+				sb.append(JiuUtils.other.upperCaseToFirstLetter(s));
 			}
 		}
-		return i;
-		
-		/*
-		String[] names = JiuUtils.other.custemSplitString(this.name, "_");
-		
-		if(names.length == 4) {
-			return JiuUtils.other.upperCaseToFistLetter(names[1]) + JiuUtils.other.upperCaseToFistLetter(names[2]) + JiuUtils.other.upperCaseToFistLetter(names[3]);
-		}else if(names.length == 3){
-			return JiuUtils.other.upperCaseToFistLetter(names[1]) + JiuUtils.other.upperCaseToFistLetter(names[2]);
-		}else {
-			return JiuUtils.other.upperCaseToFistLetter(names[1]);
-		}
-		*/
+		return sb.toString();
+	}
+	
+	Boolean hasEffect = null;
+	public BaseItemFood hasEffect(boolean hasEffect) {
+		this.hasEffect = hasEffect;
+		return this;
+	}
+	
+	private Map<Integer, Boolean> HasEffectMap = Maps.newHashMap();
+	public BaseItemFood setHasEffectMap(Map<Integer, Boolean> map) {
+		this.HasEffectMap = map;
+		return this;
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@Override
 	public boolean hasEffect(ItemStack stack) {
-		if(this.baseFood != null) {
-			return this.baseFoodStack.hasEffect();
-		}else if(this.baseFoodItem != null) {
-			return this.baseFoodItem.hasEffect(this.baseFoodStack);
-		}else {
-			return super.hasEffect(stack);
+		if(!this.HasEffectMap.isEmpty()) {
+			if(this.HasEffectMap.containsKey(stack.getMetadata())) {
+				return this.HasEffectMap.get(stack.getMetadata());
+			}
 		}
+		if(this.hasEffect != null) {
+			return this.hasEffect;
+		}else if(this.baseFood != null) {
+			return this.unCompressedItem.hasEffect();
+		}else if(this.baseFoodItem != null) {
+			return this.baseFoodItem.hasEffect(this.unCompressedItem);
+		}
+		return super.hasEffect(stack);
+	}
+	
+//	Integer itemEnchantability = null;
+//	public BaseItemFood setItemEnchantability(int itemEnchantability) {
+//		this.itemEnchantability = itemEnchantability;
+//		return this;
+//	}
+//	
+//	private Map<Integer, Integer> EnchantabilityMap = null;
+//	public BaseItemFood setEnchantabilityMap(Map<Integer, Integer> map) {
+//		this.EnchantabilityMap = map;
+//		return this;
+//	}
+//	
+//	@Override
+//	public int getItemEnchantability(ItemStack stack) {
+//		if(this.EnchantabilityMap != null) {
+//			if(this.EnchantabilityMap.containsKey(stack.getMetadata())) {
+//				return this.EnchantabilityMap.get(stack.getMetadata());
+//			}
+//		}
+//		
+//		if(this.itemEnchantability != null) {
+//			return this.itemEnchantability;
+//		}else if(this.baseFood != null) {
+//			return this.baseFood.getItemEnchantability(this.unCompressedItem);
+//		}else if(this.baseFoodItem != null) {
+//			return this.baseFoodItem.getItemEnchantability(this.unCompressedItem);
+//		}
+//		return super.getItemEnchantability(stack);
+//	}
+	
+	Map<Integer, EnumRarity> RarityMap = null;
+	public BaseItemFood setRarityMap(Map<Integer, EnumRarity> map) {
+		this.RarityMap = map;
+		return this;
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@Override
-	public int getItemEnchantability(ItemStack stack) {
-		if(this.baseFood != null) {
-			return this.baseFood.getItemEnchantability(this.baseFoodStack);
-		}else if(this.baseFoodItem != null) {
-			return this.baseFoodItem.getItemEnchantability(this.baseFoodStack);
-		}else {
-			return super.getItemEnchantability(stack);
+	public IRarity getForgeRarity(ItemStack stack) {
+		if(this.RarityMap != null) {
+			if(!this.RarityMap.isEmpty()) {
+				if(this.RarityMap.containsKey(stack.getMetadata())) {
+					return this.RarityMap.get(stack.getMetadata());
+				}
+			}
 		}
+		if(!this.unCompressedItem.isEmpty()) {
+			return this.unCompressedItem.getItem().getForgeRarity(this.unCompressedItem);
+		}
+		return super.getForgeRarity(stack);
 	}
 	
-	@SideOnly(Side.CLIENT)
-	@Override
-	public EnumRarity getRarity(ItemStack stack) {
-		if(this.baseFood != null) {
-			return this.baseFoodStack.getRarity();
-		}else if(this.baseFoodItem != null){
-			return this.baseFoodItem.getRarity(baseFoodStack);
-		}else {
-			return super.getRarity(stack);
-		}
+	private Map<Integer, Integer> HealAmountMap = null;
+	public BaseItemFood setHealAmountMap(Map<Integer, Integer> map) {
+		this.HealAmountMap = map;
+		return this;
 	}
+	
+	private int healAmount;
+	private float saturationModifier;
+	private boolean isWolfFood;
+	
+	public BaseItemFood setFoodEntry(int amount, float saturation, boolean isWolfFood) {
+		this.healAmount = amount;
+        this.saturationModifier = saturation;
+        this.isWolfFood = isWolfFood;
+		return this;
+	}
+	
+	@Override
+	public boolean isWolfsFavoriteMeat() {
+        return this.isWolfFood;
+    }
 	
 	@Override
 	public int getHealAmount(ItemStack stack) {
-		if(this.baseItemIsNotFood) {
-			if(Configs.tooltip_information.get_actual_food_amout) {
-				return (int) Math.pow(super.getHealAmount(new ItemStack(this)), stack.getMetadata() + 1);
-			}else {
-				return (int)(super.getHealAmount(new ItemStack(this)) * ((stack.getMetadata() + 1) * 9) * 0.5);
-			}
-		}else {
-			if(Configs.tooltip_information.get_actual_food_amout) {
-				return (int) Math.pow(this.baseFood.getHealAmount(this.baseFoodStack), stack.getMetadata() + 1);
-			}else {
-				return (int)(this.baseFood.getHealAmount(this.baseFoodStack) * ((stack.getMetadata() + 1) * 9) * 0.5);
+		if(this.HealAmountMap != null) {
+			if(this.HealAmountMap.containsKey(stack.getMetadata())) {
+				return this.HealAmountMap.get(stack.getMetadata());
 			}
 		}
+		if(this.baseItemIsNotFood) {
+			if(Configs.TooltipInformation.get_actual_food_amout) {
+				return (int) Math.pow(this.healAmount, stack.getMetadata() + 1);
+			}else {
+				return (int)(this.healAmount * ((stack.getMetadata() + 1) * 9) * 0.5);
+			}
+		}else {
+			if(Configs.TooltipInformation.get_actual_food_amout) {
+				return (int) Math.pow(this.baseFood.getHealAmount(this.unCompressedItem), stack.getMetadata() + 1);
+			}else {
+				return (int)(this.baseFood.getHealAmount(this.unCompressedItem) * ((stack.getMetadata() + 1) * 9) * 0.5);
+			}
+		}
+	}
+	
+	private Map<Integer, Float> SaturationModifierMap = null;
+	public BaseItemFood setSaturationModifierMap(Map<Integer, Float> map) {
+		this.SaturationModifierMap = map;
+		return this;
 	}
 	
 	@Override
 	public float getSaturationModifier(ItemStack stack) {
+		if(this.SaturationModifierMap != null) {
+			if(this.SaturationModifierMap.containsKey(stack.getMetadata())) {
+				return this.SaturationModifierMap.get(stack.getMetadata());
+			}
+		}
 		if(this.baseItemIsNotFood) {
-			if(Configs.tooltip_information.get_actual_food_amout) {
-				return (float) Math.pow(super.getSaturationModifier(new ItemStack(this)), stack.getMetadata() + 1);
+			if(Configs.TooltipInformation.get_actual_food_amout) {
+				return (float) Math.pow(this.saturationModifier, stack.getMetadata() + 1);
 			}else {
-				return super.getSaturationModifier(new ItemStack(this)) * ((stack.getMetadata() + 1) * 9);
+				return this.saturationModifier * ((stack.getMetadata() + 1) * 9);
 			}
 		}else {
-			if(Configs.tooltip_information.get_actual_food_amout) {
-				return (float) Math.pow(this.baseFood.getSaturationModifier(this.baseFoodStack), stack.getMetadata() + 1);
+			if(Configs.TooltipInformation.get_actual_food_amout) {
+				return (float) Math.pow(this.baseFood.getSaturationModifier(this.unCompressedItem), stack.getMetadata() + 1);
 			}else {
-				return this.baseFood.getSaturationModifier(this.baseFoodStack) * ((stack.getMetadata() + 1) * 9);
+				return this.baseFood.getSaturationModifier(this.unCompressedItem) * ((stack.getMetadata() + 1) * 9);
 			}
 		}
     }
@@ -238,9 +306,9 @@ public class BaseItemFood extends ItemFood implements IHasModel{
 	@SideOnly(Side.CLIENT)
 	@Override
 	public String getItemStackDisplayName(ItemStack stack) {
-		return I18n.format("tile.mcs.compressed_" + stack.getMetadata() + ".name", stack.getMetadata()) + I18n.format(this.baseFoodStack.getUnlocalizedName() + ".name", 1);
+		return I18n.format("tile.mcs.compressed_" + stack.getMetadata() + ".name", stack.getMetadata()) + this.getUnCompressedItemLocalizedName();
 	}
-
+	
 	@Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
 		if(this.getHasSubtypes()){
@@ -254,133 +322,138 @@ public class BaseItemFood extends ItemFood implements IHasModel{
 		}
 	}
 	
-	boolean canAddPotion;
-	List<PotionEffect> effects = new ArrayList<PotionEffect>();
-	
-	public BaseItemFood canAddPotionEffect(boolean canAdd) {
-		this.canAddPotion = canAdd;
+	private Map<Integer, List<PotionEffectType>> potionEffect = Maps.newHashMap();
+	public BaseItemFood addPotionEffect(Map<Integer, List<PotionEffectType>> effect) {
+		this.potionEffect = effect;
 		return this;
 	}
 	
-	public BaseItemFood setPotionEffect(PotionEffect[] potion){
-		for(int i = 0; i < potion.length; ++i) {
-			this.effects.add(potion[i]);
-		}
-		return this;
-	}
-	
-	public void addPotionEffect(EntityPlayer player, boolean isCustem) {
-		if(this.effects != null) {
-			for(PotionEffect effect : this.effects) {
-				player.addPotionEffect(effect);
+	public BaseItemFood addPotionEffect(int[] metas, PotionEffectType[]... effects) {
+		if(metas.length == 1 && metas[0] == -1) {
+			List<PotionEffectType> effect = JiuUtils.other.copyArrayToList(effects[0]);
+			for(int i = 0; i < 16; i++) {
+				this.potionEffect.put(i, effect);
 			}
-			if(isCustem) {
-				// 添加完后清掉所有buff，以防后续重新给予buff
-				// 只有在是自定义的情况下才清
-				this.effects.clear();
-			}
-			
-		}
-	}
-	
-	@Override
-	protected void onFoodEaten(ItemStack stack, World worldIn, EntityPlayer player) {
-//		super.onFoodEaten(stack, worldIn, player);
-		if(this.canAddPotion) {
-			this.addPotionEffect(player, false);
 		}else {
-			if(Configs.custom.custem_already_stuff.item.custem_eat_effect.length != 1) {
-				try {
-					for(int j = 1; j < Configs.custom.custem_already_stuff.item.custem_eat_effect.length; ++j) {
-						String configs = Configs.custom.custem_already_stuff.item.custem_eat_effect[j];
-						
-						String[] config = JiuUtils.other.custemSplitString(configs, "#");// 包含各种东西的数组
-						
-						String[] effectConfigs = JiuUtils.other.custemSplitString(config[2], "|");// 仅包含buff的总数组
-						String[][] effectConfig = JiuUtils.other.one2two(new String[effectConfigs.length / 3][3], effectConfigs, 0);// 将buff总数组里面的buffs拆分成单个buff
-						
-						String name = config[0];// 物品名字
-						int meta = new Integer(config[1]);// 物品meta
-						
-						if(MCSItems.ITEMS_NAME.contains(name)) {
-							if(this.name.equals(name)) {
-								if(stack.getMetadata() == meta) {
-									this.setEffect(effectConfig, worldIn);
-									this.addPotionEffect(player, true);
-								}
-							}
-						}else {
-							if(worldIn.isRemote) {
-								MCS.instance.log.fatal("\"" + name +  "\": "+ "\"" + name + "\"" + " is not belong to MCS's Item!");
-							}
-						}
-					}
-				} catch (Exception e) {
-					MCS.instance.log.fatal(e.getMessage() + " is not Number!");
-				}
+			for(int i = 0; i < metas.length; i++) {
+				int meta = metas[i];
+				List<PotionEffectType> effect = JiuUtils.other.copyArrayToList(effects[i]);
+				
+				this.potionEffect.put(meta, effect);
 			}
 		}
+		return this;
 	}
 	
-	private void setEffect(String[][] effectConfig, World world) {
-		for(int i = 0; i < effectConfig.length; ++i) {
-			if(effectConfig[i].length == 3) {
-				String effectName = effectConfig[i][0];// buff 名字
-				try {
-					int time = new Integer(effectConfig[i][1]) * 20;// buff时间，这里乘以20是为了以秒计算
-					int level = new Integer(effectConfig[i][2]);// buff的等级
-					if(JiuUtils.other.getRegisteredMobEffect(effectName) != null) {// 如果buff名字获取后不是null
-						if(time <= 2147483647) {// 如果时间没有超出int上限
-							if(level < 256) {// 如果等级没有超出255
-								// 往list里面添加buff
-								this.effects.add(new PotionEffect(JiuUtils.other.getRegisteredMobEffect(effectName), time, level));
-							}else {
-								if(world.isRemote) {
-									MCS.instance.log.fatal(effectName + ": \"" + level + "\" It's too large! It must be >= 255");// 提示等级太大
-								}
-							}
-						}else {
-							if(world.isRemote) {
-								MCS.instance.log.fatal(effectName + ": \"" + time + "\" It's too large! It must be >=107374182");// 提示时间太大
-							}
-						}
-					}
-				} catch (Exception e) {
-					if(world.isRemote) {
-						MCS.instance.log.fatal(effectName + ": \"" + e.getMessage() + "\" is not Number!");// 提示 xxxx 不是数字
-					}
-				}
-			}else {
-				if(world.isRemote) {
-					MCS.instance.log.fatal(effectConfig[i][0] + ": " + " length(" + effectConfig[i].length + ") is not multiple of 3!");// 提示单个buff单元不含有，或超出指定的数量
-				}
-			}
-		}
-	}
+	ItemStack container = null;
 	
-	/*
-	boolean hasContainer;
-	ItemStack container;
-	
-	public BaseItemFood hasContainer(boolean hasContainer, ItemStack container) {
-		this.hasContainer = hasContainer;
+	public BaseItemFood setContainer(ItemStack container) {
 		this.container = container;
 		return this;
 	}
 	
+	private Map<Integer, ItemStack> ContainerMap = null;
+	public BaseItemFood setContainerMap(Map<Integer, ItemStack> map) {
+		this.ContainerMap = map;
+		return this;
+	}
+	
 	@Override
-	public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityLivingBase entityLiving) {
-		super.onItemUseFinish(stack, worldIn, entityLiving);
-		if(this.hasContainer) {
-			if (entityLiving instanceof EntityPlayer) {
-	            EntityPlayer player = (EntityPlayer)entityLiving;
-	            System.out.println(stack);
-	            player.addItemStackToInventory(this.container);
-	        }
+	protected void onFoodEaten(ItemStack stack, World world, EntityPlayer player) {
+		if(this.potionEffect != null && !world.isRemote) {
+			if(this.potionEffect.containsKey(stack.getMetadata())) {
+				if(this.potionEffect.get(stack.getMetadata()) != null) {
+					if(!this.potionEffect.get(stack.getMetadata()).isEmpty()) {
+						for(PotionEffectType buff : this.potionEffect.get(stack.getMetadata())) {
+							if(buff.getEffect() != null) {
+								player.addPotionEffect(buff.getEffect());
+							}
+						}
+					}
+				}
+			}
 		}
-		return super.onItemUseFinish(stack, worldIn, entityLiving);
-    }
-	*/
+		
+		if(this.ContainerMap != null) {
+    		if(this.ContainerMap.containsKey(stack.getMetadata())) {
+    			if(this.ContainerMap.get(stack.getMetadata()) != null) {
+    				player.addItemStackToInventory(this.ContainerMap.get(stack.getMetadata()).copy());
+    			}
+    		}
+    	}
+		
+        if(this.container != null) {
+        	if(Configs.Custom.custem_already_stuff.item.give_food_container) {
+        		if(this.container.getItem() instanceof BaseItemSub
+        		|| this.container.getItem() instanceof BaseItemFood
+        		|| this.isSubBlock(this.container)) {
+        			player.addItemStackToInventory(new ItemStack(this.container.getItem(), 1, stack.getMetadata()));
+        		}else {
+        			player.addItemStackToInventory(this.container.copy());
+        		}
+        	}
+        }
+	}
+	
+	private boolean isSubBlock(ItemStack stack) {
+		if(JiuUtils.item.isBlock(stack)) {
+			if(JiuUtils.item.getBlockFromItemStack(stack) instanceof BaseBlockSub) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private List<String> shiftInfos = new ArrayList<String>();
+	public BaseItemFood addCustemShiftInformation(String... custemInfo) {
+		for(int i = 0; i < custemInfo.length; ++i) {
+			shiftInfos.add(custemInfo[i]);
+		}
+		return this;
+	}
+	
+	public BaseItemFood addCustemShiftInformation(List<String> infos) {
+		this.shiftInfos = infos;
+		return this;
+	}
+	
+	private Map<Integer, List<String>> metaShiftInfos = Maps.newHashMap();
+	public BaseItemFood addCustemShiftInformation(Map<Integer, List<String>> infos) {
+		this.metaShiftInfos = infos;
+		return this;
+	}
+	
+	private List<String> infos = new ArrayList<String>();
+	public BaseItemFood addCustemInformation(String... custemInfo) {
+		for(int i = 0; i < custemInfo.length; ++i) {
+			infos.add(custemInfo[i]);
+		}
+		return this;
+	}
+	
+	public BaseItemFood addCustemInformation(List<String> infos) {
+		this.infos = infos;
+		return this;
+	}
+	
+	private Map<Integer, List<String>> metaInfos = null;
+	public BaseItemFood addCustemInformation(Map<Integer, List<String>> infos) {
+		this.metaInfos = infos;
+		return this;
+	}
+	
+	ItemStack infoStack = null;
+	
+	public BaseItemFood setInfoStack(ItemStack stack) {
+		this.infoStack = stack;
+		return this;
+	}
+	
+	private Map<Integer, ItemStack> infoStacks = null;
+	public BaseItemFood setInfoStack(Map<Integer, ItemStack> infoStacks) {
+		this.infoStacks = infoStacks;
+		return this;
+	}
 	
 	@Override
 	@SideOnly(Side.CLIENT)
@@ -388,9 +461,24 @@ public class BaseItemFood extends ItemFood implements IHasModel{
 		int meta = stack.getMetadata();
 		int level = meta + 1;
 		
+		if(this.infoStack != null) {
+			tooltip.add(this.infoStack.toString());
+			this.infoStack.getItem().addInformation(this.infoStack, world, tooltip, advanced);
+		}else if(this.infoStacks != null){
+			if(this.infoStacks.containsKey(meta)) {
+				if(this.infoStacks.get(meta) != null) {
+					this.infoStacks.get(meta).getItem().addInformation(this.infoStacks.get(meta), world, tooltip, advanced);
+				}
+			}else {
+				this.unCompressedItem.getItem().addInformation(this.unCompressedItem, world, tooltip, advanced);
+			}
+		}else {
+			this.unCompressedItem.getItem().addInformation(this.unCompressedItem, world, tooltip, advanced);
+		}
+		
 		if(Configs.use_3x3_recipes) {
-			if(Configs.tooltip_information.show_specific_number) {
-				if(!Configs.tooltip_information.can_custom_specific_number) {
+			if(Configs.TooltipInformation.show_specific_number) {
+				if(!Configs.TooltipInformation.can_custom_specific_number) {
 					if(meta == 0) { tooltip.add("9 x " + this.getUnCompressedItemLocalizedName()); }
 					if(meta == 1) { tooltip.add("81 x " + this.getUnCompressedItemLocalizedName()); }
 					if(meta == 2) { tooltip.add("729 x " + this.getUnCompressedItemLocalizedName()); }
@@ -411,11 +499,16 @@ public class BaseItemFood extends ItemFood implements IHasModel{
 					tooltip.add(I18n.format("info.compressed_3x3_" + level + ".name", 1) + " x " + this.getUnCompressedItemLocalizedName());
 				}
 			}else {
-				tooltip.add(Math.pow(9, level) + " x " + this.getUnCompressedItemLocalizedName());
+				if(level >= 100) {
+					tooltip.add(Math.pow(9, level) + " x " + this.getUnCompressedItemLocalizedName());
+				}else {
+					tooltip.add(new BigInteger("9").pow(level) + " x " + this.getUnCompressedItemLocalizedName());
+				}
+				
 			}
 		}else {
-			if(Configs.tooltip_information.show_specific_number) {
-				if(!Configs.tooltip_information.can_custom_specific_number) {
+			if(Configs.TooltipInformation.show_specific_number) {
+				if(!Configs.TooltipInformation.can_custom_specific_number) {
 					if(meta == 0) { tooltip.add("4 x " + this.getUnCompressedItemLocalizedName()); }
 					if(meta == 1) { tooltip.add("16 x " + this.getUnCompressedItemLocalizedName()); }
 					if(meta == 2) { tooltip.add("64 x " + this.getUnCompressedItemLocalizedName()); }
@@ -436,67 +529,78 @@ public class BaseItemFood extends ItemFood implements IHasModel{
 					tooltip.add(I18n.format("info.compressed_2x2_" + level + ".name", 1) + " x " + this.getUnCompressedItemLocalizedName());
 				}
 			}else {
-				tooltip.add(Math.pow(4, level) + " x " + this.getUnCompressedItemLocalizedName());
+				if(level >= 100) {
+					tooltip.add(Math.pow(4, level) + " x " + this.getUnCompressedItemLocalizedName());
+				}else {
+					tooltip.add(new BigInteger("4").pow(level) + " x " + this.getUnCompressedItemLocalizedName());
+				}
 			}
 		}
 		
 		if(MCS.instance.test_model) {
 			String[] names = JiuUtils.other.custemSplitString(this.name, "_");
-			tooltip.add(names.length+"");
-			tooltip.add(this.getUnCompressedName());
+			tooltip.add(names.length+" : "+this.getUnCompressedName());
 		}
 		
-		if(Configs.tooltip_information.show_owner_mod) {
+		if(Configs.TooltipInformation.show_owner_mod) {
 			tooltip.add("Owner Mod: \'" + this.getOwnerMod() + "\'");
 		}
 		
-		if(Configs.tooltip_information.show_food_amount) {
+		if(Configs.TooltipInformation.show_food_amount) {
 			tooltip.add("FoodAmount: " + this.getHealAmount(stack));
 			tooltip.add("SaturationModifier: " + this.getSaturationModifier(stack));
 		}
 		
-		if(Configs.tooltip_information.show_burn_time) {
+		if(Configs.TooltipInformation.show_burn_time) {
 			tooltip.add("BurnTime: " + ForgeEventFactory.getItemBurnTime(stack));
 		}
 		
-		if(Configs.tooltip_information.show_oredict) {
+		if(Configs.TooltipInformation.show_oredict) {
 			tooltip.add("OreDictionary: ");
 			for(String ore : JiuUtils.item.getOreDict(stack)){
 				tooltip.add("> " + ore);
 			}
 		}
 		
-		if(meta == 65535) { tooltip.add("感谢喵呜玖大人的恩惠！"); }
-		
-		try {
-			for(int i = 1; i < Configs.tooltip_information.custem_info.item_food.length; ++i) {
-				String str0  = Configs.tooltip_information.custem_info.item_food[i];
-				
-				String[] strri = JiuUtils.other.custemSplitString(str0, "#");
-				
-				if(MCSItems.FOODS_NAME.contains(strri[0])) {
-					if(this.name.equals(strri[0])) {
-						try {
-							int strmeta = new Integer(strri[1]);
-							
-							if(strmeta == meta) {
-								String[] str1 = JiuUtils.other.custemSplitString(strri[2], "|");
-								
-								for(int k = 0; k < str1.length; ++k) {
-									tooltip.add(str1[k]);
-								}
-							}
-						} catch (Exception e) {
-							MCS.instance.log.fatal("\"" + strri[0] +  "\": "+ "\"" + strri[1] + "\"" + " is not Number!");
-						}
+		if(!this.infos.isEmpty()) {
+			for(String info : this.infos) {
+				tooltip.add(info);
+			}
+		}else if(this.metaInfos != null) {
+			if(!this.metaInfos.isEmpty()) {
+				if(this.metaInfos.containsKey(meta)) {
+					for(String str : this.metaInfos.get(meta)) {
+						tooltip.add(str);
 					}
-				}else {
-					MCS.instance.log.fatal("\"" + strri[0] +  "\"" + " is not belong to MCS's Item!");
 				}
 			}
-		} catch (Exception e) {
-			MCS.instance.log.fatal("Item: " + (new Integer(e.getMessage()) - 1) + " is not multiple of 3!");
 		}
+		
+		if(!this.shiftInfos.isEmpty() || !this.metaShiftInfos.isEmpty()) {
+			if(!this.shiftInfos.isEmpty()) {
+				
+				if(GuiScreen.isShiftKeyDown()) {
+					for (String info : this.shiftInfos) {
+						tooltip.add(info);
+					}
+				}else {
+					tooltip.add(I18n.format("info.mcs.shift"));
+				}
+			}
+			if(!this.metaShiftInfos.isEmpty()) {
+				if(this.metaShiftInfos.containsKey(meta)) {
+					if(GuiScreen.isShiftKeyDown()) {
+						for(String info : this.metaShiftInfos.get(meta)) {
+							tooltip.add(info);
+						}
+					}else {
+						tooltip.add(I18n.format("info.mcs.shift"));
+					}
+				}
+			}
+		}
+		
+		if(meta == Short.MAX_VALUE) { tooltip.add("感谢喵呜玖大人的恩惠�?"); }
 	}
 
 	@Override
@@ -505,7 +609,7 @@ public class BaseItemFood extends ItemFood implements IHasModel{
 			int meta = type.getMeta();
 			model.registerItemModel(this, meta, this.langModId + "/item/food/" + this.name, this.name + "." + meta);
 		}
-		model.registerItemModel(this, 65535, this.langModId + "/item/food/" + this.name, this.name + "." + 65535);
+		model.registerItemModel(this, Short.MAX_VALUE, this.langModId + "/item/food/" + this.name, this.name + "." + Short.MAX_VALUE);
 	}
 	
 	public final Item getUnCompressedItem(){
@@ -517,15 +621,28 @@ public class BaseItemFood extends ItemFood implements IHasModel{
 	}
 	
 	public final ItemStack getUnCompressedStack(){
-		return this.baseFoodStack;
+		return this.unCompressedItem;
 	}
 	
 	@SideOnly(Side.CLIENT)
 	public final String getUnCompressedItemLocalizedName() {
-		if("minecraft".equals(this.baseFoodStack.getItem().getCreatorModId(this.baseFoodStack))) {
-			return I18n.format(this.baseFoodStack.getUnlocalizedName() + ".name", 1).trim();
-		}else {
-			return I18n.format(this.baseFoodStack.getUnlocalizedName(), 1).trim();
-		}
+		return this.unCompressedItem.getDisplayName();
 	}
+	
+	public final ItemStack Level_1 = new ItemStack(this, 1, 0);
+	public final ItemStack Level_2 = new ItemStack(this, 1, 1);
+	public final ItemStack Level_3 = new ItemStack(this, 1, 2);
+	public final ItemStack Level_4 = new ItemStack(this, 1, 3);
+	public final ItemStack Level_5 = new ItemStack(this, 1, 4);
+	public final ItemStack Level_6 = new ItemStack(this, 1, 5);
+	public final ItemStack Level_7 = new ItemStack(this, 1, 6);
+	public final ItemStack Level_8 = new ItemStack(this, 1, 7);
+	public final ItemStack Level_9 = new ItemStack(this, 1, 8);
+	public final ItemStack Level_10 = new ItemStack(this, 1, 9);
+	public final ItemStack Level_11 = new ItemStack(this, 1, 10);
+	public final ItemStack Level_12 = new ItemStack(this, 1, 11);
+	public final ItemStack Level_13 = new ItemStack(this, 1, 12);
+	public final ItemStack Level_14 = new ItemStack(this, 1, 13);
+	public final ItemStack Level_15 = new ItemStack(this, 1, 14);
+	public final ItemStack Level_16 = new ItemStack(this, 1, 15);
 }

@@ -4,22 +4,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import cat.jiu.core.JiuCore.LogOS;
-import cat.jiu.core.util.JiuCoreEvents;
-import cat.jiu.mcs.blocks.net.GuiHandler;
-import cat.jiu.mcs.blocks.net.TileEntityCompressor;
+import cat.jiu.core.util.JiuUtils;
+import cat.jiu.core.util.helpers.DayUtils;
 import cat.jiu.mcs.command.MCSCommand;
 import cat.jiu.mcs.proxy.CommonProxy;
-import cat.jiu.mcs.recipes.MCSRecipe;
-import cat.jiu.mcs.util.CatEvent;
-import cat.jiu.mcs.util.TestModel;
-import cat.jiu.mcs.util.TileEntityChangeBlock;
 import cat.jiu.mcs.util.init.*;
+
 import moze_intel.projecte.emc.EMCMapper;
 import moze_intel.projecte.emc.SimpleStack;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -29,7 +24,6 @@ import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @Mod(
 	modid = MCS.MODID,
@@ -38,7 +32,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 	useMetadata = true,
 	guiFactory = "cat.jiu.mcs.config.ConfigGuiFactory",
 	dependencies =
-		  "required-after:jiucore@[1.0.3-202112050055,);"
+		  "required-after:jiucore@[1.0.7-20220201000000,);"
 		+ "after:thermalfoundation;"
 		+ "after:projecte;"
 		+ "after:botania;"
@@ -54,7 +48,7 @@ public class MultipleCompressedStuffs {
 	public static final String MODID = "mcs";
 	public static final String NAME = "MultipleCompressedStuffs";
 	public static final String OWNER = "small_jiu";
-	public static final String VERSION = "2.9.3-202112050155";
+	public static final String VERSION = "2.9.4-20220201000000";
 	public final boolean test_model = false; // if is IDE, you can set to 'true' to enable some test stuff
 	public static final CreativeTabs COMPERESSED_BLOCKS = new CreativeTabCompressedStuffsBlocks();
 	public static final CreativeTabs COMPERESSED_ITEMS = new CreativeTabCompressedStuffsItems();
@@ -69,47 +63,14 @@ public class MultipleCompressedStuffs {
 	)
 	public static CommonProxy proxy;
 	
-	long startitem = 0L;
-	long startblock = 0L;
-	
 	@Mod.EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
+	public void preInit(FMLPreInitializationEvent event) throws Throwable {
 		proxy.preInit(event);
-		GuiHandler.register();
-		
-		JiuCoreEvents.addEvent(new CatEvent());
-		JiuCoreEvents.addEvent(new TestModel());
-		
-		startitem = System.currentTimeMillis();
-		new MCSItems();
-		MCSItems.normal.CAT_HAMMER.setMaxStackSize(1);
-		startitem = System.currentTimeMillis() - startitem;
-		
-		startblock = System.currentTimeMillis();
-		new MCSBlocks();
-		startblock = System.currentTimeMillis() - startblock;
-		
-		GameRegistry.registerTileEntity(TileEntityChangeBlock.class, new ResourceLocation(MCS.MODID + ":" + "change_block"));
-		GameRegistry.registerTileEntity(TileEntityCompressor.class, new ResourceLocation(MCS.MODID + ":" + "compressor"));
 	}
-	
-	long startore = 0L;
-	long startrecipe = 0L;
 	
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		proxy.init(event);
-		
-		startore = System.currentTimeMillis();
-		try {
-			MCSOreDict.register();
-		} catch (Exception e) {e.printStackTrace();}
-		
-		startore = (System.currentTimeMillis() - startore);
-		
-		startrecipe = System.currentTimeMillis();
-		MCSRecipe.register();
-		startrecipe = (System.currentTimeMillis() - startrecipe);
 	}
 	
 	@Mod.EventHandler
@@ -124,19 +85,19 @@ public class MultipleCompressedStuffs {
 		this.log.info("");
 		
 		this.log.info("Start Register Items");
-		this.log.info("Register Items Successful, " + "(took " + startitem + " ms)");
+		this.log.info("Register Items Successful, " + "(took " + proxy.startitem + " ms)");
 		
 		this.log.info("Start Register Blocks");
-		this.log.info("Register Blocks Successful, " + "(took " + startblock + " ms)");
+		this.log.info("Register Blocks Successful, " + "(took " + proxy.startblock + " ms)");
 		
 		this.log.info("Start Register Models");
 		this.log.info("Register Models Successful, " + "(took " + startmodel + " ms)");
 		
 		this.log.info("Start Register OreDictionarys");
-		this.log.info("Register OreDictionarys Successful, " + "(took " + startore + " ms)");
+		this.log.info("Register OreDictionarys Successful, " + "(took " + proxy.startore + " ms)");
 		
 		this.log.info("Start Register Recipes");
-		this.log.info("Register Recipes Successful, " + "(took " + startrecipe + " ms)");
+		this.log.info("Register Recipes Successful, " + "(took " + proxy.startrecipe + " ms)");
 		
 		this.log.info("");
 		
@@ -144,7 +105,19 @@ public class MultipleCompressedStuffs {
 		this.log.info("#                                         #");
 		this.log.info("# MultipleCompressedStuffs Load Complete. #");
 		this.log.info("#                                         #");
+		this.log.info("#             "+this.getDayOfVersion()+"              #");
+		this.log.info("#                                         #");
 		this.log.info("###########################################");
+	}
+	
+	private String getDayOfVersion() {
+		DayUtils day = JiuUtils.day;
+		return day.getYear()+""+
+				(day.getMonth() < 10 ? "0"+day.getMonth() : day.getMonth()+"")+
+				(day.getDayOfMonth() < 10 ? "0"+day.getDayOfMonth() : day.getDayOfMonth()+"")+
+				(day.getHour() < 10 ? "0"+day.getHour() : day.getHour()+"")+
+				(day.getMinutes() < 10 ? "0"+day.getMinutes() : day.getMinutes()+"")+
+				(day.getSecond() < 10 ? "0"+day.getSecond() : day.getSecond()+"");
 	}
 	
 	@Mod.EventHandler // 服务器启动中

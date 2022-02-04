@@ -11,7 +11,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-version = "1.12.2-2.9.1"
+version = "1.12.2-2.9.4-20220201000000"
 group = "cat.jiu.mcs" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "MultipleCompressedStuffs"
 
@@ -29,8 +29,26 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20171003"
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    
+	mappings = "snapshot_20171003"
+    
+	// makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+}
+
+def commonManifest = {
+    attributes('FMLAT': 'mcs_at.cfg')
+}
+
+jar {
+	manifest commonManifest
+}
+
+task deobfJar(type: Jar) {
+    manifest commonManifest
+}
+
+artifacts {
+    deobfJar
 }
 
 repositories {
@@ -82,8 +100,7 @@ repositories {
 }
 
 dependencies {
-	
-	compile 'cat.jiu.core:jiucore:1.12.2-1.0.0'
+//	compile 'jiu:jiucore:1.12.2-1.0.0'
 	deobfCompile 'mezz.jei:jei_1.12.2:4.15.0.293'
 	deobfCompile 'cofh:ThermalFoundation:1.12.2-2.6.3.27:universal'
 	deobfCompile 'cofh:CoFHCore:1.12.2-4.6.3.27:universal'
@@ -101,7 +118,7 @@ dependencies {
 	deobfCompile "curse.maven:valkyrielib-245480:2691542" // 2.0.20.1
 	deobfCompile "curse.maven:environmental-tech-245453:2691536" // 2.0.20.1
 //	compileOnly "appeng:appliedenergistics2:6.0.0-stable.7:api"
-
+	
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"

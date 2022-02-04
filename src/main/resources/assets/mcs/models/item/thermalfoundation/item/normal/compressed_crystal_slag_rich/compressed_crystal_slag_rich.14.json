@@ -1,0 +1,7 @@
+{
+"parent":"item/generated",
+	"textures": {
+		"layer0": "thermalfoundation:items/material/crystal_slag_rich",
+		"layer1": "mcs:items/compressed_15"
+	}
+}

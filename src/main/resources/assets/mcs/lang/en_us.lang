@@ -3,8 +3,12 @@ itemGroup.compressed_stuffs_items=MultipleCompressed-Items
 info.mcs.logging.air.name=Eat the air you!
 
 item.mcs.cat_hammer.name=Cat Hammer
+item.mcs.cat_hammer.info.0=BerakBedrocks
 item.mcs.cat_ingot.name=Cat Ingot
 item.mcs.cat_hair.name=Cat Hair
+item.mcs.destroyer.name=Destroyer
+item.mcs.destroyer.info.0=BreakBlocks
+tile.mcs.compressor.name=Compressor
 
 tile.mcs.block.name=Block
 
@@ -24,7 +28,7 @@ info.compressed_13.name=2541865828329 %s
 info.compressed_14.name=22876792454961 %s 
 info.compressed_15.name=205891132094649 %s 
 info.compressed_16.name=1853020188851841 %s 
-info.compressed_65535.name=I don't know how many
+info.compressed_32767.name=I don't know how many
 
 tile.mcs.compressed_0.name=Compressed 
 tile.mcs.compressed_1.name=Double Compressed 
@@ -42,4 +46,4 @@ tile.mcs.compressed_12.name=13 Compressed
 tile.mcs.compressed_13.name=14 Compressed 
 tile.mcs.compressed_14.name=15 Compressed 
 tile.mcs.compressed_15.name=16 Compressed 
-tile.mcs.compressed_65535.name=Infinity Compressed 
+tile.mcs.compressed_32767.name=Infinity Compressed 

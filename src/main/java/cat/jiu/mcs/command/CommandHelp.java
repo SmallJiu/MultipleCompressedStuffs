@@ -1,11 +1,14 @@
+//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
+
 package cat.jiu.mcs.command;
 
-import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.base.BaseCommand;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextComponentKeybind;
 
 public class CommandHelp extends BaseCommand.CommandNormal {
 
@@ -16,11 +19,11 @@ public class CommandHelp extends BaseCommand.CommandNormal {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(sender.getCommandSenderEntity() instanceof EntityPlayer) {
-			JiuUtils.entity.sendMessage(sender, "MCS has this command: ");
-			JiuUtils.entity.sendMessage(sender, "> /mcs blocks   | get mcs registry all blocks name");
-			JiuUtils.entity.sendMessage(sender, "> /mcs getore   | get you held item OreDictionary");
-			JiuUtils.entity.sendMessage(sender, "> /mcs loadmod  | get minecraft load mod name");
-			JiuUtils.entity.sendMessage(sender, "> /mcs help     | get this helper");
+			sender.sendMessage(new TextComponentKeybind("MCS has this command: "));
+			sender.sendMessage(new TextComponentKeybind("> /mcs blocks   | get mcs registry all blocks name"));
+			sender.sendMessage(new TextComponentKeybind("> /mcs getore   | get you held item OreDictionary"));
+			sender.sendMessage(new TextComponentKeybind("> /mcs loadmod  | get minecraft load mod name"));
+			sender.sendMessage(new TextComponentKeybind("> /mcs help     | get this helper"));
 		}
     }
 }

@@ -1,0 +1,7 @@
+{
+"parent":"item/generated",
+	"textures": {
+		"layer0": "thermalfoundation:items/material/dust_mithril",
+		"layer1": "mcs:items/compressed_32768"
+	}
+}
