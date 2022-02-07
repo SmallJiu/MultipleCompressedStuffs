@@ -11,6 +11,7 @@ import com.google.common.collect.Maps;
 import cat.jiu.core.energy.CapabilityJiuEnergy;
 import cat.jiu.core.energy.JiuEnergyStorage;
 import cat.jiu.core.util.JiuUtils;
+import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.util.base.BaseBlockSub;
 import cat.jiu.mcs.util.base.BaseItemFood;
 import cat.jiu.mcs.util.base.BaseItemSub;
@@ -62,14 +63,14 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 		this.addEnergy();// 能量输入
 		this.reloadEnergy();
 		
-		// 能量是否大于等于20，大于等�?20是为了避免同时有4个多重的物品同时合成导致没有能量
+		// 能量是否大于等于20，大于等�?20是为了避免同时有4个多重的物品同时合成导致没有能量
 		if(this.energy >= 20) {
 			if (this.compressedSlot.getStackInSlot(0) != null && !this.compressedSlot.getStackInSlot(0).isEmpty()) {
-				this.onBlockCrafting();// 未压缩方块合成为�?重压缩方�?
-				this.onItemCrafting();// 未压缩物品合成为�?重压缩物�?
+				this.onBlockCrafting();// 未压缩方块合成为�?重压缩方�?
+				this.onItemCrafting();// 未压缩物品合成为�?重压缩物�?
 			}
-			this.craftCompressedItem();// 全部压缩物品合成为下�?重的压缩物品
-			this.checkItemCount();// �?查slot物品，大于一定数禁止破坏，防止过多物品掉地上卡死
+			this.craftCompressedItem();// 全部压缩物品合成为下�?重的压缩物品
+			this.checkItemCount();// �?查slot物品，大于一定数禁止破坏，防止过多物品掉地上卡死
 		}
 		
 		this.reloadEnergy();
@@ -123,7 +124,10 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 				int i = this.storage.getEnergyStored() + this.getEnergy(stack);
 				if (i < this.storage.getMaxEnergyStored() && !(i > this.maxEnergy)) {
 					this.storage.receiveEnergy(this.getEnergy(stack), false);
-					stack.shrink(1);
+					
+					if(!MCS.instance.test_model) {
+						stack.shrink(1);
+					}
 					this.reloadEnergy();
 				}
 			}else if (stack.hasCapability(CapabilityEnergy.ENERGY, (EnumFacing) null)) {
@@ -145,13 +149,15 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 		}
 	}
 	
-	// 方块的合�?
+	// 方块的合�?
 	private void onBlockCrafting() {
 		for(BaseBlockSub c : MCSBlocks.SUB_BLOCKS) {
 			ItemStack unBlock = this.compressedSlot.getStackInSlot(0);
 			if (JiuUtils.item.equalsStack(unBlock, c.getUnCompressedItemStack())) {
 				if (unBlock.getCount() >= this.getShrinkCount()) {
-//					unBlock.shrink(9);
+					if(!MCS.instance.test_model) {
+						unBlock.shrink(9);
+					}
 					JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, 1));
 					this.storage.extractEnergyWithInt(5, false);
 					this.reloadEnergy();
@@ -160,14 +166,16 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 		}
 	}
 	
-	// 物品的合�?
+	// 物品的合�?
 	private void onItemCrafting() {
 		for (BaseItemSub c : MCSItems.SUB_ITEMS) {
 			ItemStack unItem = this.compressedSlot.getStackInSlot(0);
 			if (JiuUtils.item.equalsStack(unItem, c.getUnCompressedStack())) {
 				if (unItem.getCount() >= this.getShrinkCount()) {
 					JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, 1));
-					unItem.shrink(9);
+					if(!MCS.instance.test_model) {
+						unItem.shrink(9);
+					}
 					this.storage.extractEnergyWithInt(5, false);
 					this.reloadEnergy();
 				}
@@ -178,7 +186,9 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 			if (JiuUtils.item.equalsStack(unItem, c.getUnCompressedStack())) {
 				if (unItem.getCount() >= this.getShrinkCount()) {
 					JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, 1));
-					unItem.shrink(9);
+					if(!MCS.instance.test_model) {
+						unItem.shrink(9);
+					}
 					this.storage.extractEnergyWithInt(5, false);
 					this.reloadEnergy();
 				}
