@@ -1,6 +1,6 @@
 # MultipleCompressedStuffs
 
-Last modid is MultipleCompressedBlocks,
+Before modid is MultipleCompressedBlocks,
 Now modid is MultipleCompressedStuffs
 
-This mod add Minecraft blocks 16 compressed states
+This mod add 16 compressed states
