@@ -1,5 +1,3 @@
-//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
-
 package cat.jiu.mcs.util.base;
 
 import java.util.Map;
@@ -8,8 +6,7 @@ import javax.annotation.Nonnull;
 
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.ModSubtypes;
-import cat.jiu.mcs.util.init.MCSBlocks;
-
+import cat.jiu.mcs.util.init.MCSResources;
 import cofh.api.item.IToolHammer;
 
 import net.minecraft.block.Block;
@@ -48,34 +45,6 @@ public class BaseBlock extends Block {
 	private final boolean hasSubtypes;
 	protected ItemStack unCompressedItem;
 	
-	public BaseBlock(String name, Material materialIn, SoundType soundType, CreativeTabs tab, float hardness, boolean hasSubType) {
-		super(materialIn);
-		this.name = name;
-		this.tab = tab;
-		this.hasSubtypes = hasSubType;
-		
-		this.setSoundType(soundType);
-		this.setBlockHarvestLevel();
-		this.setUnlocalizedName("mcs." + this.name);
-		this.setCreativeTab(this.tab);
-		this.setRegistryName(this.name);
-		MCSBlocks.BLOCKS.add(this);
-		MCSBlocks.BLOCKS_NAME.add(this.name);
-		MCSBlocks.BLOCKS_MAP.put(this.name, this);
-		if(hardness < 0) {
-			this.setHardness(99999999);
-			this.setBlockUnbreakable();
-		}else {
-			this.setHardness(hardness);
-		}
-		
-		if(hasSubType) {
-			ForgeRegistries.ITEMS.register(new BaseBlockItem(this, false).setRegistryName(this.name));
-		}else {
-			ForgeRegistries.ITEMS.register(new BaseBlockItem(this, hasSubType).setRegistryName(this.name));
-		}
-	}
-	
 	public BaseBlock(String name, @Nonnull ItemStack unCompressedItem, Material materialIn, SoundType soundType, CreativeTabs tab, float hardness, boolean hasSubType) {
 		super(materialIn);
 		this.name = name;
@@ -87,12 +56,11 @@ public class BaseBlock extends Block {
 		this.setBlockHarvestLevel();
 		this.setUnlocalizedName("mcs." + this.name);
 		this.setCreativeTab(this.tab);
-		this.setRegistryName(this.name);
-		MCSBlocks.BLOCKS.add(this);
-		MCSBlocks.BLOCKS_NAME.add(this.name);
+		this.setRegistryName("mcs", this.name);
+		MCSResources.BLOCKS.add(this);
+		MCSResources.BLOCKS_NAME.add(this.name);
 		if(hardness < 0) {
 			this.setHardness(99999999);
-			this.setBlockUnbreakable();
 		}else {
 			this.setHardness(hardness);
 		}
@@ -127,7 +95,7 @@ public class BaseBlock extends Block {
 		return this.unCompressedItem.getItem();
 	}
 	
-	public final ItemStack getUnCompressedItemStack() {
+	public final ItemStack getUnCompressedStack() {
 		return this.unCompressedItem;
 	}
 	
@@ -176,10 +144,8 @@ public class BaseBlock extends Block {
 		boolean lag = false;
 		if(this.canUseWrenchBreak) {
 			return this.useWrenchBreak(world, pos, state, player, hand, false);
-		}else if(this.canUseWrenchBreaks != null) {
-			if(this.canUseWrenchBreaks.containsKey(JiuUtils.item.getMetaFormBlockState(state))) {
-				return this.useWrenchBreak(world, pos, state, player, hand, true);
-			}
+		}else if(this.canUseWrenchBreaks != null && this.canUseWrenchBreaks.containsKey(JiuUtils.item.getMetaFormBlockState(state))) {
+			return this.useWrenchBreak(world, pos, state, player, hand, true);
 		}
 		return lag;
 	}

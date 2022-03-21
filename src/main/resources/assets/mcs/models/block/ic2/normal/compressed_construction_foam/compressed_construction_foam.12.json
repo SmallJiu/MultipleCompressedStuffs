@@ -1,0 +1,7 @@
+{
+"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "ic2:blocks/cf/foam",
+		"overlay": "mcs:blocks/compressed_13"
+	}
+}

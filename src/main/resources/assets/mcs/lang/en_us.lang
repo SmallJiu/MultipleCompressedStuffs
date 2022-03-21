@@ -1,5 +1,7 @@
 itemGroup.compressed_stuffs_blocks=MultipleCompressed-Blocks
 itemGroup.compressed_stuffs_items=MultipleCompressed-Items
+itemGroup.compressed_stuffs_tools=MultipleCompressed-Tools
+
 info.mcs.logging.air.name=Eat the air you!
 
 item.mcs.cat_hammer.name=Cat Hammer
@@ -9,6 +11,23 @@ item.mcs.cat_hair.name=Cat Hair
 item.mcs.destroyer.name=Destroyer
 item.mcs.destroyer.info.0=BreakBlocks
 tile.mcs.compressor.name=Compressor
+info.mcs.compressor.cache_count=Cache Count
+
+info.mcs.owner_entry=OwnerEntry
+info.mcs.entry.item.name=Item
+info.mcs.entry.block.name=Block
+info.mcs.entry.food.name=Food
+info.mcs.entry.sword.name=Sword
+info.mcs.entry.pickaxe.name=Pickaxe
+info.mcs.entry.shovel.name=Shovel
+info.mcs.entry.axe.name=Axe
+info.mcs.entry.hoe.name=Hoe
+
+info.mcs.owner_mod=Owner Mod
+info.mcs.burn_time=BurnTime
+info.mcs.oredict=OreDictionary
+info.mcs.food_amount=food_amount
+info.mcs.saturation_modifier=SaturationModifier
 
 tile.mcs.block.name=Block
 

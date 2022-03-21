@@ -1,5 +1,3 @@
-//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
-
 package cat.jiu.mcs.util;
 
 import java.util.List;
@@ -10,7 +8,7 @@ import com.google.common.collect.Lists;
 
 import cat.jiu.mcs.util.base.BaseBlock;
 import cat.jiu.mcs.util.base.BaseBlockItem;
-import cat.jiu.mcs.util.base.BaseBlockSub;
+import cat.jiu.mcs.util.base.sub.BaseBlockSub;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemOverride;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;

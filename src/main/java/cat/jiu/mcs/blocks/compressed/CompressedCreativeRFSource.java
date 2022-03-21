@@ -1,9 +1,7 @@
-//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
-
 package cat.jiu.mcs.blocks.compressed;
 
 import cat.jiu.mcs.blocks.tileentity.TileEntityCreativeEnergy;
-import cat.jiu.mcs.util.base.BaseBlockSub;
+import cat.jiu.mcs.util.base.sub.BaseBlockSub;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -11,8 +9,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 public class CompressedCreativeRFSource extends BaseBlockSub {
-	public CompressedCreativeRFSource(String nameIn, ItemStack unCompressedItem) {
-		super(nameIn, unCompressedItem, "draconicevolution");
+	public CompressedCreativeRFSource(String name, ItemStack unCompressedItem) {
+		super(name, unCompressedItem, "draconicevolution");
 		this.setInfoStack(new ItemStack(Items.AIR));
 	}
 	

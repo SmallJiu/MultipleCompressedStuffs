@@ -1,5 +1,3 @@
-//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
-
 package cat.jiu.mcs.blocks.net;
 
 import net.minecraftforge.fml.common.network.IGuiHandler;

@@ -1,6 +1,6 @@
-//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
-
 package cat.jiu.mcs.blocks.net.container;
+
+import java.math.BigInteger;
 
 import cat.jiu.mcs.blocks.tileentity.TileEntityCompressor;
 
@@ -21,18 +21,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.SlotItemHandler;
 
 public class ContainerCompressor extends Container {
+	private BigInteger bigEnergy = BigInteger.ZERO;
 	int energy = 0;
-	int maxEnergy = 0;
-	private int energyID = 0;
-	@SuppressWarnings("unused")
-	private final EntityPlayer player;
+	int shrinkCount = 10;
+	private final int energyID = 0;
+	private final int shrinkCountID= 1;
 	private final InventoryPlayer inventory;
 	private final World world;
 	private final BlockPos pos;
 	private TileEntityCompressor te = null;
 	
 	public ContainerCompressor(EntityPlayer player, World world, BlockPos pos) {
-		this.player = player;
 		this.inventory = player.inventory;
 		this.world = world;
 		this.pos = pos;
@@ -43,24 +42,24 @@ public class ContainerCompressor extends Container {
 		}
 		
 		if(this.te != null) {
-			this.energy = this.te.storage.getEnergyStored();
-			this.maxEnergy = this.te.storage.getMaxEnergyStored();
+			this.energy = this.te.storage.getEnergyStoredWithBigInteger().intValue();
+			this.bigEnergy = this.te.storage.getEnergyStoredWithBigInteger();
 			
-			this.addSlotToContainer(new SlotItemHandler(this.te.energySlot, 0, 10, 46));
+			this.addSlotToContainer(new SlotItemHandler(this.te.energySlot, 0, 10, 70));
 			
 			this.addSlotToContainer(new SlotItemHandler(this.te.compressedSlot, 0, 95, 7));
 			
 			for(int i = 1; i <= 8; i++) {
-				this.addSlotToContainer(new SlotItemHandler(this.te.compressedSlot, i, 	   14 + 18 * i, 28));
-				this.addSlotToContainer(new SlotItemHandler(this.te.compressedSlot, i + 8, 14 + 18 * i, 46));
+				this.addSlotToContainer(new SlotItemHandler(this.te.compressedSlot, i, 	   14 + 18 * i, 36));
+				this.addSlotToContainer(new SlotItemHandler(this.te.compressedSlot, i + 8, 14 + 18 * i, 65));
 			}
 			
 			int[] range = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
 			for (int i : range) {
-				this.addSlotToContainer(new Slot(this.inventory, i + 9,  14 + 18 * i, 71));
-				this.addSlotToContainer(new Slot(this.inventory, i + 18, 14 + 18 * i, 89));
-				this.addSlotToContainer(new Slot(this.inventory, i + 27, 14 + 18 * i, 107));
-				this.addSlotToContainer(new Slot(this.inventory, i,      14 + 18 * i, 129));
+				this.addSlotToContainer(new Slot(this.inventory, i + 9,  14 + 18 * i, 96));
+				this.addSlotToContainer(new Slot(this.inventory, i + 18, 14 + 18 * i, 114));
+				this.addSlotToContainer(new Slot(this.inventory, i + 27, 14 + 18 * i, 132));
+				this.addSlotToContainer(new Slot(this.inventory, i,      14 + 18 * i, 154));
 			}
 		}
 	}
@@ -73,35 +72,33 @@ public class ContainerCompressor extends Container {
 	@Override
 	public void detectAndSendChanges() {
 		super.detectAndSendChanges();
+		if(this.world.getTileEntity(this.pos) instanceof TileEntityCompressor) {
+			this.te = (TileEntityCompressor) this.world.getTileEntity(this.pos);
+			this.bigEnergy = this.te.storage.getEnergyStoredWithBigInteger();
+		}
 		
 		if(!this.te.getWorld().isRemote) {
-			if(this.energy != te.storage.getEnergyStored()) {
-				this.energy = te.storage.getEnergyStored();
+			if(this.energy != te.storage.getEnergyStoredWithLong()) {
+				this.energy = te.storage.getEnergyStoredWithBigInteger().intValue();
 				for(IContainerListener listener : this.listeners) {
-					listener.sendWindowProperty(this, this.energyID, this.energy);
+					listener.sendWindowProperty(this, this.energyID, (int) this.energy);
+				}
+			}
+			if(this.shrinkCount != this.te.getShrinkCount()) {
+				this.shrinkCount = this.te.getShrinkCount();
+				for(IContainerListener listener : this.listeners) {
+					listener.sendWindowProperty(this, this.shrinkCountID, this.shrinkCount);
 				}
 			}
 		}
-		
-//		TileEntity te = this.world.getTileEntity(this.pos);
-//		if(te instanceof TileEntityCompressor) {
-//			int energy = ((TileEntityCompressor) te).storage.getEnergyStored();
-//			if(this.energy != energy) {
-//				this.energy = energy;
-//				for(IContainerListener listener : this.listeners) {
-//					if(listener instanceof EntityPlayerMP) {
-//						listener.sendWindowProperty(this, this.energyID, energy);
-//					}
-//				}
-//			}
-//		}
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void updateProgressBar(int id, int data) {
-		if(id == this.energyID) {
-			this.energy = data;
+		switch(id) {
+			case energyID: this.energy = data; break;
+			case shrinkCountID : this.shrinkCount = data; break;
 		}
 	}
 	
@@ -110,7 +107,7 @@ public class ContainerCompressor extends Container {
 		super.addListener(listener);
 		if(listener instanceof EntityPlayerMP) {
 			EntityPlayerMP player = (EntityPlayerMP) listener;
-			player.sendWindowProperty(this, 0, this.te.storage.getEnergyStored());
+			player.sendWindowProperty(this, 0, (int) this.te.storage.getEnergyStoredWithLong());
 		}
 	}
 	
@@ -122,8 +119,12 @@ public class ContainerCompressor extends Container {
 		return this.energy;
 	}
 	
-	public int getMaxEnergy() {
-		return this.maxEnergy;
+	public BigInteger getBigEnergy() {
+		return this.bigEnergy;
+	}
+	
+	public int getShrinkCount() {
+		return this.shrinkCount;
 	}
 	
 	@Override

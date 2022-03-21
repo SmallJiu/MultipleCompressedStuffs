@@ -1,0 +1,7 @@
+{
+"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "minecraft:blocks/prismarine_bricks",
+		"overlay": "mcs:blocks/compressed_16"
+	}
+}

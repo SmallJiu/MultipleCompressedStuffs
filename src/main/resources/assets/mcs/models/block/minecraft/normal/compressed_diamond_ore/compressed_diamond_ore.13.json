@@ -1,0 +1,7 @@
+{
+"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "minecraft:blocks/diamond_ore",
+		"overlay": "mcs:blocks/compressed_14"
+	}
+}

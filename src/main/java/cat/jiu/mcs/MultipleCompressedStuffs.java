@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import cat.jiu.core.JiuCore.LogOS;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.core.util.helpers.DayUtils;
+import cat.jiu.mcs.blocks.net.NetworkHandler;
 import cat.jiu.mcs.command.MCSCommand;
 import cat.jiu.mcs.proxy.CommonProxy;
 import cat.jiu.mcs.util.init.*;
@@ -32,14 +33,15 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 	useMetadata = true,
 	guiFactory = "cat.jiu.mcs.config.ConfigGuiFactory",
 	dependencies =
-		  "required-after:jiucore@[1.0.7-20220201000000,);"
+		  "required-after:jiucore@[" + MCS.JIUCORE_VERSION + "," + MCS.JIUCORE_MAIN_VERSION + "-20221230125959" + "];"
 		+ "after:thermalfoundation;"
 		+ "after:projecte;"
 		+ "after:botania;"
 		+ "after:draconicevolution;"
 		+ "after:environmentaltech;"
 		+ "after:tconstruct;"
-		+ "after:avaritia",
+		+ "after:avaritia;"
+		+ "after:ic2",
 	acceptedMinecraftVersions = "[1.12.2]"
 )
 public class MultipleCompressedStuffs {
@@ -48,59 +50,57 @@ public class MultipleCompressedStuffs {
 	public static final String MODID = "mcs";
 	public static final String NAME = "MultipleCompressedStuffs";
 	public static final String OWNER = "small_jiu";
-	public static final String VERSION = "2.9.4-20220201000000";
+	protected static final String JIUCORE_MAIN_VERSION = "1.0.8";
+	protected static final String JIUCORE_TIME_VERSION = "20220315202836";
+	public static final String JIUCORE_VERSION = JIUCORE_MAIN_VERSION + "-" + JIUCORE_TIME_VERSION;
+	public static final String VERSION = "3.0.0-20220322000126";
 	public final boolean test_model = false; // if is IDE, you can set to 'true' to enable some test stuff
 	public static final CreativeTabs COMPERESSED_BLOCKS = new CreativeTabCompressedStuffsBlocks();
 	public static final CreativeTabs COMPERESSED_ITEMS = new CreativeTabCompressedStuffsItems();
-	
+	public static final CreativeTabs COMPERESSED_TOOLS = new CreativeTabCompressedStuffsTools();
+
 	@Mod.Instance(value = MCS.MODID, owner = MCS.OWNER)
 	public static MultipleCompressedStuffs instance = new MultipleCompressedStuffs();
-	
+
 	@SidedProxy(
 		clientSide = "cat.jiu.mcs.proxy.ClientProxy",
 		serverSide = "cat.jiu.mcs.proxy.CommonProxy",
 		modId = MCS.MODID
 	)
 	public static CommonProxy proxy;
-	
+
 	@Mod.EventHandler
-	public void preInit(FMLPreInitializationEvent event) throws Throwable {
+	public void preInit(FMLPreInitializationEvent event) {
 		proxy.preInit(event);
+		NetworkHandler.registerMessages();
 	}
-	
+
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		proxy.init(event);
 	}
-	
+
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		
+		proxy.postInit(event);
 	}
-	
+
 	public static long startmodel = 0L;
-	
+
 	@Mod.EventHandler
 	public void onLoadComplete(FMLLoadCompleteEvent event) {
 		this.log.info("");
-		
-		this.log.info("Start Register Items");
-		this.log.info("Register Items Successful, " + "(took " + proxy.startitem + " ms)");
-		
-		this.log.info("Start Register Blocks");
-		this.log.info("Register Blocks Successful, " + "(took " + proxy.startblock + " ms)");
-		
-		this.log.info("Start Register Models");
-		this.log.info("Register Models Successful, " + "(took " + startmodel + " ms)");
-		
-		this.log.info("Start Register OreDictionarys");
-		this.log.info("Register OreDictionarys Successful, " + "(took " + proxy.startore + " ms)");
-		
-		this.log.info("Start Register Recipes");
-		this.log.info("Register Recipes Successful, " + "(took " + proxy.startrecipe + " ms)");
-		
+
+		this.log.info("Register Blocks (took " + (proxy.startblock - proxy.startcustom) + " ms)");
+		this.log.info("Register Custom Entry (took " + proxy.startcustom + " ms)");
+		this.log.info("Register Items (took " + proxy.startitem + " ms)");
+		this.log.info("Register Models (took " + startmodel + " ms)");
+		this.log.info("Register OreDictionarys (took " + proxy.startore + " ms)");
+		this.log.info("Register Recipes (took " + proxy.startrecipe + " ms)");
+		this.log.info("Load Complete (took " + (proxy.startblock + proxy.startitem + startmodel + proxy.startore + proxy.startrecipe) + " ms)");
+
 		this.log.info("");
-		
+
 		this.log.info("###########################################");
 		this.log.info("#                                         #");
 		this.log.info("# MultipleCompressedStuffs Load Complete. #");
@@ -109,7 +109,7 @@ public class MultipleCompressedStuffs {
 		this.log.info("#                                         #");
 		this.log.info("###########################################");
 	}
-	
+
 	private String getDayOfVersion() {
 		DayUtils day = JiuUtils.day;
 		return day.getYear()+""+
@@ -119,11 +119,11 @@ public class MultipleCompressedStuffs {
 				(day.getMinutes() < 10 ? "0"+day.getMinutes() : day.getMinutes()+"")+
 				(day.getSecond() < 10 ? "0"+day.getSecond() : day.getSecond()+"");
 	}
-	
+
 	@Mod.EventHandler // 服务器启动中
 	public void onServerStarting(FMLServerStartingEvent event) {
 		event.registerServerCommand(new MCSCommand());
-		
+
 		if(Loader.isModLoaded("projecte")) {
 			if(this.test_model) {
 				EMCMapper.emc.put(new SimpleStack(new ItemStack(MCSItems.normal.CAT_HAIR)), Long.MAX_VALUE);
@@ -134,7 +134,7 @@ public class MultipleCompressedStuffs {
 			EMCMapper.emc.put(new SimpleStack(new ItemStack(MCSItems.normal.CAT_HAMMER)), 68448L);
 		}
 	}
-	
+
 	public static Logger getLogger() {
 		return logger;
 	}

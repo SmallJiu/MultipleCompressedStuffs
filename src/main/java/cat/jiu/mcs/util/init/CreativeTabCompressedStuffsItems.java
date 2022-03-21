@@ -1,5 +1,3 @@
-//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
-
 package cat.jiu.mcs.util.init;
 
 import java.util.Random;
@@ -7,6 +5,7 @@ import java.util.Random;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.config.Configs;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -19,7 +18,7 @@ public class CreativeTabCompressedStuffsItems extends CreativeTabs{
 
 	@Override
 	public ResourceLocation getBackgroundImage() {
-		if(Configs.TooltipInformation.can_custom_creative_tab_background) {
+		if(Configs.Tooltip_Information.can_custom_creative_tab_background) {
 			return new ResourceLocation(MCS.MODID + ":textures/gui/container/creative_inventory/tab_items.png");
 		}else {
 			return super.getBackgroundImage();
@@ -30,12 +29,11 @@ public class CreativeTabCompressedStuffsItems extends CreativeTabs{
 	public ItemStack getTabIconItem() {
 		Random rand = new Random();
 		
-		if(!MCSItems.ITEMS.isEmpty()) {
-			int item = rand.nextInt(MCSItems.ITEMS.size());
-				
-			return new ItemStack(MCSItems.ITEMS.get(item), 1, rand.nextInt(15));
+		if(!MCSResources.SUB_ITEMS.isEmpty()) {
+			int item = rand.nextInt(MCSResources.SUB_ITEMS.size());
+			return new ItemStack(MCSResources.SUB_ITEMS.get(item), 1, rand.nextInt(15));
 		}else{
-			return this.getTabIconItem();
+			return new ItemStack(Items.APPLE);
 		}
 	}
 }

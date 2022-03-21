@@ -1,0 +1,7 @@
+{
+"parent":"item/handheld",
+	"textures": {
+		"layer0": "minecraft:items/diamond_axe",
+		"layer1": "mcs:items/tools/compressed_3"
+	}
+}

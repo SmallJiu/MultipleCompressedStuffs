@@ -1,0 +1,9 @@
+{
+    "parent": "mcs:block/overlay_model_side",
+	"textures": {
+        "top": "ic2:blocks/resource/rubber_wood_bottomtop",
+		"down": "ic2:blocks/resource/rubber_wood_bottomtop",
+        "side": "ic2:blocks/resource/rubber_wood_sides",
+		"overlay": "mcs:blocks/compressed_13"
+    }
+}

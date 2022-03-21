@@ -1,0 +1,7 @@
+{
+"parent":"item/handheld",
+	"textures": {
+		"layer0": "minecraft:items/stone_shovel",
+		"layer1": "mcs:items/tools/tools/tools/compressed_4"
+	}
+}

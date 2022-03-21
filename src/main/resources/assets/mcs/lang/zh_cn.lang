@@ -1,9 +1,29 @@
 itemGroup.compressed_stuffs_blocks=多重压缩-方块
 itemGroup.compressed_stuffs_items=多重压缩-物品
+itemGroup.compressed_stuffs_tools=多重压缩-工具
+
+info.mcs.warn.ic.craft_energy=警告：将不会继承合成材料的电量到成品上
+
 info.mcs.logging.name=这是你今天的口粮，不要不识好歹
 info.mcs.logging.air.name=喝西北风吧你！
-info.compressed_65535.name=我也八懂有多少
 info.mcs.shift=§a按住§bShift§a以显示更多
+info.mcs.owner_mod=所属Mod
+info.mcs.burn_time=燃烧时间
+info.mcs.oredict=矿物词典
+info.mcs.food_amount=饱食度
+info.mcs.saturation_modifier=饱和度
+info.mcs.compressor.cache_count=缓存数量
+info.compressed_65535.name=我也八懂有多少
+
+info.mcs.owner_entry=所属类型
+info.mcs.entry.item.name=物品
+info.mcs.entry.block.name=方块
+info.mcs.entry.food.name=食物
+info.mcs.entry.sword.name=剑
+info.mcs.entry.pickaxe.name=镐
+info.mcs.entry.shovel.name=铲
+info.mcs.entry.axe.name=斧
+info.mcs.entry.hoe.name=锄
 
 tile.mcs.creative_energy.name=创造能源组件
 tile.mcs.creative_energy.info.0=创造模式独享
@@ -40,7 +60,8 @@ tile.mcs.compressed_32767.name=无限重
 #{
 config.mcs.recipe.3x3=使用3x3合成表,反之使用2x2合成表
 config.mcs.recipe.cancel_oredict_for_recipe=设置不参与合成的矿词
-config.mcs.recipe.all=是否启用默认合成表
+config.mcs.recipe.all=启用默认合成表
+config.mcs.recipe.ore=启用默认矿物词典
 
 config.mcs.enable_mod_stuff=启用联动物品(需在ModStuff开启具体mod)
 config.mcs.enable_test_stuff=使用mod预览内容
@@ -55,19 +76,19 @@ config.mcs.custem_break_drop_item=自定义毁灭者右键方块所获得的物�
 config.mcs.custem_change_block=自定义压缩方块放置世界时将会改变的方块
 		#}
 		#{
-config.mcs.can_drop_cat_hair=豹猫是否可以掉落猫絮
+config.mcs.can_drop_cat_hair=豹猫可以掉落猫絮
 config.mcs.break_bedrock_chance=自定义猫猫锤破坏基岩类方块的几率
 config.mcs.drop_cat_hair_chance=自定义豹猫掉落猫絮的几率
 config.mcs.custem_eat_effect=自定义压缩食物吃掉时给予的buff
 		#}
 	#}
-config.mcs.can_custom_tab_background=是否可以改变多重压缩物品的创造物品栏的背景
-config.mcs.show_food_amount=是否显示压缩食物的饱食度与饱和度
-config.mcs.get_real_food_amout=是否显示不是科学计数法的饱食度与饱和度
-config.mcs.show_oredict=是否显示矿词
-config.mcs.show_burn_time=是否显示燃烧时间
-config.mcs.show_specific_number=是否显示不是科学计数法的未压缩方块数
-config.mcs.can_custom_specific_number=是否可以自定义未压缩的方块数
+config.mcs.can_custom_tab_background=可以改变多重压缩物品的创造物品栏的背景
+config.mcs.show_food_amount=显示压缩食物的饱食度与饱和度
+config.mcs.get_real_food_amout=显示不是科学计数法的饱食度与饱和度
+config.mcs.show_oredict=显示矿词
+config.mcs.show_burn_time=显示燃烧时间
+config.mcs.show_specific_number=显示不是科学计数法的未压缩方块数
+config.mcs.can_custom_specific_number=可以自定义未压缩的方块数
 config.mcs.show_owner_mod=显示所属mod
 	#{
 config.mcs.custem_info.item=自定义压缩物品的tag栏内容显示

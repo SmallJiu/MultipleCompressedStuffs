@@ -1,11 +1,11 @@
-//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
-
 package cat.jiu.mcs.util;
 
+import cat.jiu.core.api.IMetadataToolMaterial;
+
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.IStringSerializable;
 
-public enum ModSubtypes implements IStringSerializable {
-
+public enum ModSubtypes implements IStringSerializable, IMetadataToolMaterial {
 	LEVEL_1(0),
 	LEVEL_2(1),
 	LEVEL_3(2),
@@ -42,6 +42,11 @@ public enum ModSubtypes implements IStringSerializable {
 	public static ModSubtypes byMetadata(int meta) {
 		return METADATA_LOOKUP[meta];
 	}
+	
+	public int getMaxDamage() {return 0;}
+	public float getAttackDamage() {return 0;}
+	public float getAttackSpeed() {return 0;}
+	public ItemStack getRepairItemStack() {return ItemStack.EMPTY;}
 	
 	static {
 		for (ModSubtypes type : values()) {

@@ -10,8 +10,6 @@ import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.fml.client.IModGuiFactory;
 import net.minecraftforge.fml.client.config.GuiConfig;
 
-import net.minecraftforge.fml.client.IModGuiFactory.RuntimeOptionCategoryElement;
-
 public class ConfigGuiFactory implements IModGuiFactory{
 
 	@Override

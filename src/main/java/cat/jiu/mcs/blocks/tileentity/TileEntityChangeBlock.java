@@ -1,5 +1,3 @@
-//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
-
 package cat.jiu.mcs.blocks.tileentity;
 
 import java.io.File;
@@ -59,7 +57,7 @@ public class TileEntityChangeBlock extends TileEntity implements ITickable {
 	
 	@Override
 	public void update() {
-		if(this.isAlive) {
+		if(this.isAlive && this.world.getBlockState(pos).getBlock() != Blocks.AIR) {
 			this.markDirty();
 			if(this.makeLog) {
 				this.log = JiuUtils.day.getDate() + " [ " + this.world.getBlockState(getPos()).getBlock().getRegistryName() + "@" + this.meta + "] Place at " + "Dim:" + this.world.provider.getDimension() + ",DimName:" + this.world.provider.getDimensionType().getName() + ",X:" + this.pos.getX() + ",Y:" + this.pos.getY() + ",Z:" + this.pos.getZ();
@@ -159,6 +157,7 @@ public class TileEntityChangeBlock extends TileEntity implements ITickable {
 				this.world.removeTileEntity(this.pos);
 			}
 		}else {
+			this.isAlive = false;
 			this.world.removeTileEntity(this.pos);
 		}
 	}

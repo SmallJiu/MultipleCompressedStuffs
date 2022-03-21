@@ -13,16 +13,7 @@ public class CustomCompressedBlock {
 	@Config.Comment("Enable Other Mod Stuffs")
 	public boolean Enable_Mod_Stuff = false;
 	
-	public final ModStuff ModStuff = new ModStuff();
-	
-	@Config.RequiresMcRestart
-	@Config.LangKey("config.mcs.ore_dict_register")
-	@Config.Comment("register OreDict")
-	public String[] ore_dict_register = new String[] {
-		"ItemName, ItemMeta, OreDict",
-		"minecraft:obsidian|0|obsidian",
-		"minecraft:end_stone|0|endstone" 
-	};
+	public final ModStuff Mod_Stuff = new ModStuff();
 	
 	public final CustemAlreadyStuff custem_already_stuff = new CustemAlreadyStuff();
 }

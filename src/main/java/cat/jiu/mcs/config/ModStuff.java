@@ -9,11 +9,6 @@ public class ModStuff {
 	public boolean ThermalFoundation = false;
 	
 	@Config.RequiresMcRestart
-	@Config.LangKey("config.mcs.enable_mod_stuff.eio")
-	@Config.Comment("Enable Other Mod Stuffs")
-	public boolean EnderIO = false;
-	
-	@Config.RequiresMcRestart
 	@Config.LangKey("config.mcs.enable_mod_stuff.de")
 	@Config.Comment("Enable Other Mod Stuffs")
 	public boolean DraconicEvolution = false;
@@ -24,22 +19,36 @@ public class ModStuff {
 	public boolean Avaritia = false;
 	
 	@Config.RequiresMcRestart
-	@Config.LangKey("config.mcs.enable_mod_stuff.proe")
+	@Config.LangKey("config.mcs.enable_mod_stuff.ic2")
 	@Config.Comment("Enable Other Mod Stuffs")
-	public boolean ProjectE = false;
+	public boolean IndustrialCraft = false;
 	
-	@Config.RequiresMcRestart
-	@Config.LangKey("config.mcs.enable_mod_stuff.env")
-	@Config.Comment("Enable Other Mod Stuffs")
-	public boolean EnvironmentalTech = false;
+	public TestMod Test_Mod = new TestMod();
 	
-	@Config.RequiresMcRestart
-	@Config.LangKey("config.mcs.enable_mod_stuff.tco")
-	@Config.Comment("Enable Other Mod Stuffs")
-	public boolean Tconstruct = false;
-	
-	@Config.RequiresMcRestart
-	@Config.LangKey("config.mcs.enable_mod_stuff.bot")
-	@Config.Comment("Enable Other Mod Stuffs")
-	public boolean Botania = false;
+	public class TestMod {
+		@Config.RequiresMcRestart
+		@Config.LangKey("config.mcs.enable_mod_stuff.eio")
+		@Config.Comment("Enable Other Mod Stuffs")
+		public boolean EnderIO = false;
+		
+		@Config.RequiresMcRestart
+		@Config.LangKey("config.mcs.enable_mod_stuff.proe")
+		@Config.Comment("Enable Other Mod Stuffs")
+		public boolean ProjectE = false;
+		
+		@Config.RequiresMcRestart
+		@Config.LangKey("config.mcs.enable_mod_stuff.env")
+		@Config.Comment("Enable Other Mod Stuffs")
+		public boolean EnvironmentalTech = false;
+		
+		@Config.RequiresMcRestart
+		@Config.LangKey("config.mcs.enable_mod_stuff.tco")
+		@Config.Comment("Enable Other Mod Stuffs")
+		public boolean Tconstruct = false;
+		
+		@Config.RequiresMcRestart
+		@Config.LangKey("config.mcs.enable_mod_stuff.bot")
+		@Config.Comment("Enable Other Mod Stuffs")
+		public boolean Botania = false;
+	}
 }

@@ -13,9 +13,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class Configs {
 	
 	@Config.LangKey("config.mcs.recipe.all")
-	@Config.Comment("Enable All Recipe")
+	@Config.Comment("Enable Default Recipe")
 	@Config.RequiresMcRestart
 	public static boolean use_default_recipes = true;
+	
+	@Config.LangKey("config.mcs.recipe.ore")
+	@Config.Comment("Enable Default Recipe")
+	@Config.RequiresMcRestart
+	public static boolean use_default_oredict = true;
 	
 	@Config.LangKey("config.mcs.recipe.3x3")
 	@Config.Comment("Use 3x3 Recipes, if is 'false', will use 2x2 recipes")
@@ -29,15 +34,20 @@ public class Configs {
 			"blockMetal", "blockGlowstone", "blockGlowstone", "cropBeetroot", "blockWoolWhite", 
 			"woolWhite", "blockWool", "leadHardenedGlass", "listAllmeatcooked", "fish",
 			"dye", "dyeWhite", "clathrateEnder", "clathrateGlowstone", "clathrateRedstone", 
-			"clathrateOil"
+			"clathrateOil", "machineBlockCasing", "machineBlockAdvanced", "machineBlockAdvancedCasing", "sandstone",
+			"dye", "dyeBrown", "dyeGreen", "dyeBlack"
 	};
 	
 	public static final CustomCompressedBlock Custom = new CustomCompressedBlock();
 	
-	public static TooltipInformation TooltipInformation = new TooltipInformation(); 
+	public static final TooltipInformation Tooltip_Information = new TooltipInformation(); 
 	
 	public static class TooltipInformation {
 		public final CustemnInformation CustemInfo = new CustemnInformation();
+		@Config.LangKey("config.mcs.show_owner_type")
+		@Config.Comment("show the item owner type")
+		public boolean show_owner_type = true;
+		
 		@Config.RequiresMcRestart
 		@Config.LangKey("config.mcs.can_custom_tab_background")
 		@Config.Comment("set can custom creative_tab background")
@@ -62,7 +72,7 @@ public class Configs {
 		
 		@Config.LangKey("config.mcs.show_owner_mod")
 		@Config.Comment("Show Owner Mod in Tooltip Information")
-		public boolean show_owner_mod = false;
+		public boolean show_owner_mod = true;
 		
 		@Config.LangKey("config.mcs.show_specific_number")
 		@Config.Comment("Show Specific Number of unCompressedItem in Tooltip Information")

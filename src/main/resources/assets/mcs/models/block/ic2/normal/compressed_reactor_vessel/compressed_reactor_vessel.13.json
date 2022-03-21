@@ -1,0 +1,7 @@
+{
+"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "ic2:blocks/generator/reactor/reactor_vessel",
+		"overlay": "mcs:blocks/compressed_14"
+	}
+}

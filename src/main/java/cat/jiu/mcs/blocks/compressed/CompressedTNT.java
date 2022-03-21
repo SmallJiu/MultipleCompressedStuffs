@@ -1,13 +1,26 @@
 package cat.jiu.mcs.blocks.compressed;
 
-import cat.jiu.mcs.util.base.BaseBlockSub;
-
+import cat.jiu.mcs.util.base.sub.BaseBlockSub;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 
 public class CompressedTNT extends BaseBlockSub {
 	public CompressedTNT(String nameIn, ItemStack unCompressedItem) {
 		super(nameIn, unCompressedItem);
 //		BlockTNT
+	}
+
+	@Override
+	public int getHarvestLevel(IBlockState state) {
+		return 0;
+	}
+
+	@Override
+	public boolean canHarvestBlock(IBlockAccess world, BlockPos pos, EntityPlayer player) {
+		return true;
 	}
 
 //	@Override

@@ -1,0 +1,7 @@
+{
+"parent":"item/generated",
+	"textures": {
+		"layer0": "ic2:items/battery/charging_lapotron_crystal_4",
+		"layer1": "mcs:items/compressed_1"
+	}
+}

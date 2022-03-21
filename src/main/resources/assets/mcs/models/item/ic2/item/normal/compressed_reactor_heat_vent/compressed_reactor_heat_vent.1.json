@@ -1,0 +1,7 @@
+{
+"parent":"item/generated",
+	"textures": {
+		"layer0": "ic2:items/reactor/reactor_heat_vent",
+		"layer1": "mcs:items/compressed_2"
+	}
+}

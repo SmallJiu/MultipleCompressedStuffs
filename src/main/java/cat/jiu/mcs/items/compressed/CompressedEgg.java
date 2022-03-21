@@ -1,10 +1,8 @@
-//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
-
 package cat.jiu.mcs.items.compressed;
 
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
-import cat.jiu.mcs.util.base.BaseItemSub;
+import cat.jiu.mcs.util.base.sub.BaseItemSub;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityEgg;
 import net.minecraft.init.SoundEvents;
@@ -60,7 +58,7 @@ public class CompressedEgg extends BaseItemSub{
 			}else {
 				JiuUtils.nbt.addItemNBT(stack, "uses", 1);
 			}
-			JiuUtils.entity.sendClientMessage(player, JiuUtils.nbt.getItemNBTInt(stack, "uses")+"");
+			JiuUtils.entity.sendMessage(player, JiuUtils.nbt.getItemNBTInt(stack, "uses")+"");
 		}
 		
 		return lag;

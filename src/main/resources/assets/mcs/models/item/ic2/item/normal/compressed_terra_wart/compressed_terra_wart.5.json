@@ -1,0 +1,7 @@
+{
+"parent":"item/generated",
+	"textures": {
+		"layer0": "ic2:items/crop/terra_wart",
+		"layer1": "mcs:items/compressed_6"
+	}
+}

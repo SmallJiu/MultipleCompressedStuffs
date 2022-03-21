@@ -1,5 +1,3 @@
-//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
-
 package cat.jiu.mcs.items;
 
 import java.util.List;
@@ -30,6 +28,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemCatHammer extends BaseItemNormal {
 	public ItemCatHammer(String name, CreativeTabs tab) {
 		super(name, tab);
+		super.setMaxStackSize(1);
 	}
 	
 	JiuRandom rand = new JiuRandom(10104);

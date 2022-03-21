@@ -1,0 +1,7 @@
+{
+"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "minecraft:blocks/sea_lantern",
+		"overlay": "mcs:blocks/compressed_2"
+	}
+}

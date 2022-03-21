@@ -1,0 +1,7 @@
+{
+"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "ic2:blocks/resource/machine",
+		"overlay": "mcs:blocks/compressed_12"
+	}
+}

@@ -2,7 +2,8 @@ package cat.jiu.mcs.util.type;
 
 import java.util.List;
 
-import cat.jiu.core.util.JiuUtils;
+import com.google.common.collect.Lists;
+
 import net.minecraft.item.ItemStack;
 
 public class ChangeBlockType {
@@ -11,7 +12,7 @@ public class ChangeBlockType {
 	private final boolean dropBlock;
 	
 	public ChangeBlockType(ItemStack[] drops, int[] time, boolean dropBlock) {
-		this(JiuUtils.other.copyArrayToList(drops), time, dropBlock);
+		this(Lists.newArrayList(drops), time, dropBlock);
 	}
 	
 	public ChangeBlockType(List<ItemStack> drops, int[] time, boolean dropBlock) {

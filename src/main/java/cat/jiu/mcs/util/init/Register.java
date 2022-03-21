@@ -12,11 +12,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class Register {
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onBlockRegister(RegistryEvent.Register<Block> event) {
-		event.getRegistry().registerAll(MCSBlocks.BLOCKS.toArray(new Block[0]));
-//		event.getRegistry().registerAll(MCSBlocks.BLOCKS0.toArray(new Block[0]));
+		event.getRegistry().registerAll(MCSResources.BLOCKS.toArray(new Block[0]));
 	}
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onItemRegister(RegistryEvent.Register<Item> event) {
-		event.getRegistry().registerAll(MCSItems.ITEMS.toArray(new Item[0]));
+		event.getRegistry().registerAll(MCSResources.ITEMS.toArray(new Item[0]));
 	}
 }

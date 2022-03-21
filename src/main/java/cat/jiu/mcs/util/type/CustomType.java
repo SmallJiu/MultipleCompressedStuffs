@@ -1,7 +1,7 @@
 package cat.jiu.mcs.util.type;
 
 public enum CustomType {
-	ITEM_NORMA, ITEM_FOOD, ITEM_TOOL, ITEM_SWORD, ITEM_PICKAXE, ITEM_AXE, BLOCK, UNKNOWN;
+	ITEM_NORMA, ITEM_FOOD, ITEM_TOOL, ITEM_SWORD, ITEM_PICKAXE, ITEM_AXE, ITEM_SHOVEL, BLOCK, UNKNOWN;
 	
 	public static CustomType getType(String[] type) {
 		if(type.length == 2) {
@@ -22,6 +22,9 @@ public enum CustomType {
 				}
 				if(sub_type.equals("pickaxe")) {
 					return ITEM_PICKAXE;
+				}
+				if(sub_type.equals("shovel")) {
+					return ITEM_SHOVEL;
 				}
 				if(sub_type.equals("axe")) {
 					return ITEM_AXE;

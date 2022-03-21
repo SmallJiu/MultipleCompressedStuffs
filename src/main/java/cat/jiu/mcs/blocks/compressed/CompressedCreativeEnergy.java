@@ -1,14 +1,10 @@
-//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
-
 package cat.jiu.mcs.blocks.compressed;
 
 import java.util.List;
 
 import cat.jiu.core.util.JiuUtils;
-import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCreativeEnergy;
-import cat.jiu.mcs.util.base.BaseBlockSub;
-
+import cat.jiu.mcs.util.base.sub.BaseBlockSub;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -22,7 +18,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class CompressedCreativeEnergy extends BaseBlockSub {
 	public CompressedCreativeEnergy(String nameIn, ItemStack unCompressedItem) {
-		super(nameIn, unCompressedItem, MCS.MODID, CreativeTabs.TRANSPORTATION);
+		super(nameIn, unCompressedItem, "mcs", CreativeTabs.TRANSPORTATION);
 		this.setInfoStack(new ItemStack(Items.AIR));
 	}
 	
@@ -31,7 +27,7 @@ public class CompressedCreativeEnergy extends BaseBlockSub {
 	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
 		super.addInformation(stack, world, tooltip, advanced);
 		tooltip.add(I18n.format("tile.mcs.creative_energy.info.0"));
-		tooltip.add(I18n.format("tile.mcs.creative_energy.info.1", JiuUtils.other.formatNumber(Integer.MAX_VALUE * (10L * (stack.getMetadata() + 5))) + " (" + Integer.MAX_VALUE * (10L * (stack.getMetadata() + 5)) + ")"));
+		tooltip.add(I18n.format("tile.mcs.creative_energy.info.1", JiuUtils.big_integer.format(Integer.MAX_VALUE * (10L * (stack.getMetadata() + 5)), 3) + " (" + Integer.MAX_VALUE * (10L * (stack.getMetadata() + 5)) + ")"));
 	}
 	
 	@Override

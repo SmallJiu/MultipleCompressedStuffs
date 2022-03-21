@@ -1,5 +1,3 @@
-//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
-
 package cat.jiu.mcs.blocks;
 
 import java.util.List;
@@ -8,8 +6,7 @@ import cat.jiu.core.util.JiuUtils;
 import cat.jiu.core.util.base.BaseBlock;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCreativeEnergy;
-import cat.jiu.mcs.util.init.MCSBlocks;
-
+import cat.jiu.mcs.util.init.MCSResources;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -27,15 +24,15 @@ public class BlockCreativeEnergy extends BaseBlock.Normal implements ITileEntity
 	public BlockCreativeEnergy() {
 		super(MCS.MODID, "creative_energy", Material.ROCK, SoundType.STONE, CreativeTabs.TRANSPORTATION, 10F);
 		this.setBlockModelResourceLocation(MCS.MODID + "/block", this.name);
-		MCSBlocks.BLOCKS_NAME.add(this.name);
-		MCSBlocks.BLOCKS0.add(this);
+		MCSResources.BLOCKS_NAME.add(this.name);
+		MCSResources.BLOCKS.add(this);
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addInformation(ItemStack stack, World player, List<String> tooltip, ITooltipFlag advanced) {
 		tooltip.add(I18n.format("tile.mcs.creative_energy.info.0"));
-		tooltip.add(I18n.format("tile.mcs.creative_energy.info.1", JiuUtils.other.formatNumber(Integer.MAX_VALUE * 10L) + "/t (" + Integer.MAX_VALUE * 10L + "/t)"));
+		tooltip.add(I18n.format("tile.mcs.creative_energy.info.1", JiuUtils.big_integer.format(Integer.MAX_VALUE * 10L, 3) + "/t (" + Integer.MAX_VALUE * 10L + "/t)"));
 	}
 	
 	@Override

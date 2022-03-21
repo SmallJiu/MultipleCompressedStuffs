@@ -1,5 +1,3 @@
-//Deobfuscated with https://github.com/PetoPetko/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings"!
-
 package cat.jiu.mcs.util.init;
 
 import java.util.ArrayList;
@@ -54,7 +52,7 @@ public class InitChangeBlock {
 					time = parseTime(dropa.get(0).getAsString());
 					
 					if(dropa.size() == 1) {
-						if(MCSBlocks.BLOCKS_NAME.contains(name)) {
+						if(MCSResources.BLOCKS_NAME.contains(name)) {
 							drop.add(new ItemStack(Item.getByNameOrId("mcs:" + name), 1, meta));
 						}else {
 							drop.add(new ItemStack(Item.getByNameOrId(name), 1, meta));
@@ -81,7 +79,7 @@ public class InitChangeBlock {
 			for(int meta : metas) {
 				if(!loadMeta.contains(meta)) {
 					List<ItemStack> drop = new ArrayList<>();
-					if(MCSBlocks.BLOCKS_NAME.contains(name)) {
+					if(MCSResources.BLOCKS_NAME.contains(name)) {
 						drop.add(new ItemStack(Item.getByNameOrId("mcs:" + name), 1, meta));
 					}else {
 						drop.add(new ItemStack(Item.getByNameOrId(name), 1, meta));
@@ -97,7 +95,7 @@ public class InitChangeBlock {
 			}
 			for(int meta : metas) {
 				List<ItemStack> drop = new ArrayList<>();
-				if(MCSBlocks.BLOCKS_NAME.contains(name)) {
+				if(MCSResources.BLOCKS_NAME.contains(name)) {
 					drop.add(new ItemStack(Item.getByNameOrId("mcs:" + name), 1, meta));
 				}else {
 					drop.add(new ItemStack(Item.getByNameOrId(name), 1, meta));
@@ -144,130 +142,4 @@ public class InitChangeBlock {
 		
 		return time;
 	}
-	
-//	public static void initDrops(String name, JsonObject obj, int[] metas, Map<Integer, List<ItemStack>> drops, Map<Integer, Boolean> canDrop) {
-//		if(obj.has("drops")) {
-//			List<Integer> loadMeta = new ArrayList<>();
-//			for(Map.Entry<String, JsonElement> dropobj : obj.getAsJsonObject("drops").entrySet()) {
-//				JsonElement drop = dropobj.getValue();
-//				List<ItemStack> drop0 = new ArrayList<>();
-//				int meta = Integer.parseInt(dropobj.getKey());
-//				loadMeta.add(meta);
-//				
-//				if(JiuUtils.other.containKey(metas, meta)) {
-//					if(drop instanceof JsonObject) {
-//						JsonObject dropo = (JsonObject) drop;
-//						
-//						if(dropo.has("item")) {
-//							JsonArray dropa = dropo.getAsJsonArray("item");
-//							for(int k=0;k<dropa.size();++k) {
-//								drop0.add(getStack(dropa.get(k).getAsString()));
-//							}
-//						}else {
-//							drop0.add(new ItemStack(Item.getByNameOrId("mcs:" + name), 1, meta));
-//						}
-//						
-//						if(dropo.has("canDrop")) {
-//							canDrop.put(meta, dropo.get("canDrop").getAsBoolean());
-//						}else if(obj.has("canDrop")) {
-//							canDrop.put(meta, obj.get("canDrop").getAsBoolean());
-//						}else {
-//							canDrop.put(meta, true);
-//						}
-//						
-//					}else if(drop instanceof JsonArray) {
-//						JsonArray dropa = (JsonArray) drop;
-//						if(dropa.size() == 1) {
-//							drop0.add(getStack(dropa.get(1).getAsString()));
-//						}else {
-//							for(int k=1;k<dropa.size();++k) {
-//								drop0.add(getStack(dropa.get(k).getAsString()));
-//							}
-//						}
-//					}else {
-//						drop0.add(getStack(drop.getAsString()));
-//					}
-//				}else {
-//					drop0.add(new ItemStack(Item.getByNameOrId(name), 1, meta));
-//				}
-//				drops.put(meta, drop0);
-//			}
-//			for(int meta : metas) {
-//				if(!loadMeta.contains(meta)) {
-//					List<ItemStack> drop = new ArrayList<>();
-//					
-//					if(MCSBlocks.BLOCKS_NAME.contains(name)) {
-//						drop.add(new ItemStack(Item.getByNameOrId("mcs:" + name), 1, meta));
-//					}else {
-//						drop.add(new ItemStack(Item.getByNameOrId(name), 1, meta));
-//					}
-//					
-//					drops.put(meta, drop);
-//					
-//					if(obj.has("canDrop")) {
-//						canDrop.put(meta, obj.get("canDrop").getAsBoolean());
-//					}else {
-//						canDrop.put(meta, true);
-//					}
-//				}
-//			}
-//		}else {
-//			for(int meta : metas) {
-//				List<ItemStack> drop = new ArrayList<>();
-//				
-//				if(MCSBlocks.BLOCKS_NAME.contains(name)) {
-//					drop.add(new ItemStack(Item.getByNameOrId("mcs:" + name), 1, meta));
-//				}else {
-//					drop.add(new ItemStack(Item.getByNameOrId(name), 1, meta));
-//				}
-//				
-//				drops.put(meta, drop);
-//				
-//				if(obj.has("canDrop")) {
-//					canDrop.put(meta, obj.get("canDrop").getAsBoolean());
-//				}else {
-//					canDrop.put(meta, true);
-//				}
-//			}
-//		}
-//	}
-//	
-
-//	
-//	public static void initTime(int[] metas, JsonObject obj, Map<Integer, Integer[]> times) {
-//		if(obj.has("drops")) {
-//			List<Integer> loadMeta = new ArrayList<>();
-//			for(Map.Entry<String, JsonElement> metas0 : obj.getAsJsonObject("drops").entrySet()) {
-//				JsonElement o = metas0.getValue();
-//				int meta = Integer.parseInt(metas0.getKey());
-//				loadMeta.add(meta);
-//				Integer[] time = new Integer[3];
-//				
-//				if(o instanceof JsonObject) {
-//					JsonObject metaObj = (JsonObject) o;
-//					if(metaObj.has("time")) {
-//						time = parseTime(metaObj.get("time").getAsString());
-//					}else {
-//						time = parseTime(obj.get("time").getAsString());
-//					}
-//				}else if(o instanceof JsonArray) {
-//					JsonArray metaArray = (JsonArray) o;
-//					time = parseTime(metaArray.get(0).getAsString());
-//				}
-//				
-//				times.put(meta, time);
-//			}
-//			for(int meta : metas) {
-//				if(!loadMeta.contains(meta)) {
-//					Integer[] time = parseTime(obj.get("time").getAsString());
-//					times.put(meta, time);
-//				}
-//			}
-//		}else {
-//			Integer[] time = parseTime(obj.get("time").getAsString());
-//			for(int meta : metas) {
-//				times.put(meta, time);
-//			}
-//		}
-//	}
 }
