@@ -19,13 +19,13 @@ public class CommandGetMCSBlocks extends BaseCommand.CommandNormal {
 		for(BaseBlockSub sub_block : MCSResources.SUB_BLOCKS) {
 			sender.sendMessage(new TextComponentKeybind(sub_block.getLocalizedName()));
 		}
-		
+
 		long regBlocks = 0L;
-		
+
 		for(int i = 0; i < MCSResources.SUB_BLOCKS.size(); ++i) {
 			regBlocks += ((i + 1) * 16);
 		}
-		
+
 		sender.sendMessage(new TextComponentKeybind("Has " + regBlocks + " Register Compressed"));
 	}
 }

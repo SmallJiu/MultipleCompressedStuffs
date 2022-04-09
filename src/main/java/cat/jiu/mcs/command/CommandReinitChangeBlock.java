@@ -13,26 +13,26 @@ public class CommandReinitChangeBlock extends BaseCommand.CommandNormal {
 	public CommandReinitChangeBlock(String name, boolean checkPermission, int level) {
 		super(name, checkPermission, level);
 	}
-	
+
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		long time = System.currentTimeMillis();
-		
+
 		boolean hasError = false;
 		String errorMsg = "";
-		
+
 		try {
 			MCSBlocks.reinitChangeBlock();
-		} catch (Exception e) {
+		}catch(Exception e) {
 			hasError = true;
-			errorMsg = e.getLocalizedMessage().substring(e.getLocalizedMessage().indexOf(":")+2);
+			errorMsg = e.getLocalizedMessage().substring(e.getLocalizedMessage().indexOf(":") + 2);
 			e.printStackTrace();
 		}
-		
+
 		if(hasError) {
 			sender.sendMessage(new TextComponentTranslation("Has error, this is error message: "));
 			TextComponentTranslation text1 = new TextComponentTranslation(errorMsg);
-			sender.sendMessage(text1.setStyle(text1.getStyle().setColor(TextFormatting.RED))); 
+			sender.sendMessage(text1.setStyle(text1.getStyle().setColor(TextFormatting.RED)));
 		}else {
 			time = System.currentTimeMillis() - time;
 			TextComponentTranslation text = new TextComponentTranslation("Reload successful! (took " + time + " ms)");

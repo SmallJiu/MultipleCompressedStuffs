@@ -30,9 +30,9 @@ public class ItemCatHammer extends BaseItemNormal {
 		super(name, tab);
 		super.setMaxStackSize(1);
 	}
-	
+
 	JiuRandom rand = new JiuRandom(10104);
-	
+
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if(pos.getY() != 0 && (worldIn.getBlockState(pos).getBlock() == Blocks.BEDROCK || worldIn.getBlockState(pos).getBlock() == MCSBlocks.minecraft.normal.C_BEDROCK_B)) {
@@ -42,8 +42,8 @@ public class ItemCatHammer extends BaseItemNormal {
 			}
 			if(JiuUtils.nbt.getItemNBTInt(stack, "time") >= 10) {
 				JiuUtils.nbt.setItemNBT(stack, "time", 0);
-				
-				if(rand.nextInt(9)+rand.nextFloat() <= (Configs.Custom.custem_already_stuff.item.break_bedrock_chance * 10)) {
+
+				if(rand.nextInt(9) + rand.nextFloat() <= (Configs.Custom.custem_already_stuff.item.break_bedrock_chance * 10)) {
 					worldIn.playSound(null, pos, SoundEvents.BLOCK_METAL_BREAK, SoundCategory.BLOCKS, 1.0F, 1.0F);
 					worldIn.playEvent(2001, pos, Block.getStateId(Blocks.BEDROCK.getDefaultState()));
 					Block.spawnAsEntity(worldIn, pos, JiuUtils.item.getStackFormBlockState(worldIn.getBlockState(pos)));
@@ -59,7 +59,7 @@ public class ItemCatHammer extends BaseItemNormal {
 			return EnumActionResult.PASS;
 		}
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {

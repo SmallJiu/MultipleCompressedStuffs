@@ -1,0 +1,7 @@
+{
+	"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "botania:blocks/elfglass",
+		"overlay": "mcs:blocks/compressed_10"
+	}
+}

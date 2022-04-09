@@ -5,9 +5,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
 
+import cat.jiu.core.api.events.item.IItemInPlayerHandTick;
 import cat.jiu.core.api.events.item.IItemInPlayerInventoryTick;
 import cat.jiu.core.util.JiuCoreEvents;
 import cat.jiu.mcs.MCS;
+import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.base.sub.BaseItemSub;
 
 import ic2.api.item.ICustomDamageItem;
@@ -31,8 +33,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
-public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent, IItemInPlayerInventoryTick, ICustomDamageItem {
-	
+public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent, IItemInPlayerInventoryTick, IItemInPlayerHandTick, ICustomDamageItem {
+
 	public final int numberOfCells;
 	protected final ItemReactorUranium base;
 	protected final BaseItemSub depletedItem;
@@ -65,7 +67,12 @@ public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent,
 	public IC2ReactorFuelRod(String name, String baseItem, BaseItemSub depletedItem) {
 		this(name, baseItem, MCS.COMPERESSED_ITEMS, depletedItem);
 	}
-	
+
+	@Override
+	public boolean createOreDictionary() {
+		return false;
+	}
+
 	@Override
 	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
 		if(this.base != null) {
@@ -75,10 +82,23 @@ public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent,
 	}
 
 	@Override
-	public void onItemInPlayerInventoryTick(EntityPlayer player, ItemStack invStack, int slot) {
-		if(invStack.getItem() instanceof IC2RadiationItem) {
+	public void onItemInPlayerHandTick(EntityPlayer player, ItemStack mainHand, ItemStack offHand) {
+		if(mainHand != null && !mainHand.isEmpty() && mainHand.getItem() instanceof IC2ReactorFuelRod) {
 			if(!ItemArmorHazmat.hasCompleteHazmat(player)) {
-				IC2Potion.radiation.applyTo(player, (int) (200 + (200 * ((invStack.getMetadata() + 1) * 0.3469))), 100);
+				IC2Potion.radiation.applyTo(player, (int) MCSUtil.item.getMetaValue(200, mainHand.getMetadata()), 100);
+			}
+		}else if(offHand != null && !offHand.isEmpty() && offHand.getItem() instanceof IC2ReactorFuelRod) {
+			if(!ItemArmorHazmat.hasCompleteHazmat(player)) {
+				IC2Potion.radiation.applyTo(player, (int) MCSUtil.item.getMetaValue(200, offHand.getMetadata()), 100);
+			}
+		}
+	}
+
+	@Override
+	public void onItemInPlayerInventoryTick(EntityPlayer player, ItemStack invStack, int slot) {
+		if(invStack.getItem() instanceof IC2ReactorFuelRod) {
+			if(!ItemArmorHazmat.hasCompleteHazmat(player)) {
+				IC2Potion.radiation.applyTo(player, (int) MCSUtil.item.getMetaValue(200, invStack.getMetadata()), 100);
 			}
 		}
 	}
@@ -95,7 +115,7 @@ public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent,
 		if(!reactor.produceEnergy()) {
 			return;
 		}
-		double cells = (this.numberOfCells + (this.numberOfCells * ((stack.getMetadata()+1) * 0.007687)));
+		double cells = (this.numberOfCells + (this.numberOfCells * ((stack.getMetadata() + 1) * 0.007687)));
 		int basePulses = 1 + this.numberOfCells / 2;
 		for(int iteration = 0; iteration < cells; ++iteration) {
 			int pulses = basePulses;
@@ -107,14 +127,14 @@ public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent,
 			}else {
 				pulses += checkPulseable(reactor, x - 1, y, stack, x, y, heatRun) + checkPulseable(reactor, x + 1, y, stack, x, y, heatRun) + checkPulseable(reactor, x, y - 1, stack, x, y, heatRun) + checkPulseable(reactor, x, y + 1, stack, x, y, heatRun);
 				// 热值
-				int heat = (int) ((((pulses * pulses + pulses) / 2) * 4) * ((stack.getMetadata()+1) * 0.979));
+				int heat = (int) ((((pulses * pulses + pulses) / 2) * 4) * ((stack.getMetadata() + 1) * 0.979));
 				heat = this.getFinalHeat(stack, reactor, x, y, heat);
 				Queue<ItemStackCoord> heatAcceptors = new ArrayDeque<ItemStackCoord>();
 				this.checkHeatAcceptor(reactor, x - 1, y, heatAcceptors);
 				this.checkHeatAcceptor(reactor, x + 1, y, heatAcceptors);
 				this.checkHeatAcceptor(reactor, x, y - 1, heatAcceptors);
 				this.checkHeatAcceptor(reactor, x, y + 1, heatAcceptors);
-				
+
 				while(!heatAcceptors.isEmpty() && heat > 0) {
 					int dheat = heat / heatAcceptors.size();
 					heat -= dheat;
@@ -126,7 +146,7 @@ public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent,
 				if(heat > 0) {
 					reactor.addHeat(heat);
 				}
-				
+
 			}
 		}
 		if(!heatRun && this.getCustomDamage(stack) >= this.getMaxCustomDamage(stack) - 1) {
@@ -135,45 +155,43 @@ public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent,
 			this.applyCustomDamage(stack, 1, null);
 		}
 	}
-	
+
 	public static boolean isMOX(ItemStack stack) {
 		Item item = stack.getItem();
-		return item == Item.getByNameOrId("ic2:mox_fuel_rod")
-			|| item == Item.getByNameOrId("ic2:dual_mox_fuel_rod")
-			|| item == Item.getByNameOrId("ic2:quad_mox_fuel_rod");
+		return item == Item.getByNameOrId("ic2:mox_fuel_rod") || item == Item.getByNameOrId("ic2:dual_mox_fuel_rod") || item == Item.getByNameOrId("ic2:quad_mox_fuel_rod");
 	}
-	
+
 	public static int triangularNumber(int x) {
-        return (x * x + x) / 2;
-    }
-	
+		return (x * x + x) / 2;
+	}
+
 	public int getFinalHeat(ItemStack stack, IReactor reactor, int x, int y, int heat) {
-        if(isMOX(this.unCompressedItem)) {
-        	if (reactor.isFluidCooled()) {
-                final float breedereffectiveness = reactor.getHeat() / (float)reactor.getMaxHeat();
-                if (breedereffectiveness > 0.5) {
-                    heat *= 2;
-                }
-            }
-        }
+		if(isMOX(this.unCompressedItem)) {
+			if(reactor.isFluidCooled()) {
+				final float breedereffectiveness = reactor.getHeat() / (float) reactor.getMaxHeat();
+				if(breedereffectiveness > 0.5) {
+					heat *= 2;
+				}
+			}
+		}
 		return heat;
-    }
-	
+	}
+
 	public static int checkPulseable(IReactor reactor, int x, int y, ItemStack stack, int mex, int mey, boolean heatrun) {
-        final ItemStack other = reactor.getItemAt(x, y);
-        if (other != null && other.getItem() instanceof IReactorComponent && ((IReactorComponent)other.getItem()).acceptUraniumPulse(other, reactor, stack, x, y, mex, mey, heatrun)) {
-            return 1;
-        }
-        return 0;
-    }
-	
+		final ItemStack other = reactor.getItemAt(x, y);
+		if(other != null && other.getItem() instanceof IReactorComponent && ((IReactorComponent) other.getItem()).acceptUraniumPulse(other, reactor, stack, x, y, mex, mey, heatrun)) {
+			return 1;
+		}
+		return 0;
+	}
+
 	public void checkHeatAcceptor(final IReactor reactor, final int x, final int y, final Collection<ItemStackCoord> heatAcceptors) {
-        final ItemStack stack = reactor.getItemAt(x, y);
-        if (stack != null && stack.getItem() instanceof IReactorComponent && ((IReactorComponent)stack.getItem()).canStoreHeat(stack, reactor, x, y)) {
-            heatAcceptors.add(new ItemStackCoord(stack, x, y));
-        }
-    }
-	
+		final ItemStack stack = reactor.getItemAt(x, y);
+		if(stack != null && stack.getItem() instanceof IReactorComponent && ((IReactorComponent) stack.getItem()).canStoreHeat(stack, reactor, x, y)) {
+			heatAcceptors.add(new ItemStackCoord(stack, x, y));
+		}
+	}
+
 	@Override
 	public boolean showDurabilityBar(ItemStack stack) {
 		return this.getCustomDamage(stack) > 0;
@@ -181,53 +199,63 @@ public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent,
 
 	@Override
 	public double getDurabilityForDisplay(ItemStack stack) {
-        return (double)this.getCustomDamage(stack) / (double)this.getMaxCustomDamage(stack);
-    }
-	
+		return (double) this.getItemDamage(stack) / (double) this.getMaxItemDamage(stack);
+	}
+
+	public long getMaxItemDamage(ItemStack stack) {
+		return (long) MCSUtil.item.getMetaValue(this.base.getMaxCustomDamage(this.unCompressedItem), stack.getMetadata());
+	}
+
+	public long getItemDamage(ItemStack stack) {
+		if(!stack.hasTagCompound()) {
+			return 0;
+		}
+		return stack.getTagCompound().getLong("advDmg");
+	}
+
 	@Override
-    public int getCustomDamage(ItemStack stack) {
-        if (!stack.hasTagCompound()) {
-            return 0;
-        }
-        return stack.getTagCompound().getInteger("advDmg");
-    }
-	
+	public int getCustomDamage(ItemStack stack) {
+		if(!stack.hasTagCompound()) {
+			return 0;
+		}
+		return stack.getTagCompound().getInteger("advDmg");
+	}
+
 	@Override
 	public int getMaxCustomDamage(ItemStack stack) {
-		int base = this.base.getMaxCustomDamage(this.unCompressedItem);
-		return (int) (base + (base * ((stack.getMetadata()+1) * 1.968)));
+		return (int) MCSUtil.item.getMetaValue(this.base.getMaxCustomDamage(this.unCompressedItem), stack.getMetadata());
 	}
 
 	@Override
 	public void setCustomDamage(ItemStack stack, int damage) {
 		NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-        nbt.setInteger("advDmg", damage);
+		nbt.setInteger("advDmg", damage);
 	}
 
 	@Override
 	public boolean applyCustomDamage(ItemStack stack, int damage, EntityLivingBase p2) {
 		this.setCustomDamage(stack, this.getCustomDamage(stack) + damage);
-        return true;
+		return true;
 	}
-	
+
 	public void setDamage(ItemStack stack, int damage) {
-        final int prev = this.getCustomDamage(stack);
-        if (damage != prev && BaseElectricItem.logIncorrectItemDamaging) {
-            IC2.log.warn(LogCategory.Armor, new Throwable(), "Detected invalid gradual item damage application (%d):", damage - prev);
-        }
-    }
+		final int prev = this.getCustomDamage(stack);
+		if(damage != prev && BaseElectricItem.logIncorrectItemDamaging) {
+			IC2.log.warn(LogCategory.Armor, new Throwable(), "Detected invalid gradual item damage application (%d):", damage - prev);
+		}
+	}
 
 	// 接受铀脉冲
 	@Override
 	public boolean acceptUraniumPulse(ItemStack stack, IReactor reactor, ItemStack pulsingStack, int youX, int youY, int pulseX, int pulseY, boolean heatrun) {
-		if (!heatrun) {
+		if(!heatrun) {
 			if(isMOX(this.unCompressedItem)) {
-				float breedereffectiveness = reactor.getHeat() / (float)reactor.getMaxHeat();
+				float breedereffectiveness = reactor.getHeat() / (float) reactor.getMaxHeat();
 				float ReaktorOutput = 4.0f * breedereffectiveness + 2.0f;
-				float out = ReaktorOutput + (ReaktorOutput * (0.5F * (stack.getMetadata()+1) * 3.337F));
+				float out = ReaktorOutput + (ReaktorOutput * (0.5F * (stack.getMetadata() + 1) * 3.337F));
 				reactor.addOutput(out);
 			}else {
-				reactor.addOutput(1.0f + (0.9F * ((stack.getMetadata()+1) * 0.639F)));
+				reactor.addOutput(1.0f + (0.9F * ((stack.getMetadata() + 1) * 0.639F)));
 			}
 		}
 		return true;
@@ -255,14 +283,16 @@ public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent,
 	@Override
 	public int alterHeat(ItemStack stack, IReactor reactor, int x, int y, int heat) {
 		int base = this.base.alterHeat(this.unCompressedItem, reactor, x, y, heat);
-		return (int) (base + (base * ((stack.getMetadata()+1)*0.579)));
+		return (int) (base + (base * ((stack.getMetadata() + 1) * 0.579)));
 	}
 
 	// 爆炸影响(爆炸力)
 	@Override
 	public float influenceExplosion(ItemStack stack, IReactor reactor) {
 		float base = this.base.influenceExplosion(stack, reactor);
-		return (float) (base + (base * (((stack.getMetadata()+1))*1.921) * (this.numberOfCells + stack.getMetadata())));
+		float i = (float) (base + (base * (((stack.getMetadata() + 1)) * 1.921) * (this.numberOfCells + stack.getMetadata())));
+		System.out.println(i);
+		return i;
 	}
 
 	public static class ItemStackCoord {

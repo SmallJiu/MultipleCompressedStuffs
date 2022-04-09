@@ -1,0 +1,7 @@
+{
+	"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "tconstruct:blocks/block_silky_jewel",
+		"overlay": "mcs:blocks/compressed_3"
+	}
+}

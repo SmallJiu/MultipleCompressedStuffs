@@ -23,5 +23,5 @@ public class CommandHelp extends BaseCommand.CommandNormal {
 			sender.sendMessage(new TextComponentKeybind("> /mcs loadmod  | get minecraft load mod name"));
 			sender.sendMessage(new TextComponentKeybind("> /mcs help     | get this helper"));
 		}
-    }
+	}
 }

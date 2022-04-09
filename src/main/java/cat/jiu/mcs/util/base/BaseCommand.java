@@ -12,62 +12,62 @@ public class BaseCommand {
 		protected final String name;
 		protected final boolean checkPermission;
 		protected final int level;
-		
-		public CommandNormal(String name){
+
+		public CommandNormal(String name) {
 			this(name, true, 0);
 		}
-		
-		public CommandNormal(String name, boolean checkPermission, int level){
+
+		public CommandNormal(String name, boolean checkPermission, int level) {
 			this.name = name;
 			this.checkPermission = checkPermission;
 			this.level = level;
 		}
-		
+
 		@Override
-		public String getName(){
+		public String getName() {
 			return this.name;
 		}
-		
+
 		@Override
 		public String getUsage(ICommandSender sender) {
-			return "command.mcs." + this.getName() +".info";
+			return "command.mcs." + this.getName() + ".info";
 		}
-		
+
 		@Override
 		public int getRequiredPermissionLevel() {
 			return this.level;
 		}
-		
+
 		@Override
 		public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
 			return super.checkPermission(server, sender);
 		}
-		
+
 		@Override
 		public abstract void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException;
 	}
-	
+
 	public static class CommandTree extends CommandTreeBase {
 		protected final String name;
 		protected final boolean canAddCommand;
 		protected final boolean checkPermission;
 		protected final int level;
 		protected final ICommand[] commands;
-		
+
 		public CommandTree(ICommand[] commands, String name, boolean canAddComman, boolean checkPermission, int level) {
 			this.commands = commands;
 			this.name = name;
 			this.canAddCommand = canAddComman;
 			this.checkPermission = checkPermission;
 			this.level = level;
-			
-			for(ICommand cmd : commands){
-				if(cmd != null){
+
+			for(ICommand cmd : commands) {
+				if(cmd != null) {
 					super.addSubcommand(cmd);
 				}
 			}
 		}
-		
+
 		public ICommand[] getCommands() {
 			return this.commands;
 		}
@@ -79,12 +79,12 @@ public class BaseCommand {
 
 		@Override
 		public String getUsage(ICommandSender sender) {
-			return "command.mcs." + this.getName() +".info";
+			return "command.mcs." + this.getName() + ".info";
 		}
 
 		@Override
 		public void addSubcommand(ICommand command) {
-			if(!this.canAddCommand){
+			if(!this.canAddCommand) {
 				if(command.getClass().getPackage() != this.getClass().getPackage()) {
 					throw new UnsupportedOperationException("Don't add sub-commands to /" + this.name + ", create your own command !");
 				}

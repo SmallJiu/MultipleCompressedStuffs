@@ -1,0 +1,7 @@
+{
+	"parent":"item/generated",
+	"textures": {
+		"layer0": "appliedenergistics2:items/paint_ball_shimmer",
+		"layer1": "mcs:items/compressed_12"
+	}
+}

@@ -1,5 +1,5 @@
 package cat.jiu.mcs.interfaces;
 
-public interface IHasModel {
-	public void registerItemModel();
+@Deprecated
+public interface IHasModel extends cat.jiu.mcs.api.IHasModel {
 }

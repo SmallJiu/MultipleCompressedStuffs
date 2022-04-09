@@ -1,0 +1,7 @@
+{
+	"parent":"item/generated",
+	"textures": {
+		"layer0": "appliedenergistics2:items/material_fluid_cell4k_part",
+		"layer1": "mcs:items/compressed_12"
+	}
+}

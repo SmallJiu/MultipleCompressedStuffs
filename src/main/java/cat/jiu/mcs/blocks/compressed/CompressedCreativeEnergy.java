@@ -21,7 +21,7 @@ public class CompressedCreativeEnergy extends BaseBlockSub {
 		super(nameIn, unCompressedItem, "mcs", CreativeTabs.TRANSPORTATION);
 		this.setInfoStack(new ItemStack(Items.AIR));
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
@@ -29,9 +29,9 @@ public class CompressedCreativeEnergy extends BaseBlockSub {
 		tooltip.add(I18n.format("tile.mcs.creative_energy.info.0"));
 		tooltip.add(I18n.format("tile.mcs.creative_energy.info.1", JiuUtils.big_integer.format(Integer.MAX_VALUE * (10L * (stack.getMetadata() + 5)), 3) + " (" + Integer.MAX_VALUE * (10L * (stack.getMetadata() + 5)) + ")"));
 	}
-	
+
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new TileEntityCreativeEnergy((10 * (meta + 4))+9);
+		return new TileEntityCreativeEnergy((10 * (meta + 4)) + 9);
 	}
 }

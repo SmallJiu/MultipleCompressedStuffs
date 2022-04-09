@@ -15,26 +15,26 @@ public class CommandGetOreDict extends BaseCommand.CommandNormal {
 	public CommandGetOreDict(String name, boolean checkPermission, int level) {
 		super(name, checkPermission, level);
 	}
-	
+
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(sender.getCommandSenderEntity() instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) sender.getCommandSenderEntity();
-            ItemStack heldItem = player.getHeldItemMainhand();
-			
+			ItemStack heldItem = player.getHeldItemMainhand();
+
 			if(!heldItem.isEmpty()) {
 				List<String> ores = JiuUtils.item.getOreDict(heldItem);
-				
+
 				if(!ores.isEmpty()) {
 					player.sendMessage(new TextComponentKeybind("OreDict Entries:"));
 					player.sendMessage(new TextComponentKeybind(" " + heldItem.getItem().getRegistryName() + "@" + heldItem.getItemDamage() + ":"));
 					for(String ore : ores) {
 						player.sendMessage(new TextComponentKeybind("  - <ore:" + ore + ">"));
 					}
-				} else {
+				}else {
 					player.sendMessage(new TextComponentKeybind("No OreDict Entries"));
 				}
 			}
 		}
-    }
+	}
 }

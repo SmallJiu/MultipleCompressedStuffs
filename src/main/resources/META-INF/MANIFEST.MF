@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-FMLAT: mcs_at.cfg
-Main-Class: cat.jiu.mcs.Main

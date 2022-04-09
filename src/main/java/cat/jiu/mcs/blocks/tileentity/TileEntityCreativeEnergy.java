@@ -9,16 +9,19 @@ import net.minecraft.util.ITickable;
 
 public class TileEntityCreativeEnergy extends TileEntity implements ITickable {
 	private int meta = -1;
+
 	public TileEntityCreativeEnergy() {}
 	public TileEntityCreativeEnergy(int meta) {
 		this.meta = meta + 1;
 	}
+
 	@Override
 	public void update() {
 		this.markDirty();
 		if(this.meta == -1) {
 			if(this.blockType instanceof CompressedCreativeRFSource || this.blockType instanceof CompressedCreativeEnergy) {
-				this.meta = ((TileEntityCreativeEnergy)this.blockType.createTileEntity(this.world, this.world.getBlockState(pos))).meta;
+				this.meta = ((TileEntityCreativeEnergy) this.blockType.createTileEntity(this.world, this.world.getBlockState(pos))).meta;
+				return;
 			}
 		}else {
 			int energy = Integer.MAX_VALUE;

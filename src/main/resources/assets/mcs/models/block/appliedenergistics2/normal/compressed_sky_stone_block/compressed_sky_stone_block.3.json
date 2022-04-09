@@ -1,0 +1,7 @@
+{
+	"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "appliedenergistics2:blocks/sky_stone_block",
+		"overlay": "mcs:blocks/compressed_4"
+	}
+}

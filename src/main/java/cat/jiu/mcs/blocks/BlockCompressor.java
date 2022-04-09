@@ -8,7 +8,6 @@ import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.net.GuiHandler;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCompressor;
 import cat.jiu.mcs.util.MCSUtil;
-import cat.jiu.mcs.util.init.MCSResources;
 
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
@@ -36,8 +35,6 @@ public class BlockCompressor extends BaseBlock.Normal implements ITileEntityProv
 	public BlockCompressor() {
 		super(MCS.MODID, "compressor", Material.ANVIL, SoundType.METAL, CreativeTabs.TRANSPORTATION, 10F);
 		this.setBlockModelResourceLocation(MCS.MODID + "/block", this.name);
-		MCSResources.BLOCKS_NAME.add(this.name);
-		MCSResources.BLOCKS.add(this);
 	}
 
 	@Override

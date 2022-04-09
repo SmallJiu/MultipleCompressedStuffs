@@ -27,9 +27,9 @@ itemGroup.compressed_stuffs_blocks=多重壓縮-矩形
  tile.mcs.compressed_13.name=十四重壓縮
  tile.mcs.compressed_14.name=十五重壓縮
  tile.mcs.compressed_15.name=十六重壓縮
- tile.mcs.compressed_32767.name=無限重
+ tile.mcs.compressed_32766.name=無限重
 
- config.mcs.name_of_uncompressed_block=自定義壓縮框（未完之作）
+ config.mcs.name_of_uncompressed_block=自定義壓縮框
  config.mcs.ore_dict_register=礦詞自定義
  config.mcs.logging_give_food=進入存檔時發送食物
  config.mcs.custem_change_block=自定義壓縮框框世界時會改變的框框

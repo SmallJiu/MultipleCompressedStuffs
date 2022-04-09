@@ -4,16 +4,19 @@ itemGroup.compressed_stuffs_tools=多重压缩-工具
 
 info.mcs.warn.ic.craft_energy=警告：将不会继承合成材料的电量到成品上
 
+info.mcs.cat_ingot=我是不是要被吃掉或者拿去发电了...
 info.mcs.logging.name=这是你今天的口粮，不要不识好歹
 info.mcs.logging.air.name=喝西北风吧你！
 info.mcs.shift=§a按住§bShift§a以显示更多
-info.mcs.owner_mod=所属Mod
+info.mcs.owner_mod=所属模组
 info.mcs.burn_time=燃烧时间
 info.mcs.oredict=矿物词典
 info.mcs.food_amount=饱食度
 info.mcs.saturation_modifier=饱和度
 info.mcs.compressor.cache_count=缓存数量
-info.compressed_65535.name=我也八懂有多少
+info.compressed_32766.name=我也八懂有多少
+info.mcs.count=数量
+info.mcs.debug.info=蹲下加右键来使压缩器启用或禁用Debug模式
 
 info.mcs.owner_entry=所属类型
 info.mcs.entry.item.name=物品
@@ -25,9 +28,6 @@ info.mcs.entry.shovel.name=铲
 info.mcs.entry.axe.name=斧
 info.mcs.entry.hoe.name=锄
 
-tile.mcs.creative_energy.name=创造能源组件
-tile.mcs.creative_energy.info.0=创造模式独享
-tile.mcs.creative_energy.info.1=最大输出：%s
 item.mcs.cat_hammer.name=猫猫锤
 item.mcs.cat_hammer.info.0=已破坏的基岩总数
 item.mcs.cat_hammer.info.1=右键将有 %s/10 的几率破坏基岩并掉落
@@ -35,6 +35,9 @@ item.mcs.cat_ingot.name=猫猫锭
 item.mcs.cat_hair.name=猫絮
 item.mcs.destroyer.name=毁灭者
 item.mcs.destroyer.info.0=已破坏的方块总数
+tile.mcs.creative_energy.name=创造能源组件
+tile.mcs.creative_energy.info.0=创造模式独享
+tile.mcs.creative_energy.info.1=最大输出：%s
 tile.mcs.compressor.name=压缩器
 
 tile.mcs.block.name=块
@@ -55,7 +58,58 @@ tile.mcs.compressed_12.name=十三重压缩
 tile.mcs.compressed_13.name=十四重压缩
 tile.mcs.compressed_14.name=十五重压缩
 tile.mcs.compressed_15.name=十六重压缩
-tile.mcs.compressed_32767.name=无限重
+tile.mcs.compressed_32766.name=无限重
+
+advancement.mcs.compressed_1.name="压缩世界"
+advancement.mcs.compressed_1.info=合成一个一重的压缩物品
+
+advancement.mcs.compressed_2.name=进入二次元
+advancement.mcs.compressed_2.info=合成一个二重的压缩物品
+
+advancement.mcs.compressed_3.name=试图合成大西瓜
+advancement.mcs.compressed_3.info=合成一个三重的压缩物品
+
+advancement.mcs.compressed_4.name=哎嘿嘿, 四重物品来咯！
+advancement.mcs.compressed_4.info=合成一个四重的压缩物品
+
+advancement.mcs.compressed_5.name=穿山甲也钻不动啊
+advancement.mcs.compressed_5.info=合成一个五重的压缩物品
+
+advancement.mcs.compressed_6.name=用啊！****为什么不用！
+advancement.mcs.compressed_6.info=合成一个六重的压缩物品
+
+advancement.mcs.compressed_7.name=有一个玩家前来合成七重物品
+advancement.mcs.compressed_7.info=合成一个七重的压缩物品
+
+advancement.mcs.compressed_8.name=更多实用设备的极限
+advancement.mcs.compressed_8.info=合成一个八重的压缩物品
+
+advancement.mcs.compressed_9.name=你不是很喜欢压缩么，把九重物品塞你**里，给你好好压缩压缩
+advancement.mcs.compressed_9.info=合成一个玖重的压缩物品
+
+advancement.mcs.compressed_10.name=此刻正是压缩之时
+advancement.mcs.compressed_10.info=合成一个十重的压缩物品
+
+advancement.mcs.compressed_11.name=您有一个包裹到**驿站，请凭取件码领取
+advancement.mcs.compressed_11.info=合成一个十一重的压缩物品
+
+advancement.mcs.compressed_12.name=中子星都望尘莫及
+advancement.mcs.compressed_12.info=合成一个十二重的压缩物品
+
+advancement.mcs.compressed_13.name=黑乎乎的大玩意
+advancement.mcs.compressed_13.info=合成一个十三重的压缩物品
+
+advancement.mcs.compressed_14.name=楚门的世界
+advancement.mcs.compressed_14.info=合成一个十四重的压缩物品
+
+advancement.mcs.compressed_15.name=世界中的世界
+advancement.mcs.compressed_15.info=合成一个十五重的压缩物品
+
+advancement.mcs.compressed_16.name=无限平行宇宙，一切皆有可能
+advancement.mcs.compressed_16.info=合成一个十六重的压缩物品
+
+advancement.mcs.compressed_32766.name=我于万物之中
+advancement.mcs.compressed_32766.info=合成一个无限重的压缩物品
 
 #{
 config.mcs.recipe.3x3=使用3x3合成表,反之使用2x2合成表
@@ -67,21 +121,21 @@ config.mcs.enable_mod_stuff=启用联动物品(需在ModStuff开启具体mod)
 config.mcs.enable_test_stuff=使用mod预览内容
 config.mcs.name_of_uncompressed_block=自定义压缩方块(未完之作)
 config.mcs.name_of_uncompressed_item=自定义压缩物品(也许能用)
-	#{
+#	{
 config.mcs.ore_dict_register=矿词自定义
 config.mcs.logging_give_food=进入存档时给予食物
-		#{
+#		{
 config.mcs.custem_can_use_wrench_break=自定义方块是否可以被扳手类破坏掉落
 config.mcs.custem_break_drop_item=自定义毁灭者右键方块所获得的物品
 config.mcs.custem_change_block=自定义压缩方块放置世界时将会改变的方块
-		#}
-		#{
+#		},
+#		{
 config.mcs.can_drop_cat_hair=豹猫可以掉落猫絮
 config.mcs.break_bedrock_chance=自定义猫猫锤破坏基岩类方块的几率
 config.mcs.drop_cat_hair_chance=自定义豹猫掉落猫絮的几率
 config.mcs.custem_eat_effect=自定义压缩食物吃掉时给予的buff
-		#}
-	#}
+#		}
+#	}
 config.mcs.can_custom_tab_background=可以改变多重压缩物品的创造物品栏的背景
 config.mcs.show_food_amount=显示压缩食物的饱食度与饱和度
 config.mcs.get_real_food_amout=显示不是科学计数法的饱食度与饱和度
@@ -90,9 +144,9 @@ config.mcs.show_burn_time=显示燃烧时间
 config.mcs.show_specific_number=显示不是科学计数法的未压缩方块数
 config.mcs.can_custom_specific_number=可以自定义未压缩的方块数
 config.mcs.show_owner_mod=显示所属mod
-	#{
+#	{
 config.mcs.custem_info.item=自定义压缩物品的tag栏内容显示
 config.mcs.custem_info.block=自定义压缩方块的tag栏内容显示
 config.mcs.custem_info.item.food=自定义压缩食物的tag栏内容显示
-	#}
+#	}
 #}

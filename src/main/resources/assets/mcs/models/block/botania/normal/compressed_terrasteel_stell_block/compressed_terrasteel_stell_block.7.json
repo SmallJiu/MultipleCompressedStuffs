@@ -1,0 +1,7 @@
+{
+	"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "botania:blocks/storage1",
+		"overlay": "mcs:blocks/compressed_8"
+	}
+}

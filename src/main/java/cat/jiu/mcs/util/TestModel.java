@@ -11,20 +11,21 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class TestModel implements IEntityJoinWorldEvent, IEntityTickEvent{
+public class TestModel implements IEntityJoinWorldEvent, IEntityTickEvent {
 	public static boolean test = false;
+
 	@Override
 	public void onEntityJoinWorld(Entity entity, World world, BlockPos pos, int dim) {
 		isTest(entity);
 		toVoid(entity);
 	}
-	
+
 	@Override
 	public void onEntityTick(Entity entity, World world, BlockPos pos) {
 		isTest(entity);
 		toVoid(entity);
 	}
-	
+
 	private static void isTest(Entity entity) {
 		if(!test) {
 			return;
@@ -42,7 +43,7 @@ public class TestModel implements IEntityJoinWorldEvent, IEntityTickEvent{
 			}
 		}
 	}
-	
+
 	private static void toVoid(Entity entity) {
 		if(test) {
 			if(entity instanceof IMob) {

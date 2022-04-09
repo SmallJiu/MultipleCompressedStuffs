@@ -10,7 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class OtherModBlockChange implements IPlayerPlaceBlock{
+public class OtherModBlockChange implements IPlayerPlaceBlock {
 	@Override
 	public void onPlayerPlaceBlock(EntityPlayer player, BlockPos pos, World world, IBlockState placedBlock, IBlockState placeedAgainst) {
 		String name = placedBlock.getBlock().getRegistryName().toString();

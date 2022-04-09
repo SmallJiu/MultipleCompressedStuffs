@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 
 public class CommandGetModList extends BaseCommand.CommandNormal {
-	
+
 	public CommandGetModList(String name, boolean checkPermission, int level) {
 		super(name, checkPermission, level);
 	}
@@ -18,7 +18,7 @@ public class CommandGetModList extends BaseCommand.CommandNormal {
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		sender.sendMessage(new TextComponentKeybind("Has " + Loader.instance().getModList().size() + " Mod load"));
 		sender.sendMessage(new TextComponentKeybind("This is load mod name: "));
-		for(ModContainer mod : Loader.instance().getModList()){
+		for(ModContainer mod : Loader.instance().getModList()) {
 			sender.sendMessage(new TextComponentKeybind("> " + mod.getName()));
 		}
 		sender.sendMessage(new TextComponentKeybind("========Linkage mod========="));

@@ -15,10 +15,14 @@ public class CompressorRenderItem extends RenderItem {
 
 	@Override
 	public void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text) {
-		if(stack.getCount() > 1|| text != null) {
-			String s0 = text == null ? String.valueOf(stack.getCount()) : text;
-			String s = JiuUtils.big_integer.format(JiuUtils.big_integer.create(s0), 1).toString();
-			super.renderItemOverlayIntoGUI(fr, stack, xPosition-1, yPosition-1, s);
+		if(!stack.isEmpty()) {
+			if(stack.getCount() > 1000) {
+				String s0 = text == null ? String.valueOf(stack.getCount()) : text;
+				String s = JiuUtils.big_integer.format(JiuUtils.big_integer.create(s0), 1).toString();
+				super.renderItemOverlayIntoGUI(fr, stack, xPosition - 1, yPosition - 1, s);
+			}else {
+				super.renderItemOverlayIntoGUI(fr, stack, xPosition, yPosition, text);
+			}
 		}
 	}
 }

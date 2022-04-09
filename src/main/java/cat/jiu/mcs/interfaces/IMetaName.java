@@ -1,7 +1,5 @@
 package cat.jiu.mcs.interfaces;
 
-import net.minecraft.item.ItemStack;
-
-public interface IMetaName {
-	public String getName(ItemStack stack);
+@Deprecated
+public interface IMetaName extends cat.jiu.mcs.api.IMetaName {
 }

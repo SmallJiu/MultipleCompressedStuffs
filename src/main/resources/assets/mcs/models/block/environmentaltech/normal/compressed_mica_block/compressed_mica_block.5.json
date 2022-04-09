@@ -1,0 +1,7 @@
+{
+	"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "environmentaltech:blocks/mica",
+		"overlay": "mcs:blocks/compressed_6"
+	}
+}

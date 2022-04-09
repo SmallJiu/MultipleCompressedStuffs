@@ -1,0 +1,7 @@
+{
+	"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "ic2:blocks/resource/lead_block",
+		"overlay": "mcs:blocks/compressed_5"
+	}
+}

@@ -1,0 +1,7 @@
+{
+	"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "thermalfoundation:blocks/ore/ore_lead",
+		"overlay": "mcs:blocks/compressed_8"
+	}
+}

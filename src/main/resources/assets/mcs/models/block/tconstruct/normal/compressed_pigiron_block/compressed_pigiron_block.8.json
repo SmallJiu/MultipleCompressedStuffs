@@ -1,0 +1,7 @@
+{
+	"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "tconstruct:blocks/block_pigiron",
+		"overlay": "mcs:blocks/compressed_9"
+	}
+}

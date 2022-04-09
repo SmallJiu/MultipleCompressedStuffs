@@ -1,5 +1,5 @@
 {
-"parent":"item/generated",
+	"parent":"item/generated",
 	"textures": {
 		"layer0": "ic2:items/resource/dust/obsidian",
 		"layer1": "mcs:items/compressed_8"

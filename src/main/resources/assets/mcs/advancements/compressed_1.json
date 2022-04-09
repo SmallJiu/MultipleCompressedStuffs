@@ -1,0 +1,18 @@
+{
+    "display": {
+        "icon": { "item": "mcs:compressed_cobblestone_block" },
+        "title": { "translate": "advancement.mcs.compressed_1.name" },
+        "frame": "task",
+		"background":"minecraft:textures/blocks/crafting_table_top.png",
+        "description": { "translate": "advancement.mcs.compressed_1.info" },
+        "hidden": true
+    },
+    "criteria": {
+        "compressed": {
+			"trigger": "mcs:craft_compressed",
+			"conditions": {
+				"meta": 0
+			}
+		}
+    }
+}

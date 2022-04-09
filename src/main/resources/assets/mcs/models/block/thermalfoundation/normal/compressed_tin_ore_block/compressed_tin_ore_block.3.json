@@ -1,0 +1,7 @@
+{
+	"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "thermalfoundation:blocks/ore/ore_tin",
+		"overlay": "mcs:blocks/compressed_4"
+	}
+}

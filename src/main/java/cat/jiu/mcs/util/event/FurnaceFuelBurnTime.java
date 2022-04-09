@@ -10,11 +10,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class FurnaceFuelBurnTime {
 	@SubscribeEvent
 	public static void setBurnTime(FurnaceFuelBurnTimeEvent event) {
-		int baseTime = MCSUtil.item.getUnCompressedBurnTime(event.getItemStack().getItem());
-		
+		int baseTime = MCSUtil.item.getUnCompressedBurnTime(event.getItemStack());
 		if(baseTime > 0) {
-			int level = event.getItemStack().getMetadata() + 1;
-			event.setBurnTime((int) (baseTime + (baseTime * (level * 0.794))));
+			event.setBurnTime((int) MCSUtil.item.getMetaValue(baseTime, event.getItemStack().getMetadata()));
 			return;
 		}
 	}

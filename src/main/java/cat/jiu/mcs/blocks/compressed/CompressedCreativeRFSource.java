@@ -13,7 +13,7 @@ public class CompressedCreativeRFSource extends BaseBlockSub {
 		super(name, unCompressedItem, "draconicevolution");
 		this.setInfoStack(new ItemStack(Items.AIR));
 	}
-	
+
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return new TileEntityCreativeEnergy((meta + 1) * 3);

@@ -1,0 +1,21 @@
+{
+  "pools": [
+    {
+	  "name":"32766",
+      "conditions": [
+        {
+          "condition": "random_chance",
+          "chance": 1
+        }
+      ],
+	  "rolls":1,
+	  "bonus_rolls":0,
+      "entries": [
+        {
+          "type": "item",
+          "name": "mcs:debug"
+        }
+      ]
+    }
+  ]
+}

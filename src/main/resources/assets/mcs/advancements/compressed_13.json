@@ -1,0 +1,18 @@
+{
+    "display": {
+        "icon": { "item": "mcs:compressed_cobblestone_block", "data": 12 },
+        "title": { "translate": "advancement.mcs.compressed_13.name" },
+        "frame": "challenge",
+        "description": { "translate": "advancement.mcs.compressed_13.info" },
+        "hidden": true
+    },
+    "parent": "mcs:compressed_12",
+    "criteria": {
+        "compressed": {
+			"trigger": "mcs:craft_compressed",
+			"conditions": {
+				"meta": 12
+			}
+		}
+    }
+}

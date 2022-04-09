@@ -1,0 +1,7 @@
+{
+	"parent":"item/generated",
+	"textures": {
+		"layer0": "appliedenergistics2:items/crystal_seed_nether3",
+		"layer1": "mcs:items/infinity"
+	}
+}

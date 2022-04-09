@@ -1,7 +1,15 @@
 package cat.jiu.mcs;
 
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 import cat.jiu.core.JiuCore.LogOS;
 import cat.jiu.core.util.JiuUtils;
@@ -13,7 +21,7 @@ import cat.jiu.mcs.util.init.*;
 
 import moze_intel.projecte.emc.EMCMapper;
 import moze_intel.projecte.emc.SimpleStack;
-
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 
@@ -32,47 +40,51 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 	version = MCS.VERSION,
 	useMetadata = true,
 	guiFactory = "cat.jiu.mcs.config.ConfigGuiFactory",
-	dependencies =
-		  "required-after:jiucore@[" + MCS.JIUCORE_VERSION + "," + MCS.JIUCORE_MAIN_VERSION + "-20221230125959" + "];"
-		+ "after:thermalfoundation;"
-		+ "after:projecte;"
-		+ "after:botania;"
-		+ "after:draconicevolution;"
-		+ "after:environmentaltech;"
-		+ "after:tconstruct;"
-		+ "after:avaritia;"
-		+ "after:ic2",
-	acceptedMinecraftVersions = "[1.12.2]"
-)
+	dependencies = "required-after:jiucore@[" + MCS.JIUCORE_VERSION + "," + MCS.JIUCORE_MAIN_VERSION + "-20221230125959" + "];" + "after:thermalfoundation;" + "after:projecte;" + "after:botania;" + "after:draconicevolution;" + "after:environmentaltech;" + "after:tconstruct;" + "after:avaritia;" + "after:ic2;" + "after:appliedenergistics2",
+	acceptedMinecraftVersions = "[1.12.2]")
 public class MultipleCompressedStuffs {
 	protected static final Logger logger = LogManager.getLogger(MCS.MODID);
 	public final LogOS log = new LogOS(logger);
 	public static final String MODID = "mcs";
 	public static final String NAME = "MultipleCompressedStuffs";
 	public static final String OWNER = "small_jiu";
-	protected static final String JIUCORE_MAIN_VERSION = "1.0.8";
-	protected static final String JIUCORE_TIME_VERSION = "20220315202836";
-	public static final String JIUCORE_VERSION = JIUCORE_MAIN_VERSION + "-" + JIUCORE_TIME_VERSION;
-	public static final String VERSION = "3.0.0-20220322000126";
+	protected static final String JIUCORE_MAIN_VERSION = "1.0.9";
+	public static final String JIUCORE_VERSION = JIUCORE_MAIN_VERSION + "-20220407201518";
+	public static final String VERSION = "3.0.1-20220322000126";
 	public final boolean test_model = false; // if is IDE, you can set to 'true' to enable some test stuff
 	public static final CreativeTabs COMPERESSED_BLOCKS = new CreativeTabCompressedStuffsBlocks();
 	public static final CreativeTabs COMPERESSED_ITEMS = new CreativeTabCompressedStuffsItems();
 	public static final CreativeTabs COMPERESSED_TOOLS = new CreativeTabCompressedStuffsTools();
-
-	@Mod.Instance(value = MCS.MODID, owner = MCS.OWNER)
+	public static final JsonObject Textures;
+	static {
+		long time = System.currentTimeMillis();
+		JsonObject obj = null;
+		try {
+			obj = new JsonParser().parse(new InputStreamReader(MCS.class.getResourceAsStream("/assets/mcs/textures/mode_textures.json"), StandardCharsets.UTF_8)).getAsJsonObject();
+		}catch(JsonIOException e) {
+			e.printStackTrace();
+		}catch(JsonSyntaxException e) {
+			e.printStackTrace();
+		}
+		Textures = obj;
+		logger.info("Format Textures json. (took " + (System.currentTimeMillis() - time) + " ms)");
+	}
+	@Mod.Instance(
+		value = MCS.MODID,
+		owner = MCS.OWNER)
 	public static MultipleCompressedStuffs instance = new MultipleCompressedStuffs();
 
 	@SidedProxy(
 		clientSide = "cat.jiu.mcs.proxy.ClientProxy",
 		serverSide = "cat.jiu.mcs.proxy.CommonProxy",
-		modId = MCS.MODID
-	)
+		modId = MCS.MODID)
 	public static CommonProxy proxy;
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		proxy.preInit(event);
 		NetworkHandler.registerMessages();
+		CriteriaTriggers.register(CraftCompressedStuffTrigger.instance);
 	}
 
 	@Mod.EventHandler
@@ -105,19 +117,14 @@ public class MultipleCompressedStuffs {
 		this.log.info("#                                         #");
 		this.log.info("# MultipleCompressedStuffs Load Complete. #");
 		this.log.info("#                                         #");
-		this.log.info("#             "+this.getDayOfVersion()+"              #");
+		this.log.info("#             " + this.getDayOfVersion() + "              #");
 		this.log.info("#                                         #");
 		this.log.info("###########################################");
 	}
 
 	private String getDayOfVersion() {
 		DayUtils day = JiuUtils.day;
-		return day.getYear()+""+
-				(day.getMonth() < 10 ? "0"+day.getMonth() : day.getMonth()+"")+
-				(day.getDayOfMonth() < 10 ? "0"+day.getDayOfMonth() : day.getDayOfMonth()+"")+
-				(day.getHour() < 10 ? "0"+day.getHour() : day.getHour()+"")+
-				(day.getMinutes() < 10 ? "0"+day.getMinutes() : day.getMinutes()+"")+
-				(day.getSecond() < 10 ? "0"+day.getSecond() : day.getSecond()+"");
+		return day.getYear() + "" + (day.getMonth() < 10 ? "0" + day.getMonth() : day.getMonth() + "") + (day.getDayOfMonth() < 10 ? "0" + day.getDayOfMonth() : day.getDayOfMonth() + "") + (day.getHour() < 10 ? "0" + day.getHour() : day.getHour() + "") + (day.getMinutes() < 10 ? "0" + day.getMinutes() : day.getMinutes() + "") + (day.getSecond() < 10 ? "0" + day.getSecond() : day.getSecond() + "");
 	}
 
 	@Mod.EventHandler // 服务器启动中

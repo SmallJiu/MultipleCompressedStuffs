@@ -1,0 +1,7 @@
+{
+	"parent": "mcs:block/overlay_model",
+	"textures": {
+		"all": "botania:blocks/blockmanaquartz0",
+		"overlay": "mcs:blocks/compressed_10"
+	}
+}

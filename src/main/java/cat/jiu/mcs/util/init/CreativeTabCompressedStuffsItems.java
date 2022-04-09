@@ -9,11 +9,11 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-public class CreativeTabCompressedStuffsItems extends CreativeTabs{
-	
+public class CreativeTabCompressedStuffsItems extends CreativeTabs {
+
 	public CreativeTabCompressedStuffsItems() {
 		super("compressed_stuffs_items");
-		
+
 	}
 
 	@Override
@@ -28,11 +28,11 @@ public class CreativeTabCompressedStuffsItems extends CreativeTabs{
 	@Override
 	public ItemStack getTabIconItem() {
 		Random rand = new Random();
-		
+
 		if(!MCSResources.SUB_ITEMS.isEmpty()) {
 			int item = rand.nextInt(MCSResources.SUB_ITEMS.size());
 			return new ItemStack(MCSResources.SUB_ITEMS.get(item), 1, rand.nextInt(15));
-		}else{
+		}else {
 			return new ItemStack(Items.APPLE);
 		}
 	}
