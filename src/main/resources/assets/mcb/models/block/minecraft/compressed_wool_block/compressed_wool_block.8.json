@@ -1,7 +1,0 @@
-{
-    "parent": "mcb:block/overlay_model",
-	"textures": {
-        "all": "minecraft:blocks/wool_colored_white",
-		"overlay": "mcb:blocks/compressed_9"
-    }
-}
