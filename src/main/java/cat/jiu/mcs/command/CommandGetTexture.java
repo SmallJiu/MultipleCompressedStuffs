@@ -6,30 +6,31 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cat.jiu.core.util.JiuUtils;
+import cat.jiu.core.util.base.BaseCommand;
 import cat.jiu.mcs.MCS;
-import cat.jiu.mcs.util.base.BaseCommand;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 
 public class CommandGetTexture extends BaseCommand.CommandNormal {
 	public CommandGetTexture() {
-		super("texture");
+		super("texture", MCS.MODID);
 	}
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(args.length < 1) {
 			JiuUtils.entity.sendMessage(sender, "Modids: ");
-			for(Entry<String, JsonElement> modids : MCS.Textures.entrySet()) {
+			for(Entry<String, JsonElement> modids : MCS.getTextures().entrySet()) {
 				JiuUtils.entity.sendMessage(sender, " > " + modids.getKey());
 			}
 		}else if(args.length >= 1) {
 			String modid = args[0];
 			JsonObject modids = null;
 
-			if(MCS.Textures.has(modid)) {
-				modids = MCS.Textures.get(modid).getAsJsonObject();
+			if(MCS.getTextures().has(modid)) {
+				modids = MCS.getTextures().get(modid).getAsJsonObject();
 			}
 
 			if(modids == null) {
@@ -40,10 +41,10 @@ public class CommandGetTexture extends BaseCommand.CommandNormal {
 				String blockoritem_boi = args[1];
 				if(args.length >= 3) {
 					String name = args[2];
-					if(!MCS.Textures.get(modid).getAsJsonObject().get(blockoritem_boi).getAsJsonObject().has(name)) {
+					if(!MCS.getTextures().get(modid).getAsJsonObject().get(blockoritem_boi).getAsJsonObject().has(name)) {
 						throw new CommandException("Item Not Found!");
 					}
-					JsonElement texture = MCS.Textures.get(modid).getAsJsonObject().get(blockoritem_boi).getAsJsonObject().get(name);
+					JsonElement texture = MCS.getTextures().get(modid).getAsJsonObject().get(blockoritem_boi).getAsJsonObject().get(name);
 					if(texture.isJsonPrimitive()) {
 						JiuUtils.entity.sendMessage(sender, "    > name: " + name + ", texture: " + texture.getAsString());
 					}

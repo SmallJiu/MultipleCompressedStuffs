@@ -12,10 +12,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 	name = "jiu/" + MCS.MODID + "/main",
 	category = "config_main")
 @Config.LangKey("config.mcs.main")
-@Mod.EventBusSubscriber(
-	modid = MCS.MODID)
+@Mod.EventBusSubscriber(modid = MCS.MODID)
 public class Configs {
-
 	@Config.LangKey("config.mcs.recipe.all")
 	@Config.Comment("Enable Default Recipe")
 	@Config.RequiresMcRestart
@@ -30,11 +28,22 @@ public class Configs {
 	@Config.Comment("Use 3x3 Recipes, if is 'false', will use 2x2 recipes")
 	@Config.RequiresMcRestart
 	public static boolean use_3x3_recipes = true;
+	
+	@Config.LangKey("config.mcs.use_scrool_gui")
+	@Config.Comment("Use scrool compressed chest gui, if is 'false', will use page gui")
+	@Config.RequiresMcRestart
+	public static boolean use_scrool_gui = true;
 
 	@Config.LangKey("config.mcs.recipe.cancel_oredict_for_recipe")
 	@Config.Comment("OreDictionary of not involved in recipes")
 	@Config.RequiresMcRestart
-	public static String[] cancel_oredict_for_recipe = new String[]{"blockMetal", "blockGlowstone", "blockGlowstone", "cropBeetroot", "blockWoolWhite", "woolWhite", "blockWool", "leadHardenedGlass", "listAllmeatcooked", "fish", "dye", "dyeWhite", "clathrateEnder", "clathrateGlowstone", "clathrateRedstone", "clathrateOil", "machineBlockCasing", "machineBlockAdvanced", "machineBlockAdvancedCasing", "sandstone", "dye", "dyeBrown", "dyeGreen", "dyeBlack"};
+	public static String[] cancel_oredict_for_recipe = new String[]{
+			"blockMetal", "blockGlowstone", "blockGlowstone", "cropBeetroot", "blockWoolWhite",
+			"woolWhite", "blockWool", "leadHardenedGlass", "listAllmeatcooked", "fish",
+			"dye", "dyeWhite", "clathrateEnder", "clathrateGlowstone", "clathrateRedstone",
+			"clathrateOil", "machineBlockCasing", "machineBlockAdvanced", "machineBlockAdvancedCasing", "sandstone",
+			"dyeBrown", "dyeGreen", "dyeBlack", "chest"
+		};
 
 	public static final CustomCompressedBlock Custom = new CustomCompressedBlock();
 

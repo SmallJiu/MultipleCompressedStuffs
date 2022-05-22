@@ -9,7 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cat.jiu.core.util.JiuUtils;
-import cat.jiu.mcs.util.MCSUtil;
+
 import cat.jiu.mcs.util.type.CustomStuffType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -36,7 +36,7 @@ public class InitChangeBlock {
 					if(dropo.has("item")) {
 						JsonArray dropa = dropo.getAsJsonArray("item");
 						for(int k = 0; k < dropa.size(); ++k) {
-							drop.add(MCSUtil.item.getStack(dropa.get(k).getAsString()));
+							drop.add(JiuUtils.item.toStack(dropa.get(k)));
 						}
 					}else {
 						drop.add(new ItemStack(Item.getByNameOrId("mcs:" + name), 1, meta));
@@ -58,14 +58,14 @@ public class InitChangeBlock {
 							drop.add(new ItemStack(Item.getByNameOrId(name), 1, meta));
 						}
 					}else if(dropa.size() == 2) {
-						drop.add(MCSUtil.item.getStack(dropa.get(1).getAsString()));
+						drop.add(JiuUtils.item.toStack(dropa.get(1)));
 					}else {
 						for(int k = 1; k < dropa.size(); ++k) {
-							drop.add(MCSUtil.item.getStack(dropa.get(k).getAsString()));
+							drop.add(JiuUtils.item.toStack(dropa.get(k)));
 						}
 					}
 				}else {
-					drop.add(MCSUtil.item.getStack(dropE.getAsString()));
+					drop.add(JiuUtils.item.toStack(dropE));
 				}
 
 				typeMap.put(meta, new CustomStuffType.ChangeBlockType(drop, time, canDrop));

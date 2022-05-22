@@ -1,14 +1,14 @@
 package cat.jiu.mcs.recipes;
 
-import cat.jiu.mcs.MCS;
-import cat.jiu.mcs.config.Configs;
-import cat.jiu.mcs.recipes.mod.AEInscriberRecipe;
-
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import appeng.api.AEApi;
 import appeng.api.features.IGrinderRecipeBuilder;
 import appeng.api.features.IGrinderRegistry;
+import appeng.api.features.IInscriberRecipe;
+import appeng.api.features.IInscriberRecipeBuilder;
 import appeng.api.features.IInscriberRegistry;
 import appeng.api.features.InscriberProcessType;
 
@@ -19,7 +19,12 @@ import cat.jiu.mcs.util.base.sub.BaseBlockSub;
 import cat.jiu.mcs.util.init.MCSBlocks;
 import cat.jiu.mcs.util.init.MCSItems;
 import cat.jiu.mcs.util.init.MCSResources;
+import cat.jiu.mcs.MCS;
+import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.config.Configs;
+
 import ic2.api.recipe.IRecipeInput;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -38,7 +43,9 @@ public class MCSRecipe {
 	}
 
 	private static void compressed() {
+		MCS.instance.log.info("Start register compressed item recipe");
 		itemCompressed();
+		MCS.instance.log.info("Start register compressed block recipe");
 		blockCompressed();
 	}
 
@@ -138,12 +145,12 @@ public class MCSRecipe {
 				new ItemStack(MCSItems.normal.CAT_HAIR), new ItemStack(MCSItems.normal.CAT_HAIR), new ItemStack(MCSItems.normal.CAT_HAIR));
 
 		if(Configs.Custom.Mod_Stuff.ThermalFoundation) {
-			recipe.addShapedRecipes(new ItemStack(MCSBlocks.COMPRESSOR),
+			recipe.addShapedRecipes(new ItemStack(MCSBlocks.compressor),
 					new ItemStack(MCSBlocks.minecraft.normal.C_OBSIDIAN_B), new ItemStack(Blocks.PISTON), new ItemStack(MCSBlocks.minecraft.normal.C_OBSIDIAN_B),
 					new ItemStack(MCSBlocks.minecraft.normal.C_OBSIDIAN_B, 1, 1), new ItemStack(MCSItems.ore_stuff.gear.C_gear_platinum_I), new ItemStack(MCSBlocks.minecraft.normal.C_OBSIDIAN_B, 1, 1),
 					new ItemStack(MCSBlocks.minecraft.normal.C_OBSIDIAN_B), new ItemStack(Blocks.PISTON), new ItemStack(MCSBlocks.minecraft.normal.C_OBSIDIAN_B));
 		}else {
-			recipe.addShapedRecipes(new ItemStack(MCSBlocks.COMPRESSOR),
+			recipe.addShapedRecipes(new ItemStack(MCSBlocks.compressor),
 					new ItemStack(MCSBlocks.minecraft.normal.C_OBSIDIAN_B), new ItemStack(Blocks.PISTON), new ItemStack(MCSBlocks.minecraft.normal.C_OBSIDIAN_B),
 					new ItemStack(MCSBlocks.minecraft.normal.C_OBSIDIAN_B, 1, 1), recipe.EMPTY, new ItemStack(MCSBlocks.minecraft.normal.C_OBSIDIAN_B, 1, 1), new ItemStack(MCSBlocks.minecraft.normal.C_OBSIDIAN_B),
 					new ItemStack(Blocks.PISTON), new ItemStack(MCSBlocks.minecraft.normal.C_OBSIDIAN_B));
@@ -160,24 +167,25 @@ public class MCSRecipe {
 				new ItemStack(MCSBlocks.minecraft.normal.C_TNT_B, 1, 1), new ItemStack(MCSBlocks.minecraft.normal.C_BEDROCK_B, 1, 2), new ItemStack(MCSBlocks.minecraft.normal.C_TNT_B, 1, 1));
 
 		if(Configs.Custom.Mod_Stuff.IndustrialCraft) {
+			MCS.instance.log.info("Start register ic2 item recipe");
 			icCompressedItemCrafting();
 		}
 		if(Configs.Custom.Mod_Stuff.AppliedEnergistics2) {
+			MCS.instance.log.info("Start register ae2 item recipe");
 			aeCompressedItemCrafting();
 		}
 	}
 
-	@SuppressWarnings("unused")
 	private static void aeCompressedItemCrafting() {
 		MCSItems.AppliedEnergistics2.Normal items = MCSItems.ae.normal;
 		MCSBlocks.AppliedEnergistics2.Normal blocks = MCSBlocks.ae2.normal;
-		MCSItems.OreStuff ore = MCSItems.ore_stuff;
 
 		IInscriberRegistry inscriberRecipe = AEApi.instance().registries().inscriber();
 		IGrinderRegistry grinderRecipe = AEApi.instance().registries().grinder();
 		IGrinderRecipeBuilder grinderRecipeBuilder = AEApi.instance().registries().grinder().builder();
-
+		
 		for(int meta = 0; meta < 16; meta++) {
+			long t = System.currentTimeMillis();
 			ItemStack pure_certus_crystal = items.C_pure_certus_crystal_I.getStack(meta);
 			ItemStack certus_quartz_crystal = items.C_certus_quartz_crystal_I.getStack(meta);
 			ItemStack certus_quartz_crystal_charged = items.C_certus_quartz_crystal_charged_I.getStack(meta);
@@ -186,7 +194,7 @@ public class MCSRecipe {
 			ItemStack eng = items.C_eng_processor_I.getStack(meta);
 			ItemStack logic = items.C_logic_processor_I.getStack(meta);
 			ItemStack calc = items.C_calc_processor_I.getStack(meta);
-
+			
 			grinderRecipe.addRecipe(grinderRecipeBuilder.withInput(fluix_crystal).withOutput(items.C_fluix_dust_I.getStack(meta)).build());
 			grinderRecipe.addRecipe(grinderRecipeBuilder.withInput(blocks.C_sky_stone_block_B.getStack(meta)).withOutput(items.C_sky_dust_I.getStack(meta)).build());
 			grinderRecipe.addRecipe(grinderRecipeBuilder.withInput(MCSBlocks.minecraft.has.C_ENDER_PEARL_B.getStack(meta)).withOutput(items.C_ender_dust_I.getStack(meta)).build());
@@ -194,20 +202,20 @@ public class MCSRecipe {
 			grinderRecipe.addRecipe(grinderRecipeBuilder.withInput(MCSBlocks.minecraft.normal.C_QUARTZ_BLOCK_B.getStack(meta)).withOutput(items.C_nether_quartz_dust_I.getStack(meta)).build());
 
 			// 电路板
-			inscriberRecipe.addRecipe(new AEInscriberRecipe(pure_certus_crystal, items.C_calc_processor_print_I.getStack(meta), items.C_calc_processor_press_I.getStack(meta), ItemStack.EMPTY, InscriberProcessType.INSCRIBE));
-			inscriberRecipe.addRecipe(new AEInscriberRecipe(meta == 0 ? new ItemStack(Blocks.GOLD_BLOCK) : MCSBlocks.minecraft.normal.C_GOLD_B.getStack(meta - 1), items.C_logic_processor_print_I.getStack(meta), items.C_logic_processor_press_I.getStack(meta), ItemStack.EMPTY, InscriberProcessType.INSCRIBE));
-			inscriberRecipe.addRecipe(new AEInscriberRecipe(meta == 0 ? new ItemStack(Blocks.DIAMOND_BLOCK) : MCSBlocks.minecraft.normal.C_DIAMOND_B.getStack(meta - 1), items.C_eng_processor_print_I.getStack(meta), items.C_eng_processor_press_I.getStack(meta), ItemStack.EMPTY, InscriberProcessType.INSCRIBE));
-			inscriberRecipe.addRecipe(new AEInscriberRecipe(items.C_silicon_I.getStack(meta), items.C_silicon_print_I.getStack(meta), items.C_silicon_press_I.getStack(meta), ItemStack.EMPTY, InscriberProcessType.INSCRIBE));
+			inscriberRecipe.addRecipe(addAEInscriberRecipe(pure_certus_crystal, items.C_calc_processor_print_I.getStack(meta), items.C_calc_processor_press_I.getStack(meta), ItemStack.EMPTY, InscriberProcessType.INSCRIBE));
+			inscriberRecipe.addRecipe(addAEInscriberRecipe(meta == 0 ? new ItemStack(Blocks.GOLD_BLOCK) : MCSBlocks.minecraft.normal.C_GOLD_B.getStack(meta - 1), items.C_logic_processor_print_I.getStack(meta), items.C_logic_processor_press_I.getStack(meta), ItemStack.EMPTY, InscriberProcessType.INSCRIBE));
+			inscriberRecipe.addRecipe(addAEInscriberRecipe(meta == 0 ? new ItemStack(Blocks.DIAMOND_BLOCK) : MCSBlocks.minecraft.normal.C_DIAMOND_B.getStack(meta - 1), items.C_eng_processor_print_I.getStack(meta), items.C_eng_processor_press_I.getStack(meta), ItemStack.EMPTY, InscriberProcessType.INSCRIBE));
+			inscriberRecipe.addRecipe(addAEInscriberRecipe(items.C_silicon_I.getStack(meta), items.C_silicon_print_I.getStack(meta), items.C_silicon_press_I.getStack(meta), ItemStack.EMPTY, InscriberProcessType.INSCRIBE));
 
 			// 模板
-			inscriberRecipe.addRecipe(new AEInscriberRecipe(MCSBlocks.minecraft.normal.C_IRON_B.getStack(meta), items.C_calc_processor_press_I.getStack(meta), items.C_calc_processor_press_I.getStack(meta), ItemStack.EMPTY, InscriberProcessType.INSCRIBE));
-			inscriberRecipe.addRecipe(new AEInscriberRecipe(MCSBlocks.minecraft.normal.C_IRON_B.getStack(meta), items.C_logic_processor_press_I.getStack(meta), items.C_logic_processor_press_I.getStack(meta), ItemStack.EMPTY, InscriberProcessType.INSCRIBE));
-			inscriberRecipe.addRecipe(new AEInscriberRecipe(MCSBlocks.minecraft.normal.C_IRON_B.getStack(meta), items.C_eng_processor_press_I.getStack(meta), items.C_eng_processor_press_I.getStack(meta), ItemStack.EMPTY, InscriberProcessType.INSCRIBE));
+			inscriberRecipe.addRecipe(addAEInscriberRecipe(MCSBlocks.minecraft.normal.C_IRON_B.getStack(meta), items.C_calc_processor_press_I.getStack(meta), items.C_calc_processor_press_I.getStack(meta), ItemStack.EMPTY, InscriberProcessType.INSCRIBE));
+			inscriberRecipe.addRecipe(addAEInscriberRecipe(MCSBlocks.minecraft.normal.C_IRON_B.getStack(meta), items.C_logic_processor_press_I.getStack(meta), items.C_logic_processor_press_I.getStack(meta), ItemStack.EMPTY, InscriberProcessType.INSCRIBE));
+			inscriberRecipe.addRecipe(addAEInscriberRecipe(MCSBlocks.minecraft.normal.C_IRON_B.getStack(meta), items.C_eng_processor_press_I.getStack(meta), items.C_eng_processor_press_I.getStack(meta), ItemStack.EMPTY, InscriberProcessType.INSCRIBE));
 
 			// 处理器
-			inscriberRecipe.addRecipe(new AEInscriberRecipe(meta == 0 ? new ItemStack(Blocks.REDSTONE_BLOCK) : MCSBlocks.minecraft.normal.C_RED_STONE_B.getStack(meta), eng, items.C_eng_processor_print_I.getStack(meta), items.C_silicon_print_I.getStack(meta), InscriberProcessType.PRESS));
-			inscriberRecipe.addRecipe(new AEInscriberRecipe(meta == 0 ? new ItemStack(Blocks.REDSTONE_BLOCK) : MCSBlocks.minecraft.normal.C_RED_STONE_B.getStack(meta), logic, items.C_logic_processor_print_I.getStack(meta), items.C_silicon_print_I.getStack(meta), InscriberProcessType.PRESS));
-			inscriberRecipe.addRecipe(new AEInscriberRecipe(meta == 0 ? new ItemStack(Blocks.REDSTONE_BLOCK) : MCSBlocks.minecraft.normal.C_RED_STONE_B.getStack(meta), calc, items.C_calc_processor_print_I.getStack(meta), items.C_silicon_print_I.getStack(meta), InscriberProcessType.PRESS));
+			inscriberRecipe.addRecipe(addAEInscriberRecipe(meta == 0 ? new ItemStack(Blocks.REDSTONE_BLOCK) : MCSBlocks.minecraft.normal.C_RED_STONE_B.getStack(meta), eng, items.C_eng_processor_print_I.getStack(meta), items.C_silicon_print_I.getStack(meta), InscriberProcessType.PRESS));
+			inscriberRecipe.addRecipe(addAEInscriberRecipe(meta == 0 ? new ItemStack(Blocks.REDSTONE_BLOCK) : MCSBlocks.minecraft.normal.C_RED_STONE_B.getStack(meta), logic, items.C_logic_processor_print_I.getStack(meta), items.C_silicon_print_I.getStack(meta), InscriberProcessType.PRESS));
+			inscriberRecipe.addRecipe(addAEInscriberRecipe(meta == 0 ? new ItemStack(Blocks.REDSTONE_BLOCK) : MCSBlocks.minecraft.normal.C_RED_STONE_B.getStack(meta), calc, items.C_calc_processor_print_I.getStack(meta), items.C_silicon_print_I.getStack(meta), InscriberProcessType.PRESS));
 
 			add1x3ShapedRecipes(items.C_annihilation_core_I.getStack(2, meta), items.C_pure_nether_crystal_I.getStack(meta), items.C_fluix_dust_I.getStack(meta), items.C_logic_processor_I.getStack(meta));
 			add1x3ShapedRecipes(items.C_annihilation_core_I.getStack(2, meta), MCSBlocks.minecraft.normal.C_QUARTZ_BLOCK_B.getStack(meta), items.C_fluix_dust_I.getStack(meta), items.C_logic_processor_I.getStack(meta));
@@ -301,7 +309,23 @@ public class MCSRecipe {
 					fluix_dust, fluix_crystal, fluix_dust,
 					fluix_crystal, ener_pearl, fluix_crystal,
 					fluix_dust, fluix_crystal, fluix_dust);
+			MCS.instance.log.info("register ae2 item meta: " + meta + " recipe success (took " + (System.currentTimeMillis()-t) + "ms)");
 		}
+	}
+	
+	private static IInscriberRecipe addAEInscriberRecipe(ItemStack input, ItemStack output, ItemStack top, ItemStack down, InscriberProcessType type) {
+		IInscriberRecipeBuilder re = AEApi.instance().registries().inscriber().builder()
+				.withInputs(Lists.newArrayList(input))
+				.withOutput(output)
+				.withProcessType(type);
+		
+		if(top != null && !top.isEmpty()) {
+			re = re.withTopOptional(top);
+		}
+		if(down != null && !down.isEmpty()) {
+			re = re.withBottomOptional(down);
+		}
+		return re.build();
 	}
 
 	private static void add1x3ShapedRecipes(ItemStack output, ItemStack input1, ItemStack input2, ItemStack input3) {
@@ -317,6 +341,7 @@ public class MCSRecipe {
 		ic2.api.recipe.Recipes icRecipe = new ic2.api.recipe.Recipes();
 
 		for(int meta = 0; meta < 16; meta++) {
+			long t = System.currentTimeMillis();
 			// 装罐机
 			icRecipe.cannerBottle.addRecipe(getICInput(ic2.C_MOX_I.getStack(meta)), getICInput(ic2.C_fuel_rod_I.getStack(meta)), ic2.C_MOX_FUEL_ROD_I.getStack(meta), false);
 			icRecipe.cannerBottle.addRecipe(getICInput(ic2.C_URANIUM_I.getStack(meta)), getICInput(ic2.C_fuel_rod_I.getStack(meta)), ic2.C_URANIUM_FUEL_ROD_I.getStack(meta), false);
@@ -365,7 +390,6 @@ public class MCSRecipe {
 			icRecipe.macerator.addRecipe(getICInput(ic2.C_dense_plate_lapis_I.getStack(meta)), null, false, ic2.C_dust_lapis_I.getStack(8, meta));
 			icRecipe.macerator.addRecipe(getICInput(ic2.C_dense_plate_lead_I.getStack(meta)), null, false, oreItem.dust.C_dust_lead_I.getStack(8, meta));
 			icRecipe.macerator.addRecipe(getICInput(ic2.C_dense_plate_obsidian_I.getStack(meta)), null, false, oreItem.dust.C_dust_obsidian_I.getStack(8, meta));
-			icRecipe.macerator.addRecipe(getICInput(ic2.C_dense_plate_steel_I.getStack(meta)), null, false, oreItem.dust.C_dust_steel_I.getStack(8, meta));
 			icRecipe.macerator.addRecipe(getICInput(ic2.C_dense_plate_tin_I.getStack(meta)), null, false, oreItem.dust.C_dust_tin_I.getStack(8, meta));
 
 			if(meta < 15) {
@@ -592,6 +616,7 @@ public class MCSRecipe {
 					recipe.addShapedlessRecipe(new ItemStack(ic2.C_casing_tin_I, 2, meta), forge_hammer, oredict);
 				}
 			}
+			MCS.instance.log.info("register ic2 item meta: " + meta + " recipe success (took " + (System.currentTimeMillis()-t) + "ms)");
 		}
 	}
 
@@ -603,47 +628,56 @@ public class MCSRecipe {
 		if(Configs.use_default_recipes) {
 			if(Configs.use_3x3_recipes) {
 				for(Item item : MCSResources.ITEMS) {
-					ItemStack unCompressedItem = MCSUtil.item.getUnCompressed(item);
-					boolean canMakeDefaultStackRecipe = MCSUtil.item.canMakeDefaultStackRecipe(item);
-					if(!unCompressedItem.isEmpty()) {
-						if(canMakeDefaultStackRecipe) {
-							// 压缩
-							recipe.add3x3AllRecipes(new ItemStack(item), unCompressedItem);
-							for(int meta = 1; meta < 16; ++meta) {
-								recipe.add3x3AllRecipes(new ItemStack(item, 1, meta), new ItemStack(item, 1, (meta - 1)));
-							}
-							recipe.add3X3ShapedRecipes(new ItemStack(item, 1, Short.MAX_VALUE - 1), new ItemStack(item, 1, 15));
+					if(item instanceof ICompressedStuff) {
+						long t = System.currentTimeMillis();
+						ItemStack unCompressedItem = MCSUtil.item.getUnCompressed(item);
+						boolean canMakeDefaultStackRecipe = MCSUtil.item.canMakeDefaultStackRecipe(item);
+						if(!unCompressedItem.isEmpty()) {
+							if(canMakeDefaultStackRecipe) {
+								// 压缩
+								recipe.add3x3AllRecipes(new ItemStack(item), unCompressedItem);
+								for(int meta = 1; meta < 16; ++meta) {
+									recipe.add3x3AllRecipes(new ItemStack(item, 1, meta), new ItemStack(item, 1, (meta - 1)));
+								}
+								recipe.add3X3ShapedRecipes(new ItemStack(item, 1, Short.MAX_VALUE - 1), new ItemStack(item, 1, 15));
 
-							// 解压
-							recipe.add1x1Recipes(JiuUtils.item.copyStack(unCompressedItem, 9, false), new ItemStack(item));
-							for(int meta = 0; meta < 15; ++meta) {
-								recipe.add1x1Recipes(new ItemStack(item, 9, meta), new ItemStack(item, 1, (meta + 1)));
+								// 解压
+								recipe.add1x1Recipes(JiuUtils.item.copyStack(unCompressedItem, 9, false), new ItemStack(item));
+								for(int meta = 0; meta < 15; ++meta) {
+									recipe.add1x1Recipes(new ItemStack(item, 9, meta), new ItemStack(item, 1, (meta + 1)));
+								}
+								recipe.add1x1ShapedRecipes(new ItemStack(item, 9, 15), new ItemStack(item, 1, Short.MAX_VALUE - 1));
 							}
-							recipe.add1x1ShapedRecipes(new ItemStack(item, 9, 15), new ItemStack(item, 1, Short.MAX_VALUE - 1));
 						}
+						MCS.instance.log.info("register " + item.getRegistryName() + " recipe success (took " + (System.currentTimeMillis()-t) + "ms)");
 					}
 				}
 			}else {
 				for(Item item : MCSResources.ITEMS) {
-					ItemStack unCompressedItem = MCSUtil.item.getUnCompressed(item);
-					Boolean canMakeDefaultStackRecipe = MCSUtil.item.canMakeDefaultStackRecipe(item);
+					if(item instanceof ICompressedStuff) {
+						long t = System.currentTimeMillis();
+						ItemStack unCompressedItem = MCSUtil.item.getUnCompressed(item);
+						Boolean canMakeDefaultStackRecipe = MCSUtil.item.canMakeDefaultStackRecipe(item);
 
-					if(!unCompressedItem.isEmpty()) {
-						if(canMakeDefaultStackRecipe) {
-							// 压缩
-							recipe.add2x2AllRecipes(new ItemStack(item), unCompressedItem);
-							for(int meta = 1; meta < 16; ++meta) {
-								recipe.add2x2AllRecipes(new ItemStack(item, 1, meta), new ItemStack(item, 1, (meta - 1)));
-							}
-							recipe.add2x2ShapedRecipes(new ItemStack(item, 1, Short.MAX_VALUE - 1), new ItemStack(item, 1, 15));
+						if(!unCompressedItem.isEmpty()) {
+							if(canMakeDefaultStackRecipe) {
+								// 压缩
+								recipe.add2x2AllRecipes(new ItemStack(item), unCompressedItem);
+								for(int meta = 1; meta < 16; ++meta) {
+									recipe.add2x2AllRecipes(new ItemStack(item, 1, meta), new ItemStack(item, 1, (meta - 1)));
+								}
+								recipe.add2x2ShapedRecipes(new ItemStack(item, 1, Short.MAX_VALUE - 1), new ItemStack(item, 1, 15));
 
-							// 解压
-							recipe.add1x1Recipes(JiuUtils.item.copyStack(unCompressedItem, 4, false), new ItemStack(item));
-							for(int meta = 0; meta < 15; ++meta) {
-								recipe.add1x1Recipes(new ItemStack(item, 4, meta), new ItemStack(item, 1, (meta + 1)));
+								// 解压
+								recipe.add1x1Recipes(JiuUtils.item.copyStack(unCompressedItem, 4, false), new ItemStack(item));
+								for(int meta = 0; meta < 15; ++meta) {
+									recipe.add1x1Recipes(new ItemStack(item, 4, meta), new ItemStack(item, 1, (meta + 1)));
+								}
+								recipe.add1x1ShapedRecipes(new ItemStack(item, 4, 15), new ItemStack(item, 1, Short.MAX_VALUE - 1));
 							}
-							recipe.add1x1ShapedRecipes(new ItemStack(item, 4, 15), new ItemStack(item, 1, Short.MAX_VALUE - 1));
 						}
+						
+						MCS.instance.log.info("register " + item.getRegistryName() + " recipe success (took " + (System.currentTimeMillis()-t) + "ms)");
 					}
 				}
 			}
@@ -653,11 +687,9 @@ public class MCSRecipe {
 	private static void blockCompressed() {
 		if(Configs.use_default_recipes) {
 			for(BaseBlockSub block : MCSResources.SUB_BLOCKS) {
+				long t = System.currentTimeMillis();
 				ItemStack unCompressedItem = block.getUnCompressedStack();
 
-				if(block.getOwnerMod().equals("botania")) {
-					System.out.println("botania");
-				}
 				if(!unCompressedItem.isEmpty()) {
 					if(block.canMakeDefaultStackRecipe()) {
 						if(Configs.use_3x3_recipes) {
@@ -687,6 +719,7 @@ public class MCSRecipe {
 						}
 					}
 				}
+				MCS.instance.log.info("register " + block.getRegistryName() + " recipe success (took " + (System.currentTimeMillis()-t) + "ms)");
 			}
 		}
 	}

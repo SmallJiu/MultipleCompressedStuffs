@@ -25,6 +25,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
@@ -43,23 +44,19 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuff {
-	public static BaseItemHoe register(String name, ItemStack baseItem, String langModId, CreativeTabs tab, boolean hasSubtypes) {
+	public static BaseItemHoe register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
 		if(baseItem == null || baseItem.isEmpty()) {
 			return null;
 		}
-		if(Loader.isModLoaded(langModId) || langModId.equals("custom")) {
-			return new BaseItemHoe(baseItem, name);
+		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
+			return new BaseItemHoe(name, baseItem, ownerMod, tab);
 		}else {
 			return null;
 		}
 	}
 
-	public static BaseItemHoe register(String name, ItemStack baseItem, String langModId, CreativeTabs tab) {
-		return register(name, baseItem, langModId, tab, true);
-	}
-
-	public static BaseItemHoe register(String name, ItemStack baseItem, String langModId) {
-		return register(name, baseItem, langModId, MCS.COMPERESSED_ITEMS);
+	public static BaseItemHoe register(String name, ItemStack baseItem, String ownerMod) {
+		return register(name, baseItem, ownerMod, MCS.COMPERESSED_TOOLS);
 	}
 
 	protected final ItemStack baseToolStack;
@@ -67,8 +64,8 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 	protected final float baseAttackSpeed;
 	protected final String ownerMod;
 
-	public BaseItemHoe(ItemStack baseTool, String name) {
-		super(MCS.MODID, name, MCS.COMPERESSED_TOOLS, true, getToolMaterial(baseTool), ModSubtypes.values());
+	public BaseItemHoe(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab) {
+		super(MCS.MODID, name, tab, true, getToolMaterial(baseTool), ModSubtypes.values());
 		this.baseToolStack = baseTool;
 		if(baseTool.getItem() instanceof ItemHoe) {
 			this.baseTool = (ItemHoe) baseTool.getItem();
@@ -76,17 +73,23 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 			this.baseTool = null;
 			throw new NonToolException(baseTool, "Hoe");
 		}
-		this.ownerMod = this.baseTool.getRegistryName().getResourceDomain();
+		this.ownerMod = ownerMod;
 		this.baseAttackSpeed = this.baseTool.speed - 4.0F;
 		this.setMaxMetadata(16);
 
-		MCSResources.SUB_TOOLS.add(this);
-		MCSResources.SUB_TOOLS_NAME.add(name);
-		MCSResources.ITEMS.add(this);
-		MCSResources.ITEMS_NAME.add(name);
-		MCSResources.HOES.add(this);
-		MCSResources.HOES_NAME.add(name);
-		MCSResources.SUB_TOOLS_MAP.put(name, this);
+		if(!ownerMod.equals("custom")) {
+			MCSResources.SUB_TOOLS.add(this);
+			MCSResources.SUB_TOOLS_NAME.add(name);
+			MCSResources.ITEMS.add(this);
+			MCSResources.ITEMS_NAME.add(name);
+			MCSResources.HOES.add(this);
+			MCSResources.HOES_NAME.add(name);
+			MCSResources.SUB_TOOLS_MAP.put(name, this);
+		}
+	}
+
+	public BaseItemHoe(String name, ItemStack baseTool) {
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS);
 	}
 
 	private static ToolMaterial getToolMaterial(ItemStack baseItem) {
@@ -351,16 +354,12 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 			tooltip.add(I18n.format("info.mcs.owner_mod") + " : " + TextFormatting.AQUA.toString() + this.getOwnerMod());
 		}
 
-		if(MCS.instance.test_model) {
+		if(MCS.test()) {
 			tooltip.add("最大耐久: " + this.getMaxDamage(stack));
 		}
 
 		MCSUtil.info.addMetaInfo(meta, tooltip, this.infos, this.metaInfos);
 		MCSUtil.info.addShiftInfo(meta, tooltip, this.shiftInfos, this.metaShiftInfos);
-
-		if(meta == (Short.MAX_VALUE - 1)) {
-			tooltip.add("感谢喵呜玖大人的恩惠！");
-		}
 	}
 
 	@Override
@@ -370,12 +369,25 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 
 	@Override
 	public void getItemModel() {
-		super.getItemModel();
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
 			this.model.registerItemModel(this, meta, this.ownerMod + "/item/tools/hoe/" + this.name, this.name + "." + meta);
 		}
 		this.model.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/tools/hoe/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+	}
+	
+	@Override
+	public void setDamage(ItemStack stack, int damage) {
+		if(stack.getMetadata() < 32766) {
+			super.setDamage(stack, damage);
+		}
+	}
+	
+	@Override
+	public void damageItem(ItemStack stack, int amount, EntityLivingBase entity) {
+		if(stack.getMetadata() < 32766) {
+			super.damageItem(stack, amount, entity);
+		}
 	}
 
 	public String getOwnerMod() {

@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -370,6 +371,38 @@ public class ModelWriter {
 		out.write("\n		\"top\": \"" + (ca ? modid + ":" : "") + up + "\",");
 		out.write("\n		\"down\": \"" + (ca ? modid + ":" : "") + down + "\",");
 		out.write("\n		\"side\": \"" + (ca ? modid + ":" : "") + side + "\"");
+		out.write("\n	}");
+		out.write("\n}");
+		out.close();
+	}
+	
+	static void writeOverlayModel(String modid, String name, boolean isHas, int meta, String all, List<String> overlays, boolean ca) throws IOException {
+		String path = "run/main/mcs/models/block/" + modid + "/" + (isHas ? "has" : "normal") + "/" + name;
+		File dir = new File(path);
+		if(!dir.isDirectory()) {
+			dir.mkdirs();
+		}
+
+		File file = new File(path + "/" + name + "." + meta + ".json");
+
+		if(file.exists()) {
+			file.delete();
+		}
+		file.createNewFile();
+		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(file));
+		String faModel = isHas && meta == 0 ? "mcs:block/overlay_model" : "mcs:block/overlay_model_" + (overlays.size()+1);
+		out.write("{");
+		out.write("\n	\"parent\": \"" + faModel + "\",");
+		out.write("\n	\"textures\": {");
+		out.write("\n		\"all\": \"" + (ca ? modid + ":" : "") + all + "\",");
+		if(isHas && meta == 0) {
+			out.write("\n		\"overlay\": \"" + overlays.get(0) + "\"");
+		}else {
+			for(int i = 0; i < overlays.size(); i++) {
+				out.write("\n		\"overlay_" + (i+1) + "\": \"" + (ca ? modid + ":" : "") + overlays.get(i) + "\",");
+			}
+			out.write("\n		\"overlay_" + (overlays.size()+1) + "\": \"mcs:blocks/compressed_" + (isHas ? meta : meta + 1) + "\"");
+		}
 		out.write("\n	}");
 		out.write("\n}");
 		out.close();

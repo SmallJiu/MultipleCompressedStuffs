@@ -36,15 +36,16 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SuppressWarnings("deprecation")
-@InterfaceList({@Interface(
-	iface = "buildcraft.api.tools.IToolWrench",
-	modid = "buildcraftcore"),
-		@Interface(
-			iface = "crazypants.enderio.api.tool.ITool",
-			modid = "enderio"),
-		@Interface(
-			iface = "cofh.api.item.IToolHammer",
-			modid = "cofhcore")})
+@InterfaceList({
+	@Interface(
+		iface = "buildcraft.api.tools.IToolWrench",
+		modid = "buildcraftcore"),
+	@Interface(
+		iface = "crazypants.enderio.api.tool.ITool",
+		modid = "enderio"),
+	@Interface(
+		iface = "cofh.api.item.IToolHammer",
+		modid = "cofhcore")})
 public abstract class BaseBlock extends Block implements ICompressedStuff {
 	protected final String name;
 	protected final CreativeTabs tab;
@@ -158,7 +159,7 @@ public abstract class BaseBlock extends Block implements ICompressedStuff {
 		boolean lag = false;
 		if(this.canUseWrenchBreak) {
 			return this.useWrenchBreak(world, pos, state, player, hand, false);
-		}else if(this.canUseWrenchBreaks != null && this.canUseWrenchBreaks.containsKey(JiuUtils.item.getMetaFormBlockState(state))) {
+		}else if(this.canUseWrenchBreaks != null && this.canUseWrenchBreaks.containsKey(JiuUtils.item.getMetaFromBlockState(state))) {
 			return this.useWrenchBreak(world, pos, state, player, hand, true);
 		}
 		return lag;
@@ -173,14 +174,14 @@ public abstract class BaseBlock extends Block implements ICompressedStuff {
 				if(Loader.isModLoaded("thermalfoundation")) {
 					if(handitem.getItem() instanceof IToolHammer) {
 						if(!useMap) {
-							JiuUtils.item.spawnAsEntity(world, pos, JiuUtils.item.getStackFormBlockState(state));
+							JiuUtils.item.spawnAsEntity(world, pos, JiuUtils.item.getStackFromBlockState(state));
 							world.setBlockState(pos, Blocks.AIR.getDefaultState());
 							return true;
 						}else {
-							int meta = JiuUtils.item.getMetaFormBlockState(state);
+							int meta = JiuUtils.item.getMetaFromBlockState(state);
 							if(this.canUseWrenchBreaks.containsKey(meta)) {
 								if(this.canUseWrenchBreaks.get(meta)) {
-									JiuUtils.item.spawnAsEntity(world, pos, JiuUtils.item.getStackFormBlockState(state));
+									JiuUtils.item.spawnAsEntity(world, pos, JiuUtils.item.getStackFromBlockState(state));
 									world.setBlockState(pos, Blocks.AIR.getDefaultState());
 									return true;
 								}

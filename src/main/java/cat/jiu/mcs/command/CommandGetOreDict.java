@@ -1,8 +1,10 @@
 package cat.jiu.mcs.command;
+
 import java.util.List;
 
 import cat.jiu.core.util.JiuUtils;
-import cat.jiu.mcs.util.base.BaseCommand;
+import cat.jiu.core.util.base.BaseCommand;
+import cat.jiu.mcs.MCS;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,9 +13,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentKeybind;
 
 public class CommandGetOreDict extends BaseCommand.CommandNormal {
-
-	public CommandGetOreDict(String name, boolean checkPermission, int level) {
-		super(name, checkPermission, level);
+	public CommandGetOreDict(String name, int level) {
+		super(name, MCS.MODID, level);
 	}
 
 	@Override

@@ -163,27 +163,27 @@ public class MCSItems {
 			public final Hoe hoe = new Hoe();
 
 			public class Sword {
-				public final BaseItemSword C_DIAMOND_SWORD_I = new BaseItemSword(new ItemStack(Items.DIAMOND_SWORD), "compressed_diamond_sword");
-				public final BaseItemSword C_IRON_SWORD_I = new BaseItemSword(new ItemStack(Items.IRON_SWORD), "compressed_iron_sword");
-				public final BaseItemSword C_STONE_SWORD_I = new BaseItemSword(new ItemStack(Items.STONE_SWORD), "compressed_stone_sword");
-				public final BaseItemSword C_WOODEN_SWORD_I = new BaseItemSword(new ItemStack(Items.WOODEN_SWORD), "compressed_wooden_sword");
-				public final BaseItemSword C_goldEN_SWORD_I = new BaseItemSword(new ItemStack(Items.GOLDEN_SWORD), "compressed_golden_sword");
+				public final BaseItemSword C_DIAMOND_SWORD_I = new BaseItemSword("compressed_diamond_sword", new ItemStack(Items.DIAMOND_SWORD));
+				public final BaseItemSword C_IRON_SWORD_I = new BaseItemSword("compressed_iron_sword", new ItemStack(Items.IRON_SWORD));
+				public final BaseItemSword C_STONE_SWORD_I = new BaseItemSword("compressed_stone_sword", new ItemStack(Items.STONE_SWORD));
+				public final BaseItemSword C_WOODEN_SWORD_I = new BaseItemSword("compressed_wooden_sword", new ItemStack(Items.WOODEN_SWORD));
+				public final BaseItemSword C_goldEN_SWORD_I = new BaseItemSword("compressed_golden_sword", new ItemStack(Items.GOLDEN_SWORD));
 
 			}
 			public class Pickaxe {
-				public final BaseItemPickaxe C_DIAMOND_PICKAXE_I = new BaseItemPickaxe(new ItemStack(Items.DIAMOND_PICKAXE), "compressed_diamond_pickaxe");
-				public final BaseItemPickaxe C_IRON_PICKAXE_I = new BaseItemPickaxe(new ItemStack(Items.IRON_PICKAXE), "compressed_iron_pickaxe");
-				public final BaseItemPickaxe C_STONE_PICKAXE_I = new BaseItemPickaxe(new ItemStack(Items.STONE_PICKAXE), "compressed_stone_pickaxe");
-				public final BaseItemPickaxe C_WOODEN_PICKAXE_I = new BaseItemPickaxe(new ItemStack(Items.WOODEN_PICKAXE), "compressed_wooden_pickaxe");
-				public final BaseItemPickaxe C_goldEN_PICKAXE_I = new BaseItemPickaxe(new ItemStack(Items.GOLDEN_PICKAXE), "compressed_golden_pickaxe");
+				public final BaseItemPickaxe C_DIAMOND_PICKAXE_I = new BaseItemPickaxe("compressed_diamond_pickaxe", new ItemStack(Items.DIAMOND_PICKAXE));
+				public final BaseItemPickaxe C_IRON_PICKAXE_I = new BaseItemPickaxe("compressed_iron_pickaxe", new ItemStack(Items.IRON_PICKAXE));
+				public final BaseItemPickaxe C_STONE_PICKAXE_I = new BaseItemPickaxe("compressed_stone_pickaxe", new ItemStack(Items.STONE_PICKAXE));
+				public final BaseItemPickaxe C_WOODEN_PICKAXE_I = new BaseItemPickaxe("compressed_wooden_pickaxe", new ItemStack(Items.WOODEN_PICKAXE));
+				public final BaseItemPickaxe C_goldEN_PICKAXE_I = new BaseItemPickaxe("compressed_golden_pickaxe", new ItemStack(Items.GOLDEN_PICKAXE));
 
 			}
 			public class Shovel {
-				public final BaseItemShovel C_DIAMOND_SHOVEL_I = new BaseItemShovel(new ItemStack(Items.DIAMOND_SHOVEL), "compressed_diamond_shovel");
-				public final BaseItemShovel C_IRON_SHOVEL_I = new BaseItemShovel(new ItemStack(Items.IRON_SHOVEL), "compressed_iron_shovel");
-				public final BaseItemShovel C_STONE_SHOVEL_I = new BaseItemShovel(new ItemStack(Items.STONE_SHOVEL), "compressed_stone_shovel");
-				public final BaseItemShovel C_WOODEN_SHOVEL_I = new BaseItemShovel(new ItemStack(Items.WOODEN_SHOVEL), "compressed_wooden_shovel");
-				public final BaseItemShovel C_goldEN_SHOVEL_I = new BaseItemShovel(new ItemStack(Items.GOLDEN_SHOVEL), "compressed_golden_shovel");
+				public final BaseItemShovel C_DIAMOND_SHOVEL_I = new BaseItemShovel("compressed_diamond_shovel", new ItemStack(Items.DIAMOND_SHOVEL));
+				public final BaseItemShovel C_IRON_SHOVEL_I = new BaseItemShovel("compressed_iron_shovel", new ItemStack(Items.IRON_SHOVEL));
+				public final BaseItemShovel C_STONE_SHOVEL_I = new BaseItemShovel("compressed_stone_shovel", new ItemStack(Items.STONE_SHOVEL));
+				public final BaseItemShovel C_WOODEN_SHOVEL_I = new BaseItemShovel("compressed_wooden_shovel", new ItemStack(Items.WOODEN_SHOVEL));
+				public final BaseItemShovel C_goldEN_SHOVEL_I = new BaseItemShovel("compressed_golden_shovel", new ItemStack(Items.GOLDEN_SHOVEL));
 
 			}
 			public class Axe {
@@ -195,11 +195,11 @@ public class MCSItems {
 
 			}
 			public class Hoe {
-				public final BaseItemHoe C_DIAMOND_HOE_I = new BaseItemHoe(new ItemStack(Items.DIAMOND_HOE), "compressed_diamond_hoe");
-				public final BaseItemHoe C_IRON_HOE_I = new BaseItemHoe(new ItemStack(Items.IRON_HOE), "compressed_iron_hoe");
-				public final BaseItemHoe C_STONE_HOE_I = new BaseItemHoe(new ItemStack(Items.STONE_HOE), "compressed_stone_hoe");
-				public final BaseItemHoe C_WOODEN_HOE_I = new BaseItemHoe(new ItemStack(Items.WOODEN_HOE), "compressed_wooden_hoe");
-				public final BaseItemHoe C_goldEN_HOE_I = new BaseItemHoe(new ItemStack(Items.GOLDEN_HOE), "compressed_golden_hoe");
+				public final BaseItemHoe C_DIAMOND_HOE_I = new BaseItemHoe("compressed_diamond_hoe", new ItemStack(Items.DIAMOND_HOE));
+				public final BaseItemHoe C_IRON_HOE_I = new BaseItemHoe("compressed_iron_hoe", new ItemStack(Items.IRON_HOE));
+				public final BaseItemHoe C_STONE_HOE_I = new BaseItemHoe("compressed_stone_hoe", new ItemStack(Items.STONE_HOE));
+				public final BaseItemHoe C_WOODEN_HOE_I = new BaseItemHoe("compressed_wooden_hoe", new ItemStack(Items.WOODEN_HOE));
+				public final BaseItemHoe C_goldEN_HOE_I = new BaseItemHoe("compressed_golden_hoe", new ItemStack(Items.GOLDEN_HOE));
 
 			}
 		}
@@ -235,16 +235,16 @@ public class MCSItems {
 			public final BaseItemSub C_plate_steel_I = TF ? register("steel", TFItems.itemMaterial.plateSteel, "thermalfoundation") : IC ? register("steel", "plate", 7, "ic2") : null;
 			public final BaseItemSub C_plate_tin_I = TF ? register("tin", TFItems.itemMaterial.plateTin, "thermalfoundation") : IC ? register("tin", "plate", 8, "ic2") : null;
 
-			private BaseItemSub register(String ore, String unCompressed, String ownerModid) {
-				return this.register(ore, unCompressed, 0, ownerModid);
+			private BaseItemSub register(String ore, String unCompressed, String ownerMod) {
+				return this.register(ore, unCompressed, 0, ownerMod);
 			}
 
-			private BaseItemSub register(String ore, String unCompressed, int meta, String ownerModid) {
-				return this.register(ore, new ItemStack(Item.getByNameOrId(ownerModid + ":" + unCompressed), 1, meta), ownerModid);
+			private BaseItemSub register(String ore, String unCompressed, int meta, String ownerMod) {
+				return this.register(ore, new ItemStack(Item.getByNameOrId(ownerMod + ":" + unCompressed), 1, meta), ownerMod);
 			}
 
-			private BaseItemSub register(String ore, ItemStack unCompressed, String ownerModid) {
-				BaseItemSub item = BaseItemSub.register("compressed_plate_" + ore, unCompressed, ownerModid);
+			private BaseItemSub register(String ore, ItemStack unCompressed, String ownerMod) {
+				BaseItemSub item = BaseItemSub.register("compressed_plate_" + ore, unCompressed, ownerMod);
 				if(item == null) {
 					return null;
 				}
@@ -274,16 +274,16 @@ public class MCSItems {
 			public final BaseItemSub C_gear_tin_I = TF ? register("tin", TFItems.itemMaterial.gearTin, "thermalfoundation") : null;
 
 			@SuppressWarnings("unused")
-			private BaseItemSub register(String ore, String unCompressed, String ownerModid) {
-				return this.register(ore, unCompressed, 0, ownerModid);
+			private BaseItemSub register(String ore, String unCompressed, String ownerMod) {
+				return this.register(ore, unCompressed, 0, ownerMod);
 			}
 
-			private BaseItemSub register(String ore, String unCompressed, int meta, String ownerModid) {
-				return this.register(ore, new ItemStack(Item.getByNameOrId(ownerModid + ":" + unCompressed), 1, meta), ownerModid);
+			private BaseItemSub register(String ore, String unCompressed, int meta, String ownerMod) {
+				return this.register(ore, new ItemStack(Item.getByNameOrId(ownerMod + ":" + unCompressed), 1, meta), ownerMod);
 			}
 
-			private BaseItemSub register(String ore, ItemStack unCompressed, String ownerModid) {
-				BaseItemSub item = BaseItemSub.register("compressed_gear_" + ore, unCompressed, ownerModid);
+			private BaseItemSub register(String ore, ItemStack unCompressed, String ownerMod) {
+				BaseItemSub item = BaseItemSub.register("compressed_gear_" + ore, unCompressed, ownerMod);
 				if(item == null) {
 					return null;
 				}
@@ -310,16 +310,16 @@ public class MCSItems {
 			public final BaseItemSub C_dust_obsidian_I = TF ? register("obsidian", TFItems.itemMaterial.dustObsidian, "thermalfoundation") : IC ? register("obsidian", "dust", 12, "ic2") : null;
 			public final BaseItemSub C_dust_sulfur_I = TF ? register("sulfur", TFItems.itemMaterial.dustSulfur, "thermalfoundation") : IC ? register("sulfur", "dust", 16, "ic2") : null;
 
-			private BaseItemSub register(String ore, String unCompressed, String ownerModid) {
-				return this.register(ore, unCompressed, 0, ownerModid);
+			private BaseItemSub register(String ore, String unCompressed, String ownerMod) {
+				return this.register(ore, unCompressed, 0, ownerMod);
 			}
 
-			private BaseItemSub register(String ore, String unCompressed, int meta, String ownerModid) {
-				return this.register(ore, new ItemStack(Item.getByNameOrId(ownerModid + ":" + unCompressed), 1, meta), ownerModid);
+			private BaseItemSub register(String ore, String unCompressed, int meta, String ownerMod) {
+				return this.register(ore, new ItemStack(Item.getByNameOrId(ownerMod + ":" + unCompressed), 1, meta), ownerMod);
 			}
 
-			private BaseItemSub register(String ore, ItemStack unCompressed, String ownerModid) {
-				BaseItemSub item = BaseItemSub.register("compressed_dust_" + ore, unCompressed, ownerModid);
+			private BaseItemSub register(String ore, ItemStack unCompressed, String ownerMod) {
+				BaseItemSub item = BaseItemSub.register("compressed_dust_" + ore, unCompressed, ownerMod);
 				if(item == null) {
 					return null;
 				}
@@ -651,6 +651,6 @@ public class MCSItems {
 		public final BaseItemNormal CAT_INGOT = new BaseItemNormal("cat_ingot", CreativeTabs.MISC).addI18nInfo("info.mcs.cat_ingot");
 		public final BaseItemNormal CAT_HAMMER = new ItemCatHammer("cat_hammer", CreativeTabs.TOOLS);
 		public final BaseItemNormal DESTROYER = new ItemDestroyer("destroyer", CreativeTabs.TOOLS);
-		public final BaseItem.Normal debug = new ItemDeBug("debug");
+		public final BaseItem.Normal debug = new ItemDeBug("debug").setModelResourceLocation("normal/items", "debug");
 	}
 }

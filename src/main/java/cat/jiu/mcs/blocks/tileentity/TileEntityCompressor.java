@@ -5,8 +5,8 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import cat.jiu.core.api.IJiuEnergyStorage;
-import cat.jiu.core.energy.CapabilityJiuEnergy;
-import cat.jiu.core.energy.JiuEnergyStorage;
+import cat.jiu.core.capability.CapabilityJiuEnergy;
+import cat.jiu.core.capability.JiuEnergyStorage;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.util.MCSUtil;
@@ -20,7 +20,9 @@ import cat.jiu.mcs.util.base.sub.tool.BaseItemShovel;
 import cat.jiu.mcs.util.base.sub.tool.BaseItemSword;
 import cat.jiu.mcs.util.init.MCSBlocks;
 import cat.jiu.mcs.util.init.MCSResources;
+
 import ic2.api.item.IElectricItem;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -130,7 +132,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 						if(this.compressedSlot.getStackInSlot(i + 1).getCount() < Integer.MAX_VALUE) {
 							if(this.compressedSlot.insertItem(i + 1, new ItemStack(cStack.getItem(), amount, cStack.getMetadata() + 1), true).isEmpty()) {
 								cStack.shrink(amount * 9);
-								if(this.debug || MCS.instance.test_model) {
+								if(this.debug || MCS.test()) {
 									
 								}else {
 									this.storage.extractEnergyWithLong(5 * amount, false);
@@ -193,10 +195,10 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 					// this.storage.receiveEnergyWithLong(4, false);
 				}
 			}else if(JiuUtils.item.isBlock(stack)) {
-				if(JiuUtils.item.getBlockFromItemStack(stack) == MCSBlocks.CREATIVE_ENERGY) {
+				if(JiuUtils.item.getBlockFromItemStack(stack) == MCSBlocks.creative_energy) {
 					this.storage.receiveEnergyWithLong(Integer.MAX_VALUE, false);
 					return;
-				}else if(JiuUtils.item.getBlockFromItemStack(stack) == MCSBlocks.C_CREATIVE_ENERGY_B) {
+				}else if(JiuUtils.item.getBlockFromItemStack(stack) == MCSBlocks.C_creative_energy_B) {
 					this.storage.receiveEnergyWithLong(Integer.MAX_VALUE, false);
 					return;
 				}
@@ -212,7 +214,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 				if(unBlock.getCount() >= this.getShrinkCount()) {
 					int amount = unBlock.getCount() / 9;
 					if(JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.instance.test_model) {
+						if(this.debug || MCS.test()) {
 
 						}else {
 							unBlock.shrink(amount * 9);
@@ -233,7 +235,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 				if(unItem.getCount() >= this.getShrinkCount()) {
 					int amount = unItem.getCount() / 9;
 					if(JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.instance.test_model) {
+						if(this.debug || MCS.test()) {
 
 						}else {
 							unItem.shrink(amount * 9);
@@ -250,7 +252,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 				if(unItem.getCount() >= this.getShrinkCount()) {
 					int amount = unItem.getCount() / 9;
 					if(JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.instance.test_model) {
+						if(this.debug || MCS.test()) {
 
 						}else {
 							unItem.shrink(amount * 9);
@@ -271,7 +273,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 				if(unItem.getCount() >= this.getShrinkCount()) {
 					int amount = unItem.getCount() / 9;
 					if(!JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.instance.test_model) {
+						if(this.debug || MCS.test()) {
 
 						}else {
 							unItem.shrink(amount * 9);
@@ -288,7 +290,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 				if(unItem.getCount() >= this.getShrinkCount()) {
 					int amount = unItem.getCount() / 9;
 					if(JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.instance.test_model) {
+						if(this.debug || MCS.test()) {
 
 						}else {
 							unItem.shrink(amount * 9);
@@ -305,7 +307,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 				if(unItem.getCount() >= this.getShrinkCount()) {
 					int amount = unItem.getCount() / 9;
 					if(JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.instance.test_model) {
+						if(this.debug || MCS.test()) {
 
 						}else {
 							unItem.shrink(amount * 9);
@@ -322,7 +324,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 				if(unItem.getCount() >= this.getShrinkCount()) {
 					int amount = unItem.getCount() / 9;
 					if(JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.instance.test_model) {
+						if(this.debug || MCS.test()) {
 
 						}else {
 							unItem.shrink(amount * 9);
@@ -339,7 +341,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 				if(unItem.getCount() >= this.getShrinkCount()) {
 					int amount = unItem.getCount() / 9;
 					if(JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.instance.test_model) {
+						if(this.debug || MCS.test()) {
 
 						}else {
 							unItem.shrink(amount * 9);

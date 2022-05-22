@@ -26,6 +26,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -43,23 +44,23 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BaseItemSword extends BaseItemTool.MetaSword implements ICompressedStuff {
-	public static BaseItemSword register(String name, ItemStack baseItem, String langModId, CreativeTabs tab, boolean hasSubtypes) {
+	public static BaseItemSword register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab, boolean hasSubtypes) {
 		if(baseItem == null || baseItem.isEmpty()) {
 			return null;
 		}
-		if(Loader.isModLoaded(langModId) || langModId.equals("custom")) {
-			return new BaseItemSword(baseItem, name);
+		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
+			return new BaseItemSword(name, baseItem, ownerMod, tab);
 		}else {
 			return null;
 		}
 	}
 
-	public static BaseItemSword register(String name, ItemStack baseItem, String langModId, CreativeTabs tab) {
-		return register(name, baseItem, langModId, tab, true);
+	public static BaseItemSword register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
+		return register(name, baseItem, ownerMod, tab, true);
 	}
 
-	public static BaseItemSword register(String name, ItemStack baseItem, String langModId) {
-		return register(name, baseItem, langModId, MCS.COMPERESSED_ITEMS);
+	public static BaseItemSword register(String name, ItemStack baseItem, String ownerMod) {
+		return register(name, baseItem, ownerMod, MCS.COMPERESSED_TOOLS);
 	}
 
 	protected final ItemStack baseToolStack;
@@ -67,8 +68,8 @@ public class BaseItemSword extends BaseItemTool.MetaSword implements ICompressed
 	protected final float baseAttackDamage;
 	protected final String ownerMod;
 
-	public BaseItemSword(ItemStack baseTool, String name) {
-		super(MCS.MODID, name, MCS.COMPERESSED_TOOLS, true, getToolMaterial(baseTool), ModSubtypes.values());
+	public BaseItemSword(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab) {
+		super(MCS.MODID, name, tab, true, getToolMaterial(baseTool), ModSubtypes.values());
 		this.baseToolStack = baseTool;
 		if(baseTool.getItem() instanceof ItemSword) {
 			this.baseTool = (ItemSword) baseTool.getItem();
@@ -76,17 +77,23 @@ public class BaseItemSword extends BaseItemTool.MetaSword implements ICompressed
 			this.baseTool = null;
 			throw new NonToolException(baseTool, "Sword");
 		}
-		this.ownerMod = this.baseTool.getRegistryName().getResourceDomain();
+		this.ownerMod = ownerMod;
 		this.baseAttackDamage = 3.0F + (baseTool.getItem() instanceof ItemSword ? ((ItemSword) baseTool.getItem()).getAttackDamage() : 0);
 		this.setMaxMetadata(16);
 
-		MCSResources.SUB_TOOLS.add(this);
-		MCSResources.SUB_TOOLS_NAME.add(name);
-		MCSResources.ITEMS.add(this);
-		MCSResources.ITEMS_NAME.add(name);
-		MCSResources.SWORDS.add(this);
-		MCSResources.SWORDS_NAME.add(name);
-		MCSResources.SUB_TOOLS_MAP.put(name, this);
+		if(!ownerMod.equals("custom")) {
+			MCSResources.SUB_TOOLS.add(this);
+			MCSResources.SUB_TOOLS_NAME.add(name);
+			MCSResources.ITEMS.add(this);
+			MCSResources.ITEMS_NAME.add(name);
+			MCSResources.SWORDS.add(this);
+			MCSResources.SWORDS_NAME.add(name);
+			MCSResources.SUB_TOOLS_MAP.put(name, this);
+		}
+	}
+
+	public BaseItemSword(String name, ItemStack baseTool) {
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS);
 	}
 
 	private static ToolMaterial getToolMaterial(ItemStack baseItem) {
@@ -324,7 +331,7 @@ public class BaseItemSword extends BaseItemTool.MetaSword implements ICompressed
 			tooltip.add(I18n.format("info.mcs.owner_mod") + " : " + TextFormatting.AQUA.toString() + this.getOwnerMod());
 		}
 
-		if(MCS.instance.test_model) {
+		if(MCS.test()) {
 			Color rgb = new Color(Color.WHITE.getRGB() - (new Color(16, 16, 16).getRGB() * (stack.getMetadata())));
 			tooltip.add("R: " + rgb.getRed());
 			tooltip.add("G: " + rgb.getGreen());
@@ -335,10 +342,6 @@ public class BaseItemSword extends BaseItemTool.MetaSword implements ICompressed
 
 		MCSUtil.info.addMetaInfo(meta, tooltip, this.infos, this.metaInfos);
 		MCSUtil.info.addShiftInfo(meta, tooltip, this.shiftInfos, this.metaShiftInfos);
-
-		if(meta == (Short.MAX_VALUE - 1)) {
-			tooltip.add("感谢喵呜玖大人的恩惠！");
-		}
 	}
 
 	@Override
@@ -348,12 +351,25 @@ public class BaseItemSword extends BaseItemTool.MetaSword implements ICompressed
 
 	@Override
 	public void getItemModel() {
-		super.getItemModel();
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
 			this.model.registerItemModel(this, meta, this.ownerMod + "/item/tools/sword/" + this.name, this.name + "." + meta);
 		}
 		this.model.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/tools/sword/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+	}
+	
+	@Override
+	public void setDamage(ItemStack stack, int damage) {
+		if(stack.getMetadata() < 32766) {
+			super.setDamage(stack, damage);
+		}
+	}
+	
+	@Override
+	public void damageItem(ItemStack stack, int amount, EntityLivingBase entity) {
+		if(stack.getMetadata() < 32766) {
+			super.damageItem(stack, amount, entity);
+		}
 	}
 
 	public String getOwnerMod() {

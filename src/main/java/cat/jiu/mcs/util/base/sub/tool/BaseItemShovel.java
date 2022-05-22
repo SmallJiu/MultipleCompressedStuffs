@@ -25,6 +25,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
@@ -44,23 +45,19 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompressedStuff {
-	public static BaseItemShovel register(String name, ItemStack baseItem, String langModId, CreativeTabs tab, boolean hasSubtypes) {
+	public static BaseItemShovel register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
 		if(baseItem == null || baseItem.isEmpty()) {
 			return null;
 		}
-		if(Loader.isModLoaded(langModId) || langModId.equals("custom")) {
-			return new BaseItemShovel(baseItem, name);
+		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
+			return new BaseItemShovel(name, baseItem, ownerMod, tab);
 		}else {
 			return null;
 		}
 	}
 
-	public static BaseItemShovel register(String name, ItemStack baseItem, String langModId, CreativeTabs tab) {
-		return register(name, baseItem, langModId, tab, true);
-	}
-
-	public static BaseItemShovel register(String name, ItemStack baseItem, String langModId) {
-		return register(name, baseItem, langModId, MCS.COMPERESSED_ITEMS);
+	public static BaseItemShovel register(String name, ItemStack baseItem, String ownerMod) {
+		return register(name, baseItem, ownerMod, MCS.COMPERESSED_ITEMS);
 	}
 
 	protected final ItemStack baseToolStack;
@@ -68,8 +65,8 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 	protected final float baseAttackDamage;
 	protected final String ownerMod;
 
-	public BaseItemShovel(ItemStack baseTool, String name) {
-		super(MCS.MODID, name, MCS.COMPERESSED_TOOLS, true, getToolMaterial(baseTool), ModSubtypes.values());
+	public BaseItemShovel(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab) {
+		super(MCS.MODID, name, tab, true, getToolMaterial(baseTool), ModSubtypes.values());
 		this.baseToolStack = baseTool;
 		if(baseTool.getItem() instanceof ItemSpade) {
 			this.baseTool = (ItemSpade) baseTool.getItem();
@@ -77,17 +74,23 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 			this.baseTool = null;
 			throw new NonToolException(baseTool, "Shovel");
 		}
-		this.ownerMod = this.baseTool.getRegistryName().getResourceDomain();
+		this.ownerMod = ownerMod;
 		this.baseAttackDamage = 3.0F + this.baseTool.attackDamage;
 		this.setMaxMetadata(16);
 
-		MCSResources.SUB_TOOLS.add(this);
-		MCSResources.SUB_TOOLS_NAME.add(name);
-		MCSResources.ITEMS.add(this);
-		MCSResources.ITEMS_NAME.add(name);
-		MCSResources.SHOVELS.add(this);
-		MCSResources.SHOVEL_NAME.add(name);
-		MCSResources.SUB_TOOLS_MAP.put(name, this);
+		if(!ownerMod.equals("custom")) {
+			MCSResources.SUB_TOOLS.add(this);
+			MCSResources.SUB_TOOLS_NAME.add(name);
+			MCSResources.ITEMS.add(this);
+			MCSResources.ITEMS_NAME.add(name);
+			MCSResources.SHOVELS.add(this);
+			MCSResources.SHOVEL_NAME.add(name);
+			MCSResources.SUB_TOOLS_MAP.put(name, this);
+		}
+	}
+
+	public BaseItemShovel(String name, ItemStack baseTool) {
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS);
 	}
 
 	private static ToolMaterial getToolMaterial(ItemStack baseItem) {
@@ -152,7 +155,8 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 		if(!this.DestroySpeedMap.isEmpty() && this.DestroySpeedMap.containsKey(stack.getMetadata())) {
 			return this.DestroySpeedMap.get(stack.getMetadata());
 		}
-		return this.baseTool.getDestroySpeed(this.baseToolStack, state);
+		float base = this.baseTool.getDestroySpeed(this.baseToolStack, state);
+		return (float) MCSUtil.item.getMetaValue(base, stack);
 	}
 
 	public Map<Integer, Integer> MaxDamageMap = Maps.newHashMap();
@@ -352,16 +356,12 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 			tooltip.add(I18n.format("info.mcs.owner_mod") + " : " + TextFormatting.AQUA.toString() + this.getOwnerMod());
 		}
 
-		if(MCS.instance.test_model) {
+		if(MCS.test()) {
 			tooltip.add("最大耐久: " + this.getMaxDamage(stack));
 		}
 
 		MCSUtil.info.addMetaInfo(meta, tooltip, this.infos, this.metaInfos);
 		MCSUtil.info.addShiftInfo(meta, tooltip, this.shiftInfos, this.metaShiftInfos);
-
-		if(meta == (Short.MAX_VALUE - 1)) {
-			tooltip.add("感谢喵呜玖大人的恩惠！");
-		}
 	}
 
 	@Override
@@ -371,12 +371,25 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 
 	@Override
 	public void getItemModel() {
-		super.getItemModel();
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
 			this.model.registerItemModel(this, meta, this.ownerMod + "/item/tools/shovel/" + this.name, this.name + "." + meta);
 		}
 		this.model.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/tools/shovel/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+	}
+	
+	@Override
+	public void setDamage(ItemStack stack, int damage) {
+		if(stack.getMetadata() < 32766) {
+			super.setDamage(stack, damage);
+		}
+	}
+	
+	@Override
+	public void damageItem(ItemStack stack, int amount, EntityLivingBase entity) {
+		if(stack.getMetadata() < 32766) {
+			super.damageItem(stack, amount, entity);
+		}
 	}
 
 	public String getOwnerMod() {

@@ -1,6 +1,7 @@
 package cat.jiu.mcs.command;
 
-import cat.jiu.mcs.util.base.BaseCommand;
+import cat.jiu.core.util.base.BaseCommand;
+import cat.jiu.mcs.MCS;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -9,9 +10,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentKeybind;
 
 public class CommandHelp extends BaseCommand.CommandNormal {
-
-	public CommandHelp(String name, boolean checkPermission, int level) {
-		super(name, checkPermission, level);
+	public CommandHelp(String name, int level) {
+		super(name, MCS.MODID, level);
 	}
 
 	@Override

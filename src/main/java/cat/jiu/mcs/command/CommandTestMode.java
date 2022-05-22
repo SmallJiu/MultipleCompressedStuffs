@@ -1,8 +1,8 @@
 package cat.jiu.mcs.command;
 
+import cat.jiu.core.util.base.BaseCommand;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.util.TestModel;
-import cat.jiu.mcs.util.base.BaseCommand;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -12,8 +12,8 @@ import net.minecraft.tileentity.CommandBlockBaseLogic;
 import net.minecraft.util.text.TextComponentKeybind;
 
 public class CommandTestMode extends BaseCommand.CommandNormal {
-	public CommandTestMode(String name, boolean checkPermission, int level) {
-		super(name, checkPermission, level);
+	public CommandTestMode(String name, int level) {
+		super(name, MCS.MODID, level);
 	}
 
 	@Override

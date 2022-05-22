@@ -102,7 +102,7 @@ advancement.mcs.compressed_13.info=合成一个十三重的压缩物品
 advancement.mcs.compressed_14.name=楚门的世界
 advancement.mcs.compressed_14.info=合成一个十四重的压缩物品
 
-advancement.mcs.compressed_15.name=世界中的世界
+advancement.mcs.compressed_15.name=进度条是个谎言
 advancement.mcs.compressed_15.info=合成一个十五重的压缩物品
 
 advancement.mcs.compressed_16.name=无限平行宇宙，一切皆有可能
@@ -116,6 +116,7 @@ config.mcs.recipe.3x3=使用3x3合成表,反之使用2x2合成表
 config.mcs.recipe.cancel_oredict_for_recipe=设置不参与合成的矿词
 config.mcs.recipe.all=启用默认合成表
 config.mcs.recipe.ore=启用默认矿物词典
+config.mcs.use_scrool_gui=启用压缩箱子的滚动物品栏,否则使用翻页物品栏
 
 config.mcs.enable_mod_stuff=启用联动物品(需在ModStuff开启具体mod)
 config.mcs.enable_test_stuff=使用mod预览内容

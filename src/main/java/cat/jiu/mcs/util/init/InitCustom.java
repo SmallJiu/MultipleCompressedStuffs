@@ -3,9 +3,13 @@ package cat.jiu.mcs.util.init;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
@@ -19,9 +23,7 @@ import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.exception.JsonElementNotFoundException;
 import cat.jiu.mcs.exception.JsonException;
-import cat.jiu.mcs.exception.ItemNotFoundException;
 import cat.jiu.mcs.exception.UnknownTypeException;
-import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.base.sub.BaseBlockSub;
 import cat.jiu.mcs.util.base.sub.BaseItemFood;
 import cat.jiu.mcs.util.base.sub.BaseItemSub;
@@ -39,8 +41,9 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 
 public class InitCustom {
-	public static final Map<String, String> unRegisterCustom = Maps.newHashMap();
-	public static final Map<String, BaseBlockSub> unSetUnItem = Maps.newHashMap();
+	private static final Logger log = LogManager.getLogger();
+	public static final HashMap<String, JsonElement> unRegisterCustom = Maps.newHashMap();
+	public static final HashMap<String, BaseBlockSub> unSetUnItem = Maps.newHashMap();
 
 	public static void registerCustom() {
 		File config = new File("./config/jiu/mcs/custom.json");
@@ -58,23 +61,23 @@ public class InitCustom {
 
 						CustomType type = CustomType.getType(main_type);
 						if(type == CustomType.UNKNOWN) {
-							String crashMsg = "\n\ncustom.json -> nunknown type: \n -> " + fileObject.getKey() + ": \n  -> (" + i + "):\n   -> \"type\": \"" + type_tmp + "\"\n";
+							String crashMsg = "\n\ncustom.json -> \nunknown type: \n -> " + fileObject.getKey() + ": \n  -> (" + i + "):\n   -> \"type\": \"" + type_tmp + "\"\n";
 							throw new UnknownTypeException(crashMsg);
 						}else {
 							JsonArray entries = subObject.get("entries").getAsJsonArray();// 方块清单
 							for(int m = 0; m < entries.size(); ++m) {
 								JsonObject itemObject = entries.get(m).getAsJsonObject();
-
+								
 								String name = itemObject.get("id").getAsString();
 								MCS.instance.log.info(itemObject.toString());
-								ItemStack unItem = MCSUtil.item.getStack(itemObject.get("unItem").getAsString());
+								ItemStack unItem = JiuUtils.item.toStack(itemObject.get("unItem"));
 								if(unItem == null || unItem.isEmpty()) {
-									String crashMsg = "\n\ncustom.json -> unknown item:\n -> " + fileObject.getKey() + ":\n  -> (" + i + "): \n   -> \"unItem\": \"" + itemObject.get("unItem").getAsString() + "\"\n";
-									throw new ItemNotFoundException(crashMsg);
+									String crashMsg = "\n\ncustom.json -> unknown item:\n -> " + fileObject.getKey() + ":\n  -> (" + i + "): \n   -> \"unItem\": \"" + (itemObject.get("unItem").isJsonObject() ? itemObject.get("unItem").getAsJsonObject().get("name").getAsString() : itemObject.get("unItem").getAsString()) + "\"\n";
+									log.error(crashMsg);
 								}
 								switch(type) {
 									case BLOCK:
-										initBlock(itemObject, name, itemObject.get("unItem").getAsString(), InitCustomItem.getTab(itemObject, MCS.COMPERESSED_BLOCKS));
+										initBlock(itemObject, name, itemObject.get("unItem"), InitCustomItem.getTab(itemObject, MCS.COMPERESSED_BLOCKS));
 										break;
 									case ITEM_NORMA:
 										initNormalItem(itemObject, name, unItem, InitCustomItem.getTab(itemObject, MCS.COMPERESSED_ITEMS));
@@ -111,12 +114,13 @@ public class InitCustom {
 		}
 	}
 
-	public static void initBlock(JsonObject blockObject, String name, String unItemName, CreativeTabs tab) {
-		ItemStack unItem = MCSUtil.item.getStack(unItemName);
+	public static void initBlock(JsonObject blockObject, String name, JsonElement unItemE, CreativeTabs tab) {
+		ItemStack unItem = JiuUtils.item.toStack(unItemE);
 		boolean lag = false;
 		if(unItem == null || unItem.isEmpty()) {
 			lag = true;
-			InitCustom.unRegisterCustom.put(name, unItemName);
+			InitCustom.unRegisterCustom.put(name, unItemE);
+			unItem = ItemStack.EMPTY;
 		}
 		BaseBlockSub block = BaseBlockSub.register(name, unItem, "custom", tab);
 		if(lag) {

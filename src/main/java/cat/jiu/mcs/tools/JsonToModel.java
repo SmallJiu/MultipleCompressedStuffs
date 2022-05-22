@@ -6,7 +6,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 
 import javax.swing.JButton;
@@ -26,7 +29,7 @@ public class JsonToModel {
 		JFrame f = new JFrame("");
 		f.setLayout(null);
 
-		JTextField file = new JTextField("D:/Minecraft_MDK/MultipleCompressedStuffs-1.12.2-14.23.5.2847-eclipse/src/main/resources/assets/mcs/textures/mode_textures.json", 9999999);
+		JTextField file = new JTextField("/assets/mcs/textures/mode_textures.json", 9999999);
 		file.setBounds(5, 5, 99999999, 50);
 		file.setFont(new Font(null, 0, 20));
 
@@ -41,6 +44,13 @@ public class JsonToModel {
 			if(file.getText().isEmpty())
 				return;
 			File json = new File(file.getText());
+			if(file.getText().startsWith("/")) {
+				try {
+					json = new File(JsonToModel.class.getResource(file.getText()).toURI());
+				}catch(URISyntaxException e1) {
+					e1.printStackTrace();
+				}
+			}
 			if(!json.exists())
 				return;
 
@@ -94,21 +104,7 @@ public class JsonToModel {
 										count += 17;
 									}else if(entry.isJsonObject()) {
 										if(name.equals("tool")) {
-											for(Entry<String, JsonElement> tools : entry.getAsJsonObject().entrySet()) {
-												String tool = tools.getKey();
-												JsonElement toolsEntry = tools.getValue();
-												if(toolsEntry.isJsonObject()) {
-													for(Entry<String, JsonElement> toolEntry : toolsEntry.getAsJsonObject().entrySet()) {
-														String toolName = toolEntry.getKey();
-														JsonElement toolTexture = toolEntry.getValue();
-														if(toolTexture.isJsonPrimitive()) {
-															// // modid, boi tools, name, texture, isHas
-															ModelWriter.main(new String[]{modid, boi, tool, toolName, toolTexture.getAsString(), "not"});
-															count += 17;
-														}
-													}
-												}
-											}
+											itemTool(name, boi, entry.getAsJsonObject());
 										}
 									}
 								}
@@ -120,6 +116,7 @@ public class JsonToModel {
 										for(Entry<String, JsonElement> blockEntry : block.getAsJsonObject().entrySet()) {
 											String blockName = blockEntry.getKey();
 											JsonElement blockTexture = blockEntry.getValue();
+											
 											if(blockTexture.isJsonPrimitive()) {
 												// System.out.println(blockTexture.getAsString());
 												// // modid, boi tools, name, texture, isHas
@@ -127,18 +124,13 @@ public class JsonToModel {
 												count += 16;
 											}else if(blockTexture.isJsonObject()) {
 												ModelWriter.main(new String[]{modid, boi, null, blockName, "TempTexture", isHas});
-												JsonObject sides = (JsonObject) blockTexture;
+												JsonObject sides = blockTexture.getAsJsonObject();
 												
-												JsonElement top = sides.get("top");
-												JsonElement side = sides.get("side");
-												JsonElement down = sides.get("down");
-												
-												if(top.isJsonPrimitive() && side.isJsonPrimitive() && down.isJsonPrimitive()) {
-													for(int meta = 0; meta < 16; meta++) {
-														ModelWriter.writeFaceBlockModel(modid, blockName, isHas.equals("has"), meta, top.getAsString(), side.getAsString(), down.getAsString(), false);
-													}
+												if(sides.has("all")) {
+													overlayBlock(modid, blockName, isHas, sides);
+												}else {
+													sideBlock(modid, blockName, isHas, sides);
 												}
-												count += 16;
 											}
 										}
 									}
@@ -149,5 +141,53 @@ public class JsonToModel {
 				}
 			}
 		}
+	}
+	
+	private static void itemTool(String modid, String boi, JsonObject obj) throws IOException {
+		for(Entry<String, JsonElement> tools : obj.getAsJsonObject().entrySet()) {
+			String tool = tools.getKey();
+			JsonElement toolsEntry = tools.getValue();
+			if(toolsEntry.isJsonObject()) {
+				for(Entry<String, JsonElement> toolEntry : toolsEntry.getAsJsonObject().entrySet()) {
+					String toolName = toolEntry.getKey();
+					JsonElement toolTexture = toolEntry.getValue();
+					if(toolTexture.isJsonPrimitive()) {
+						// // modid, boi tools, name, texture, isHas
+						ModelWriter.main(new String[]{modid, boi, tool, toolName, toolTexture.getAsString(), "not"});
+						count += 17;
+					}
+				}
+			}
+		}
+	}
+	private static void overlayBlock(String modid, String blockName, String isHas, JsonObject sides) throws IOException {
+		JsonElement all = sides.get("all");
+		List<String> overlays = new ArrayList<>();
+		
+		for(int i = 1; i < 5; i++) {
+			String over = "overlay_" + i;
+			if(sides.has(over)) {
+				overlays.add(sides.get(over).getAsString());
+			}else {
+				break;
+			}
+		}
+		for(int i = 0; i < 16; i++) {
+			ModelWriter.writeOverlayModel(modid, blockName, isHas.equals("has"), i, all.getAsString(), overlays, false);
+		}
+		count += 16;
+	}
+	
+	private static void sideBlock(String modid, String blockName, String isHas, JsonObject sides) throws IOException {
+		JsonElement top = sides.get("top");
+		JsonElement side = sides.get("side");
+		JsonElement down = sides.get("down");
+		
+		if(top.isJsonPrimitive() && side.isJsonPrimitive() && down.isJsonPrimitive()) {
+			for(int meta = 0; meta < 16; meta++) {
+				ModelWriter.writeFaceBlockModel(modid, blockName, isHas.equals("has"), meta, top.getAsString(), side.getAsString(), down.getAsString(), false);
+			}
+		}
+		count += 16;
 	}
 }

@@ -20,9 +20,19 @@ public interface ICompressedStuff {
 	String getOwnerMod();
 
 	String getUnCompressedName();
+	
+	default boolean isHas() {return false;}
 
 	default int getUnCompressedBurnTime() {
 		return TileEntityFurnace.getItemBurnTime(this.getUnCompressedStack());
+	}
+	
+	default Item getItem() {
+		return this instanceof Item ? (Item)this : this instanceof Block ? Item.getItemFromBlock((Block)this) : null;
+	}
+	
+	default Block getBlock() {
+		return this instanceof Block ? (Block)this : null;
 	}
 	
 	default ItemStack getStack() {
@@ -34,7 +44,9 @@ public interface ICompressedStuff {
 	}
 
 	default ItemStack getStack(int count, int meta) {
-		return new ItemStack(this instanceof Item ? (Item) this : this instanceof Block ? Item.getItemFromBlock((Block) this) : (Item) null, count, meta);
+		Item item = this.getItem();
+		if(item == null) return null;
+		return new ItemStack(item, count, meta);
 	}
 
 	default List<String> addOtherOreDictionary() {

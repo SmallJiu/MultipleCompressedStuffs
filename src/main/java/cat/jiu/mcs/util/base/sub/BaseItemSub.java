@@ -11,8 +11,8 @@ import com.google.common.collect.Maps;
 import cat.jiu.core.util.RegisterModel;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
-import cat.jiu.mcs.api.IHasModel;
 import cat.jiu.mcs.config.Configs;
+import cat.jiu.core.api.IHasModel;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
@@ -38,7 +38,7 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 	protected final CreativeTabs tab;
 	protected final ItemStack unCompressedItem;
 	protected final Item baseItem;
-	protected final String langModID;
+	protected final String ownerMod;
 	protected final RegisterModel model = new RegisterModel(MCS.MODID);
 	private String model_material = null;
 
@@ -47,47 +47,52 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 		return this;
 	}
 
-	public static BaseItemSub register(String name, ItemStack baseItem, String langModId, CreativeTabs tab, boolean hasSubtypes) {
+	public static BaseItemSub register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab, boolean hasSubtypes) {
 		if(baseItem == null || baseItem.isEmpty()) {
 			return null;
 		}
-		if(Loader.isModLoaded(langModId) || langModId.equals("custom")) {
-			return new BaseItemSub(name, baseItem, tab, hasSubtypes);
+		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
+			return new BaseItemSub(name, baseItem, ownerMod, tab, hasSubtypes);
 		}else {
 			return null;
 		}
 	}
 
-	public static BaseItemSub register(String name, ItemStack baseItem, String langModId, CreativeTabs tab) {
-		return register(name, baseItem, langModId, tab, true);
+	public static BaseItemSub register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
+		return register(name, baseItem, ownerMod, tab, true);
 	}
 
-	public static BaseItemSub register(String name, ItemStack baseItem, String langModId) {
-		return register(name, baseItem, langModId, MCS.COMPERESSED_ITEMS);
+	public static BaseItemSub register(String name, ItemStack baseItem, String ownerMod) {
+		return register(name, baseItem, ownerMod, MCS.COMPERESSED_ITEMS);
 	}
 
-	public BaseItemSub(String name, ItemStack baseItem, CreativeTabs tab, boolean hasSubtypes) {
+	public BaseItemSub(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab, boolean hasSubtypes) {
 		this.name = name;
 		this.tab = tab;
 		this.unCompressedItem = baseItem;
 		this.baseItem = baseItem.getItem();
-		this.langModID = baseItem.getItem().getRegistryName().getResourceDomain();
+		this.ownerMod = ownerMod;
 		this.setHasSubtypes(hasSubtypes);
 		this.setUnlocalizedName("mcs." + this.name);
 		this.setCreativeTab(this.tab);
 		this.setRegistryName(this.name);
 		this.setNoRepair();
-		if(!this.langModID.equals("custom")) {
+		if(!this.ownerMod.equals("custom")) {
 			MCSResources.ITEMS.add(this);
 			MCSResources.ITEMS_NAME.add(this.name);
 			MCSResources.SUB_ITEMS.add(this);
 			MCSResources.SUB_ITEMS_NAME.add(this.name);
 			MCSResources.SUB_ITEMS_MAP.put(this.name, this);
 		}
+		RegisterModel.NeedToRegistryModel.add(this);
+	}
+	
+	public BaseItemSub(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
+		this(name, baseItem, ownerMod, tab, true);
 	}
 
 	public BaseItemSub(String name, ItemStack baseItem, CreativeTabs tab) {
-		this(name, baseItem, tab, true);
+		this(name, baseItem, baseItem.getItem().getRegistryName().getResourceDomain(), tab);
 	}
 
 	public BaseItemSub(String name, ItemStack baseItem) {
@@ -95,7 +100,7 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 	}
 
 	public String getOwnerMod() {
-		return this.langModID;
+		return this.ownerMod;
 	}
 
 	private final List<String> otherOredict = ICompressedStuff.super.addOtherOreDictionary();
@@ -262,7 +267,7 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.unCompressedItem, infoStacks);
 		MCSUtil.info.addCompressedInfo(meta, tooltip, this.getUnCompressedItemLocalizedName(), this);
 
-		if(MCS.instance.test_model) {
+		if(MCS.test()) {
 			String[] names = JiuUtils.other.custemSplitString(this.name, "_");
 			tooltip.add(names.length + "");
 			tooltip.add(this.getUnCompressedName());
@@ -290,27 +295,23 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 
 		MCSUtil.info.addMetaInfo(meta, tooltip, this.infos, this.metaInfos);
 		MCSUtil.info.addShiftInfo(meta, tooltip, this.shiftInfos, this.metaShiftInfos);
-
-		if(meta == Short.MAX_VALUE - 1) {
-			tooltip.add("感谢喵呜玖大人的恩惠！");
-		}
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void registerItemModel() {
+	public void getItemModel() {
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
 			if(this.model_material != null) {
-				model.registerItemModel(this, meta, this.langModID + "/item/normal/" + this.model_material + "/" + this.name, this.name + "." + meta);
+				model.registerItemModel(this, meta, this.ownerMod + "/item/normal/" + this.model_material + "/" + this.name, this.name + "." + meta);
 			}else {
-				model.registerItemModel(this, meta, this.langModID + "/item/normal/" + this.name, this.name + "." + meta);
+				model.registerItemModel(this, meta, this.ownerMod + "/item/normal/" + this.name, this.name + "." + meta);
 			}
 		}
 		if(this.model_material != null) {
-			model.registerItemModel(this, Short.MAX_VALUE - 1, this.langModID + "/item/normal/" + this.model_material + "/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+			model.registerItemModel(this, Short.MAX_VALUE - 1, this.ownerMod + "/item/normal/" + this.model_material + "/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
 		}else {
-			model.registerItemModel(this, Short.MAX_VALUE - 1, this.langModID + "/item/normal/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+			model.registerItemModel(this, Short.MAX_VALUE - 1, this.ownerMod + "/item/normal/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
 		}
 	}
 

@@ -1,7 +1,6 @@
 package cat.jiu.mcs.util.type;
 
 import java.util.List;
-import java.util.Map;
 
 import com.google.common.collect.Lists;
 
@@ -47,23 +46,15 @@ public class CustomStuffType {
 		}
 	}
 
-	public static class ChangeBlockJsonType {
-		public final Map<Integer, Integer[]> time;
-		public final Map<Integer, List<ItemStack>> drops;
-		public final Map<Integer, Boolean> canDrop;
-
-		public ChangeBlockJsonType(Map<Integer, Integer[]> time, Map<Integer, List<ItemStack>> drops, Map<Integer, Boolean> canDrop) {
-			this.time = time;
-			this.drops = drops;
-			this.canDrop = canDrop;
-		}
-	}
-
 	public static class PotionEffectType {
 		private final PotionEffect effect;
 
+		public PotionEffectType(PotionEffectType effect) {
+			this.effect = new PotionEffect(effect.effect);
+		}
+		
 		public PotionEffectType(PotionEffect effect) {
-			this.effect = effect;
+			this.effect = new PotionEffect(effect);
 		}
 
 		public PotionEffectType(Potion potion, int tick, int level) {

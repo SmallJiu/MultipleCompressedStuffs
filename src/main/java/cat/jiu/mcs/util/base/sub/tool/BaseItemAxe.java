@@ -25,6 +25,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
@@ -43,23 +44,19 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuff {
-	public static BaseItemAxe register(String name, ItemStack baseItem, String langModId, CreativeTabs tab, boolean hasSubtypes) {
+	public static BaseItemAxe register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
 		if(baseItem == null || baseItem.isEmpty()) {
 			return null;
 		}
-		if(Loader.isModLoaded(langModId) || langModId.equals("custom")) {
-			return new BaseItemAxe(name, baseItem);
+		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
+			return new BaseItemAxe(name, baseItem, ownerMod, tab);
 		}else {
 			return null;
 		}
 	}
 
-	public static BaseItemAxe register(String name, ItemStack baseItem, String langModId, CreativeTabs tab) {
-		return register(name, baseItem, langModId, tab, true);
-	}
-
-	public static BaseItemAxe register(String name, ItemStack baseItem, String langModId) {
-		return register(name, baseItem, langModId, MCS.COMPERESSED_ITEMS);
+	public static BaseItemAxe register(String name, ItemStack baseItem, String ownerMod) {
+		return register(name, baseItem, ownerMod, MCS.COMPERESSED_TOOLS);
 	}
 
 	protected final ItemStack baseToolStack;
@@ -68,8 +65,8 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 	protected final float baseAttackSpeed;
 	protected final String ownerMod;
 
-	public BaseItemAxe(String name, ItemStack baseTool) {
-		super(MCS.MODID, name, MCS.COMPERESSED_TOOLS, true, getToolMaterial(baseTool), ModSubtypes.values());
+	public BaseItemAxe(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab) {
+		super(MCS.MODID, name, tab, true, getToolMaterial(baseTool), ModSubtypes.values());
 		this.baseToolStack = baseTool;
 		if(baseTool.getItem() instanceof ItemAxe) {
 			this.baseTool = (ItemAxe) baseTool.getItem();
@@ -77,18 +74,24 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 			this.baseTool = null;
 			throw new NonToolException(baseTool, "Axe");
 		}
-		this.ownerMod = this.baseTool.getRegistryName().getResourceDomain();
+		this.ownerMod = ownerMod;
 		this.baseAttackDamage = 3.0F + this.baseTool.attackDamage;
 		this.baseAttackSpeed = this.baseTool.attackSpeed;
 		this.setMaxMetadata(16);
 
-		MCSResources.SUB_TOOLS.add(this);
-		MCSResources.SUB_TOOLS_NAME.add(name);
-		MCSResources.ITEMS.add(this);
-		MCSResources.ITEMS_NAME.add(name);
-		MCSResources.AXES.add(this);
-		MCSResources.AXES_NAME.add(name);
-		MCSResources.SUB_TOOLS_MAP.put(name, this);
+		if(!ownerMod.equals("custom")) {
+			MCSResources.SUB_TOOLS.add(this);
+			MCSResources.SUB_TOOLS_NAME.add(name);
+			MCSResources.ITEMS.add(this);
+			MCSResources.ITEMS_NAME.add(name);
+			MCSResources.AXES.add(this);
+			MCSResources.AXES_NAME.add(name);
+			MCSResources.SUB_TOOLS_MAP.put(name, this);
+		}
+	}
+
+	public BaseItemAxe(String name, ItemStack baseTool) {
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS);
 	}
 
 	private static ToolMaterial getToolMaterial(ItemStack baseItem) {
@@ -98,7 +101,7 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 		return ToolMaterial.WOOD;
 	}
 
-	public Map<Integer, Integer> EnchantabilityLevelMap = Maps.newHashMap();
+	protected Map<Integer, Integer> EnchantabilityLevelMap = Maps.newHashMap();
 
 	public BaseItemAxe setEnchantabilityLevel(Map<Integer, Integer> EnchantabilityLevelMap) {
 		this.EnchantabilityLevelMap = EnchantabilityLevelMap;
@@ -111,10 +114,10 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 			return this.EnchantabilityLevelMap.get(stack.getMetadata());
 		}
 		int enchantability = this.baseTool.getItemEnchantability(this.baseToolStack);
-		return (int) (enchantability + (enchantability * ((stack.getMetadata() + 1) * 0.29394)));
+		return (int) MCSUtil.item.getMetaValue(enchantability, stack);
 	}
 
-	public Map<Integer, ItemStack> RepairableMap = Maps.newHashMap();
+	protected Map<Integer, ItemStack> RepairableMap = Maps.newHashMap();
 
 	public BaseItemAxe setRepairableMap(Map<Integer, ItemStack> RepairableMap) {
 		this.RepairableMap = RepairableMap;
@@ -130,7 +133,7 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 		return this.baseTool.getIsRepairable(this.baseToolStack, repair) || lag;
 	}
 
-	public Map<Integer, Float> DestroySpeedMap = Maps.newHashMap();
+	protected Map<Integer, Float> DestroySpeedMap = Maps.newHashMap();
 
 	public BaseItemAxe setDestroySpeed(Map<Integer, Float> DestroySpeedMap) {
 		this.DestroySpeedMap = DestroySpeedMap;
@@ -142,11 +145,11 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 		if(!this.DestroySpeedMap.isEmpty() && this.DestroySpeedMap.containsKey(stack.getMetadata())) {
 			return this.DestroySpeedMap.get(stack.getMetadata());
 		}
-		return this.baseTool.getDestroySpeed(this.baseToolStack, state);
+		float base = this.baseTool.getDestroySpeed(this.baseToolStack, state);
+		return (float) MCSUtil.item.getMetaValue(base, stack);
 	}
 
-	public Map<Integer, Integer> MaxDamageMap = Maps.newHashMap();
-
+	protected Map<Integer, Integer> MaxDamageMap = Maps.newHashMap();
 	public BaseItemAxe setMaxDamage(Map<Integer, Integer> MaxDamageMap) {
 		this.MaxDamageMap = MaxDamageMap;
 		return this;
@@ -154,6 +157,7 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 
 	@Override
 	public int getMaxDamage(ItemStack stack) {
+		if(stack.getMetadata() >= 32766) return 10104;
 		if(!this.MaxDamageMap.isEmpty() && this.MaxDamageMap.containsKey(stack.getMetadata())) {
 			return this.MaxDamageMap.get(stack.getMetadata());
 		}
@@ -192,8 +196,7 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 		return multimap;
 	}
 
-	public Map<Integer, Integer> HarvestLevelMap = Maps.newHashMap();
-
+	protected Map<Integer, Integer> HarvestLevelMap = Maps.newHashMap();
 	public BaseItemAxe setHarvestLevelMap(Map<Integer, Integer> HarvestLevelMap) {
 		this.HarvestLevelMap = HarvestLevelMap;
 		return this;
@@ -209,8 +212,7 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 		return level;
 	}
 
-	public Map<Integer, List<IBlockState>> CanHarvestBlock = Maps.newHashMap();
-
+	protected Map<Integer, List<IBlockState>> CanHarvestBlock = Maps.newHashMap();
 	public BaseItemAxe setCanHarvestBlockMap(Map<Integer, List<IBlockState>> CanHarvestBlock) {
 		this.CanHarvestBlock = CanHarvestBlock;
 		return this;
@@ -318,14 +320,12 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 	}
 
 	ItemStack infoStack = null;
-
 	public BaseItemAxe setInfoStack(ItemStack stack) {
 		this.infoStack = stack;
 		return this;
 	}
 
 	private Map<Integer, ItemStack> infoStacks = Maps.newHashMap();
-
 	public BaseItemAxe setInfoStack(Map<Integer, ItemStack> infoStacks) {
 		this.infoStacks = infoStacks;
 		return this;
@@ -342,16 +342,12 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 			tooltip.add(I18n.format("info.mcs.owner_mod") + " : " + TextFormatting.AQUA.toString() + this.getOwnerMod());
 		}
 
-		if(MCS.instance.test_model) {
+		if(MCS.test()) {
 			tooltip.add("最大耐久: " + this.getMaxDamage(stack));
 		}
 
 		MCSUtil.info.addMetaInfo(meta, tooltip, this.infos, this.metaInfos);
 		MCSUtil.info.addShiftInfo(meta, tooltip, this.shiftInfos, this.metaShiftInfos);
-
-		if(meta == (Short.MAX_VALUE - 1)) {
-			tooltip.add("感谢喵呜玖大人的恩惠！");
-		}
 	}
 
 	@Override
@@ -362,12 +358,25 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void getItemModel() {
-		super.getItemModel();
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
 			this.model.registerItemModel(this, meta, this.ownerMod + "/item/tools/axe/" + this.name, this.name + "." + meta);
 		}
 		this.model.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/tools/axe/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+	}
+	
+	@Override
+	public void setDamage(ItemStack stack, int damage) {
+		if(stack.getMetadata() < 32766) {
+			super.setDamage(stack, damage);
+		}
+	}
+	
+	@Override
+	public void damageItem(ItemStack stack, int amount, EntityLivingBase entity) {
+		if(stack.getMetadata() < 32766) {
+			super.damageItem(stack, amount, entity);
+		}
 	}
 
 	public String getOwnerMod() {

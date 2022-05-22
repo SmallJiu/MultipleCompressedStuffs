@@ -14,7 +14,7 @@ public class BaseBlockItem extends ItemBlock implements ICompressedStuff {
 
 	public BaseBlockItem(BaseBlock block) {
 		super(block);
-		this.subBlock = block;
+		this.subBlock = (BaseBlock) this.block;
 		this.setHasSubtypes(true);
 		this.setMaxDamage(0);
 	}

@@ -49,12 +49,12 @@ import vazkii.botania.common.block.ModFluffBlocks;
 
 @SuppressWarnings("static-access")
 public class MCSBlocks {
-	public static final BlockCompressor COMPRESSOR = new BlockCompressor();
-	public static final BlockCreativeEnergy CREATIVE_ENERGY = new BlockCreativeEnergy();
-	public static final BaseBlockSub C_CREATIVE_ENERGY_B = new CompressedCreativeEnergy("compressed_creative_energy", new ItemStack(CREATIVE_ENERGY));
+	public static final BlockCompressor compressor = new BlockCompressor();
+	public static final BlockCreativeEnergy creative_energy = new BlockCreativeEnergy();
+	public static final BaseBlockSub C_creative_energy_B = new CompressedCreativeEnergy("compressed_creative_energy", new ItemStack(creative_energy));
 	public static cat.jiu.core.util.base.BaseBlock.Normal TEST_BLOCK = null;
 	static {
-		if(MCS.instance.test_model) {
+		if(MCS.test()) {
 			TEST_BLOCK = new BlockTest().setBlockModelResourceLocation("mcs/block/test", "test_block");
 		}
 	}
@@ -98,7 +98,7 @@ public class MCSBlocks {
 						OreDictionary.registerOre((i + 1) + "x" + ore, new ItemStack(block, 1, i));
 					}
 				}
-				JiuUtils.item.registerCompressedOre(block.getUnCompressedName(), block, block.isHasBlock());
+				JiuUtils.item.registerCompressedOre(block.getUnCompressedName(), block, block.isHas());
 			}
 		}
 	}
@@ -179,6 +179,10 @@ public class MCSBlocks {
 			public final BaseBlockSub C_emerald_ore_B = new BaseBlockSub("compressed_emerald_ore", new ItemStack(Blocks.EMERALD_ORE));
 			public final BaseBlockSub C_quartz_ore_B = new BaseBlockSub("compressed_quartz_ore", new ItemStack(Blocks.QUARTZ_ORE));
 
+			// Update 3.0.1
+			public final BaseBlockSub C_chest_B = new CompressedChest("compressed_chest", new ItemStack(Blocks.CHEST), 54);
+			public final BaseBlockSub C_shulker_box_B = new CompressedChest("compressed_shulker_box", new ItemStack(Blocks.PURPLE_SHULKER_BOX), 32);
+			
 		}
 
 		public class Has {
@@ -211,7 +215,7 @@ public class MCSBlocks {
 			public final BaseBlockSub C_silver_B = TF ? register("silver", TFBlocks.blockStorage.blockSilver, "thermalfoundation", false) : IC ? register("silver", "resource", 15, "ic2", false) : null;
 			public final BaseBlockSub C_tin_B = TF ? register("tin", TFBlocks.blockStorage.blockTin, "thermalfoundation", false) : IC ? register("tin", "resource", 9, "ic2", false) : null;
 			public final BaseBlockSub C_uranium_B = IC ? register("uranium", "resource", 10, "ic2", false) : null;
-			// compressed_ _block
+			// compressed__block
 			public final BaseBlockSub C_bronze_B = TF ? register("bronze", TFBlocks.blockStorageAlloy.blockBronze, "thermalfoundation", false) : IC ? register("bronze", "resource", 5, "ic2", false) : null;
 			public final BaseBlockSub C_constantan_B = TF ? register("constantan", TFBlocks.blockStorageAlloy.blockConstantan, "thermalfoundation", false) : null;
 			public final BaseBlockSub C_electrum_B = TF ? register("electrum", TFBlocks.blockStorageAlloy.blockElectrum, "thermalfoundation", false) : null;
@@ -229,7 +233,7 @@ public class MCSBlocks {
 			public final BaseBlockSub C_silver_B = TF ? register("silver", TFBlocks.blockOre.oreSilver, "thermalfoundation", true) : null;
 			public final BaseBlockSub C_tin_B = TF ? register("tin", TFBlocks.blockOre.oreTin, "thermalfoundation", true) : IC ? register("tin", "resource", 3, "ic2", true) : null;
 			public final BaseBlockSub C_uranium_B = IC ? register("uranium", "resource", 4, "ic2", true) : null;
-			// compressed_ _ore_block
+			// compressed__ore_block
 		}
 
 		@SuppressWarnings("unused")
@@ -552,9 +556,9 @@ public class MCSBlocks {
 		}
 	}
 
-	private static int[] parseMeta(String times, JsonObject obj) {
+	private static int[] parseMeta(String name, JsonObject obj) {
 		int[] metas = {0};
-		if(obj.has("meta")) {
+		if(obj.has(name)) {
 			JsonArray metasArray = obj.get("meta").getAsJsonArray();
 			metas = new int[metasArray.size()];
 			for(int meta = 0; meta < metasArray.size(); ++meta) {

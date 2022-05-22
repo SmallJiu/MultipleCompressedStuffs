@@ -25,7 +25,7 @@ public class CompressedEgg extends BaseItemSub {
 		ItemStack stack = player.getHeldItem(hand);
 		ActionResult<ItemStack> lag = new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
 		
-		if(MCS.instance.test_model) {
+		if(MCS.test()) {
 			{
 				world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_EGG_THROW, SoundCategory.PLAYERS, 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
 

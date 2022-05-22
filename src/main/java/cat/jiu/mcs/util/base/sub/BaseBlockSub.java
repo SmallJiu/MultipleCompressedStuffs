@@ -12,10 +12,10 @@ import com.google.common.collect.Maps;
 import cat.jiu.core.util.RegisterModel;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
-import cat.jiu.mcs.api.IHasModel;
 import cat.jiu.mcs.api.IMetaName;
 import cat.jiu.mcs.blocks.tileentity.TileEntityChangeBlock;
 import cat.jiu.mcs.config.Configs;
+import cat.jiu.core.api.IHasModel;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
@@ -59,7 +59,7 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 	protected final boolean recipeIsRepeat;
 	protected Block unCompressedBlock;
 	protected IBlockState unCompressedState;
-	protected final String langModID;
+	protected final String ownerMod;
 	protected final RegisterModel model = new RegisterModel(MCS.MODID);
 
 	public static final PropertyEnum<ModSubtypes> VARIANT = PropertyEnum.create("level", ModSubtypes.class);
@@ -76,31 +76,31 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 		}
 	}
 
-	public static BaseBlockSub register(String nameIn, ItemStack unCompressedItem, String langModID, Material materialIn, SoundType soundIn, CreativeTabs tabIn) {
-		return register(nameIn, unCompressedItem, langModID, materialIn, soundIn, tabIn, 4.0F);
+	public static BaseBlockSub register(String nameIn, ItemStack unCompressedItem, String ownerMod, Material materialIn, SoundType soundIn, CreativeTabs tabIn) {
+		return register(nameIn, unCompressedItem, ownerMod, materialIn, soundIn, tabIn, 4.0F);
 	}
 
-	public static BaseBlockSub register(String nameIn, ItemStack unCompressedItem, String langModID, Material materialIn, CreativeTabs tabIn) {
-		return register(nameIn, unCompressedItem, langModID, materialIn, SoundType.METAL, tabIn);
+	public static BaseBlockSub register(String nameIn, ItemStack unCompressedItem, String ownerMod, Material materialIn, CreativeTabs tabIn) {
+		return register(nameIn, unCompressedItem, ownerMod, materialIn, SoundType.METAL, tabIn);
 	}
 
-	public static BaseBlockSub register(String nameIn, ItemStack unCompressedItem, String langModID, SoundType soundIn, CreativeTabs tabIn) {
-		return register(nameIn, unCompressedItem, langModID, Material.IRON, soundIn, tabIn);
+	public static BaseBlockSub register(String nameIn, ItemStack unCompressedItem, String ownerMod, SoundType soundIn, CreativeTabs tabIn) {
+		return register(nameIn, unCompressedItem, ownerMod, Material.IRON, soundIn, tabIn);
 	}
 
-	public static BaseBlockSub register(String nameIn, ItemStack unCompressedItem, String langModID, CreativeTabs tabIn) {
-		return register(nameIn, unCompressedItem, langModID, Material.IRON, SoundType.METAL, tabIn);
+	public static BaseBlockSub register(String nameIn, ItemStack unCompressedItem, String ownerMod, CreativeTabs tabIn) {
+		return register(nameIn, unCompressedItem, ownerMod, Material.IRON, SoundType.METAL, tabIn);
 	}
 
 	/**
 	 * 
-	 * @param langModID
+	 * @param ownerMod
 	 *            the unCompressedItem owner modid, it use to the model
 	 * 
 	 * @author small_jiu
 	 */
-	public static BaseBlockSub register(String nameIn, ItemStack unCompressedItem, String langModID) {
-		return register(nameIn, unCompressedItem, langModID, MCS.COMPERESSED_BLOCKS);
+	public static BaseBlockSub register(String nameIn, ItemStack unCompressedItem, String ownerMod) {
+		return register(nameIn, unCompressedItem, ownerMod, MCS.COMPERESSED_BLOCKS);
 	}
 
 	/**
@@ -112,65 +112,70 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 		return register(nameIn, unCompressedItem, unCompressedItem.getItem().getRegistryName().getResourceDomain());
 	}
 
-	public static BaseBlockSub register(ItemStack unCompressedItem, String langModID) {
-		return register("compressed_" + unCompressedItem.getItem().getRegistryName().getResourcePath(), unCompressedItem, langModID);
+	public static BaseBlockSub register(ItemStack unCompressedItem, String ownerMod) {
+		return register("compressed_" + unCompressedItem.getItem().getRegistryName().getResourcePath(), unCompressedItem, ownerMod);
 	}
 
 	public static BaseBlockSub register(ItemStack unCompressedItem) {
 		return register("compressed_" + unCompressedItem.getItem().getRegistryName().getResourcePath(), unCompressedItem);
 	}
 
-	public BaseBlockSub(String nameIn, @Nonnull ItemStack unCompressedItem, String langModID, Material materialIn, SoundType soundIn, CreativeTabs tabIn, float hardnessIn) {
+	public BaseBlockSub(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, Material materialIn, SoundType soundIn, CreativeTabs tabIn, float hardnessIn) {
 		super(nameIn, unCompressedItem, materialIn, soundIn, tabIn, hardnessIn, true);
 		this.recipeIsRepeat = this.checkRecipe(unCompressedItem);
-		this.langModID = langModID;
-		this.unCompressedBlock = this.isHasBlock() ? JiuUtils.item.getBlockFromItemStack(unCompressedItem) : Blocks.AIR;
-		this.unCompressedState = this.isHasBlock() ? JiuUtils.item.getStateFromItemStack(unCompressedItem) : Blocks.AIR.getDefaultState();
-		if(!langModID.equals("custom")) {
+		this.ownerMod = ownerMod;
+		this.unCompressedBlock = this.isHas() ? JiuUtils.item.getBlockFromItemStack(unCompressedItem) : Blocks.AIR;
+		this.unCompressedState = this.isHas() ? JiuUtils.item.getStateFromItemStack(unCompressedItem) : Blocks.AIR.getDefaultState();
+		if(!ownerMod.equals("custom")) {
 			MCSResources.SUB_BLOCKS_NAME.add(nameIn);
 			MCSResources.SUB_BLOCKS.add(this);
 			MCSResources.SUB_BLOCKS_MAP.put(nameIn, this);
 		}
 		this.setDefaultState(this.blockState.getBaseState().withProperty(VARIANT, ModSubtypes.LEVEL_1));
+		RegisterModel.NeedToRegistryModel.add(this);
 	}
 
-	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String langModID, Material materialIn, SoundType soundIn, CreativeTabs tabIn) {
-		this(nameIn, unCompressedItem, langModID, materialIn, soundIn, tabIn, 4.0F);
+	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String ownerMod, Material materialIn, SoundType soundIn, CreativeTabs tabIn) {
+		this(nameIn, unCompressedItem, ownerMod, materialIn, soundIn, tabIn, 4.0F);
 	}
 
-	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String langModID, Material materialIn, CreativeTabs tabIn) {
-		this(nameIn, unCompressedItem, langModID, materialIn, SoundType.METAL, tabIn);
+	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String ownerMod, Material materialIn, CreativeTabs tabIn) {
+		this(nameIn, unCompressedItem, ownerMod, materialIn, SoundType.METAL, tabIn);
 	}
 
-	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String langModID, SoundType soundIn, CreativeTabs tabIn) {
-		this(nameIn, unCompressedItem, langModID, Material.IRON, soundIn, tabIn);
+	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String ownerMod, SoundType soundIn, CreativeTabs tabIn) {
+		this(nameIn, unCompressedItem, ownerMod, Material.IRON, soundIn, tabIn);
 	}
 
-	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String langModID, CreativeTabs tabIn, float hardnessIn) {
-		this(nameIn, unCompressedItem, langModID, Material.IRON, SoundType.METAL, tabIn, hardnessIn);
+	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String ownerMod, CreativeTabs tabIn, float hardnessIn) {
+		this(nameIn, unCompressedItem, ownerMod, Material.IRON, SoundType.METAL, tabIn, hardnessIn);
 	}
 
-	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String langModID, float hardnessIn) {
-		this(nameIn, unCompressedItem, langModID, MCS.COMPERESSED_BLOCKS, hardnessIn);
+	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String ownerMod, float hardnessIn) {
+		this(nameIn, unCompressedItem, ownerMod, MCS.COMPERESSED_BLOCKS, hardnessIn);
 	}
 
-	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String langModID, CreativeTabs tabIn) {
-		this(nameIn, unCompressedItem, langModID, Material.IRON, tabIn);
+	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String ownerMod, CreativeTabs tabIn) {
+		this(nameIn, unCompressedItem, ownerMod, Material.IRON, tabIn);
 	}
 
-	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String langModID) {
-		this(nameIn, unCompressedItem, langModID, MCS.COMPERESSED_BLOCKS);
+	public BaseBlockSub(String nameIn, ItemStack unCompressedItem, String ownerMod) {
+		this(nameIn, unCompressedItem, ownerMod, MCS.COMPERESSED_BLOCKS);
 	}
 
-	public BaseBlockSub(ItemStack unCompressedItem, String langModID) {
-		this("compressed_" + unCompressedItem.getItem().getRegistryName().getResourcePath(), unCompressedItem, langModID, MCS.COMPERESSED_BLOCKS);
+	public BaseBlockSub(ItemStack unCompressedItem, String ownerMod) {
+		this("compressed_" + unCompressedItem.getItem().getRegistryName().getResourcePath(), unCompressedItem, ownerMod);
 	}
 
 	/**
 	 * default is minecraft owner unCompressedItem
 	 */
 	public BaseBlockSub(String nameIn, ItemStack unCompressedItem) {
-		this(nameIn, unCompressedItem, "minecraft");
+		this(nameIn, unCompressedItem, unCompressedItem.getItem().getRegistryName().getResourceDomain());
+	}
+
+	public BaseBlockSub(ItemStack unCompressedItem) {
+		this(unCompressedItem, unCompressedItem.getItem().getRegistryName().getResourceDomain());
 	}
 
 	public BaseBlockSub setUnCompressed(ItemStack stack) {
@@ -220,12 +225,12 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 		return this.createOredict;
 	}
 
-	public boolean isHasBlock() {
+	public boolean isHas() {
 		return !JiuUtils.item.isBlock(this.unCompressedItem);
 	}
 
 	public String getOwnerMod() {
-		return this.langModID;
+		return this.ownerMod;
 	}
 
 	public boolean checkRecipe(ItemStack unCompressedItem) {
@@ -367,7 +372,7 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.unCompressedItem, infoStacks);
 		MCSUtil.info.addCompressedInfo(meta, tooltip, this.getUnCompressedItemLocalizedName(), Item.getItemFromBlock(this));
 
-		if(MCS.instance.test_model) {
+		if(MCS.test()) {
 			NBTTagCompound nbt = stack.getTagCompound();
 			tooltip.add("unCompressedItem: " + this.unCompressedItem.getItem().getRegistryName() + "." + this.unCompressedItem.getItemDamage());
 
@@ -415,15 +420,15 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void registerItemModel() {
+	public void getItemModel() {
 		String has = this.unCompressedItem.getItem() instanceof ItemBlock ? "normal" : "has";
 		if(this.state != null)
 			has = this.state;
 
-		model.setBlockStateMapper(this, false, this.langModID + "/" + has + "/" + this.name);
+		model.setBlockStateMapper(this, false, this.ownerMod + "/" + has + "/" + this.name);
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
-			model.registerItemModel(this, meta, this.langModID + "/block/" + has + "/" + this.name, this.name + "." + meta);
+			model.registerItemModel(this, meta, this.ownerMod + "/block/" + has + "/" + this.name, this.name + "." + meta);
 		}
 	}
 
@@ -442,12 +447,12 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 	@Override
 	public String getHarvestTool(IBlockState state) {
 		if(!HarvestMap.isEmpty()) {
-			if(HarvestMap.containsKey(JiuUtils.item.getMetaFormBlockState(state))) {
-				return HarvestMap.get(JiuUtils.item.getMetaFormBlockState(state)).getHarvestTool();
-			}else if(!this.isHasBlock()) {
+			if(HarvestMap.containsKey(JiuUtils.item.getMetaFromBlockState(state))) {
+				return HarvestMap.get(JiuUtils.item.getMetaFromBlockState(state)).getHarvestTool();
+			}else if(!this.isHas()) {
 				return this.getUnCompressedBlock().getHarvestTool(this.getUnCompressedState());
 			}
-		}else if(!this.isHasBlock()) {
+		}else if(!this.isHas()) {
 			return this.getUnCompressedBlock().getHarvestTool(this.getUnCompressedState());
 		}
 		return super.getHarvestTool(state);
@@ -481,12 +486,12 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 			return 0;
 		}
 		if(!HarvestMap.isEmpty()) {
-			if(HarvestMap.containsKey(JiuUtils.item.getMetaFormBlockState(state))) {
-				return HarvestMap.get(JiuUtils.item.getMetaFormBlockState(state)).getHarvestLevel();
-			}else if(!this.isHasBlock()) {
+			if(HarvestMap.containsKey(JiuUtils.item.getMetaFromBlockState(state))) {
+				return HarvestMap.get(JiuUtils.item.getMetaFromBlockState(state)).getHarvestLevel();
+			}else if(!this.isHas()) {
 				return this.getUnCompressedBlock().getHarvestLevel(this.getUnCompressedState());
 			}
-		}else if(!this.isHasBlock()) {
+		}else if(!this.isHas()) {
 			return this.getUnCompressedBlock().getHarvestLevel(this.getUnCompressedState());
 		}
 		return super.getHarvestLevel(state);
@@ -534,12 +539,12 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 	@Override
 	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
 		if(HardnessMap != null && !HardnessMap.isEmpty()) {
-			if(HardnessMap.containsKey(JiuUtils.item.getMetaFormBlockState(world.getBlockState(pos)))) {
-				return HardnessMap.get(JiuUtils.item.getMetaFormBlockState(world.getBlockState(pos)));
-			}else if(!this.isHasBlock()) {
+			if(HardnessMap.containsKey(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)))) {
+				return HardnessMap.get(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)));
+			}else if(!this.isHas()) {
 				return this.getUnCompressedBlock().getBlockHardness(this.getUnCompressedState(), world, pos);
 			}
-		}else if(!this.isHasBlock()) {
+		}else if(!this.isHas()) {
 			return this.getUnCompressedBlock().getBlockHardness(this.getUnCompressedState(), world, pos);
 		}
 		return super.getBlockHardness(blockState, world, pos);
@@ -555,12 +560,12 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 	@Override
 	public boolean isBeaconBase(IBlockAccess world, BlockPos pos, BlockPos beacon) {
 		if(!BeaconBaseMap.isEmpty()) {
-			if(BeaconBaseMap.containsKey(JiuUtils.item.getMetaFormBlockState(world.getBlockState(pos)))) {
-				return BeaconBaseMap.get(JiuUtils.item.getMetaFormBlockState(world.getBlockState(pos)));
-			}else if(!this.isHasBlock()) {
+			if(BeaconBaseMap.containsKey(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)))) {
+				return BeaconBaseMap.get(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)));
+			}else if(!this.isHas()) {
 				return this.getUnCompressedBlock().isBeaconBase(world, pos, beacon);
 			}
-		}else if(!this.isHasBlock()) {
+		}else if(!this.isHas()) {
 			return this.getUnCompressedBlock().isBeaconBase(world, pos, beacon);
 		}
 
@@ -569,7 +574,7 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 
 	@Override
 	public boolean isNormalCube(IBlockState state, IBlockAccess world, BlockPos pos) {
-		return this.isHasBlock() ? this.unCompressedBlock.isNormalCube(this.unCompressedState, world, pos) : super.isNormalCube(state, world, pos);
+		return this.isHas() ? this.unCompressedBlock.isNormalCube(this.unCompressedState, world, pos) : super.isNormalCube(state, world, pos);
 	}
 
 	private Map<Integer, Integer> LightValueMap = Maps.newHashMap();
@@ -582,12 +587,12 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 	@Override
 	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
 		if(!LightValueMap.isEmpty()) {
-			if(LightValueMap.containsKey(JiuUtils.item.getMetaFormBlockState(state))) {
-				return LightValueMap.get(JiuUtils.item.getMetaFormBlockState(state));
-			}else if(!this.isHasBlock()) {
+			if(LightValueMap.containsKey(JiuUtils.item.getMetaFromBlockState(state))) {
+				return LightValueMap.get(JiuUtils.item.getMetaFromBlockState(state));
+			}else if(!this.isHas()) {
 				return this.getUnCompressedBlock().getLightValue(this.getUnCompressedState(), world, pos);
 			}
-		}else if(!this.isHasBlock()) {
+		}else if(!this.isHas()) {
 			return this.getUnCompressedBlock().getLightValue(this.getUnCompressedState(), world, pos);
 		}
 
@@ -599,10 +604,10 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 	// @SuppressWarnings("deprecation")
 	// @Override
 	// public int getWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
-	//// return JiuUtils.item.getMetaFormBlockState(state);
+	//// return JiuUtils.item.getMetaFromBlockState(state);
 	// if(!WeakPowerMap.isEmpty()) {
-	// if(WeakPowerMap.containsKey(JiuUtils.item.getMetaFormBlockState(state))) {
-	// return WeakPowerMap.get(JiuUtils.item.getMetaFormBlockState(state));
+	// if(WeakPowerMap.containsKey(JiuUtils.item.getMetaFromBlockState(state))) {
+	// return WeakPowerMap.get(JiuUtils.item.getMetaFromBlockState(state));
 	// }else if(this.isHasBlock()) {
 	// return this.unCompressedBlock.getWeakPower(this.unCompressedState, world, pos, side);
 	// }
@@ -623,12 +628,12 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 	@Override
 	public float getExplosionResistance(World world, BlockPos pos, Entity exploder, Explosion explosion) {
 		if(!ExplosionResistanceMap.isEmpty()) {
-			if(ExplosionResistanceMap.containsKey(JiuUtils.item.getMetaFormBlockState(world.getBlockState(pos)))) {
-				return ExplosionResistanceMap.get(JiuUtils.item.getMetaFormBlockState(world.getBlockState(pos)));
-			}else if(!this.isHasBlock()) {
+			if(ExplosionResistanceMap.containsKey(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)))) {
+				return ExplosionResistanceMap.get(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)));
+			}else if(!this.isHas()) {
 				return this.getUnCompressedBlock().getExplosionResistance(world, pos, exploder, explosion);
 			}
-		}else if(!this.isHasBlock()) {
+		}else if(!this.isHas()) {
 			return this.getUnCompressedBlock().getExplosionResistance(world, pos, exploder, explosion);
 		}
 		return super.getExplosionResistance(world, pos, exploder, explosion);

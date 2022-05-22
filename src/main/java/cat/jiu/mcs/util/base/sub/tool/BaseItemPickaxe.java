@@ -25,6 +25,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
@@ -43,23 +44,19 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompressedStuff {
-	public static BaseItemPickaxe register(String name, ItemStack baseItem, String langModId, CreativeTabs tab, boolean hasSubtypes) {
+	public static BaseItemPickaxe register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
 		if(baseItem == null || baseItem.isEmpty()) {
 			return null;
 		}
-		if(Loader.isModLoaded(langModId) || langModId.equals("custom")) {
-			return new BaseItemPickaxe(baseItem, name);
+		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
+			return new BaseItemPickaxe(name, baseItem, ownerMod, tab);
 		}else {
 			return null;
 		}
 	}
 
-	public static BaseItemPickaxe register(String name, ItemStack baseItem, String langModId, CreativeTabs tab) {
-		return register(name, baseItem, langModId, tab, true);
-	}
-
-	public static BaseItemPickaxe register(String name, ItemStack baseItem, String langModId) {
-		return register(name, baseItem, langModId, MCS.COMPERESSED_ITEMS);
+	public static BaseItemPickaxe register(String name, ItemStack baseItem, String ownerMod) {
+		return register(name, baseItem, ownerMod, MCS.COMPERESSED_TOOLS);
 	}
 
 	private final ItemStack baseToolStack;
@@ -67,26 +64,31 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 	private final float baseAttackDamage;
 	private final String ownerMod;
 
-	public BaseItemPickaxe(ItemStack baseTool, String name) {
-		super(MCS.MODID, name, MCS.COMPERESSED_TOOLS, true, getToolMaterial(baseTool), ModSubtypes.values());
+	public BaseItemPickaxe(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab) {
+		super(MCS.MODID, name, tab, true, getToolMaterial(baseTool), ModSubtypes.values());
 		this.baseToolStack = baseTool;
 		if(baseTool.getItem() instanceof ItemPickaxe) {
 			this.baseTool = (ItemPickaxe) baseTool.getItem();
 		}else {
-			this.baseTool = null;
 			throw new NonToolException(baseTool, "Pickaxe");
 		}
-		this.ownerMod = this.baseTool.getRegistryName().getResourceDomain();
+		this.ownerMod = ownerMod;
 		this.baseAttackDamage = this.baseTool.attackDamage;
 		this.setMaxMetadata(16);
 
-		MCSResources.SUB_TOOLS.add(this);
-		MCSResources.SUB_TOOLS_NAME.add(name);
-		MCSResources.ITEMS.add(this);
-		MCSResources.ITEMS_NAME.add(name);
-		MCSResources.PICKAXES.add(this);
-		MCSResources.PICKAXES_NAME.add(name);
-		MCSResources.SUB_TOOLS_MAP.put(name, this);
+		if(!ownerMod.equals("custom")) {
+			MCSResources.SUB_TOOLS.add(this);
+			MCSResources.SUB_TOOLS_NAME.add(name);
+			MCSResources.ITEMS.add(this);
+			MCSResources.ITEMS_NAME.add(name);
+			MCSResources.PICKAXES.add(this);
+			MCSResources.PICKAXES_NAME.add(name);
+			MCSResources.SUB_TOOLS_MAP.put(name, this);
+		}
+	}
+
+	public BaseItemPickaxe(String name, ItemStack baseTool) {
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS);
 	}
 
 	private static ToolMaterial getToolMaterial(ItemStack baseItem) {
@@ -120,7 +122,7 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 			return this.EnchantabilityLevelMap.get(stack.getMetadata());
 		}
 		int enchantability = this.baseTool.getItemEnchantability(this.baseToolStack);
-		return (int) (enchantability + (enchantability * ((stack.getMetadata() + 1) * 0.29394)));
+		return (int) MCSUtil.item.getMetaValue(enchantability, stack);
 	}
 
 	public Map<Integer, ItemStack> RepairableMap = Maps.newHashMap();
@@ -151,7 +153,8 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 		if(!this.DestroySpeedMap.isEmpty() && this.DestroySpeedMap.containsKey(stack.getMetadata())) {
 			return this.DestroySpeedMap.get(stack.getMetadata());
 		}
-		return this.baseTool.getDestroySpeed(this.baseToolStack, state);
+		float base = this.baseTool.getDestroySpeed(this.baseToolStack, state);
+		return (float) MCSUtil.item.getMetaValue(base, stack);
 	}
 
 	public Map<Integer, Integer> MaxDamageMap = Maps.newHashMap();
@@ -163,6 +166,7 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 
 	@Override
 	public int getMaxDamage(ItemStack stack) {
+		if(stack.getMetadata() >= 32766) return 998;
 		if(!this.MaxDamageMap.isEmpty() && this.MaxDamageMap.containsKey(stack.getMetadata())) {
 			return this.MaxDamageMap.get(stack.getMetadata());
 		}
@@ -352,16 +356,12 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 			tooltip.add(I18n.format("info.mcs.owner_mod") + " : " + TextFormatting.AQUA.toString() + this.getOwnerMod());
 		}
 
-		if(MCS.instance.test_model) {
+		if(MCS.test()) {
 			tooltip.add("最大耐久: " + this.getMaxDamage(stack));
 		}
 
 		MCSUtil.info.addMetaInfo(meta, tooltip, this.infos, this.metaInfos);
 		MCSUtil.info.addShiftInfo(meta, tooltip, this.shiftInfos, this.metaShiftInfos);
-
-		if(meta == (Short.MAX_VALUE - 1)) {
-			tooltip.add("感谢喵呜玖大人的恩惠！");
-		}
 	}
 
 	@Override
@@ -371,12 +371,25 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 
 	@Override
 	public void getItemModel() {
-		super.getItemModel();
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
 			this.model.registerItemModel(this, meta, this.ownerMod + "/item/tools/pickaxe/" + this.name, this.name + "." + meta);
 		}
 		this.model.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/tools/pickaxe/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+	}
+	
+	@Override
+	public void setDamage(ItemStack stack, int damage) {
+		if(stack.getMetadata() < 32766) {
+			super.setDamage(stack, damage);
+		}
+	}
+	
+	@Override
+	public void damageItem(ItemStack stack, int amount, EntityLivingBase entity) {
+		if(stack.getMetadata() < 32766) {
+			super.damageItem(stack, amount, entity);
+		}
 	}
 
 	public String getOwnerMod() {

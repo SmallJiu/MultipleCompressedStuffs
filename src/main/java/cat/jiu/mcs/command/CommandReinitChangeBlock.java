@@ -1,6 +1,7 @@
 package cat.jiu.mcs.command;
 
-import cat.jiu.mcs.util.base.BaseCommand;
+import cat.jiu.core.util.base.BaseCommand;
+import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.util.init.MCSBlocks;
 
 import net.minecraft.command.CommandException;
@@ -10,8 +11,8 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
 public class CommandReinitChangeBlock extends BaseCommand.CommandNormal {
-	public CommandReinitChangeBlock(String name, boolean checkPermission, int level) {
-		super(name, checkPermission, level);
+	public CommandReinitChangeBlock(String name, int level) {
+		super(name, MCS.MODID, level);
 	}
 
 	@Override

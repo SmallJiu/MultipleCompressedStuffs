@@ -15,7 +15,7 @@ public class OtherModBlockChange implements IPlayerPlaceBlock {
 	public void onPlayerPlaceBlock(EntityPlayer player, BlockPos pos, World world, IBlockState placedBlock, IBlockState placeedAgainst) {
 		String name = placedBlock.getBlock().getRegistryName().toString();
 		if(MCSBlocks.CHANGE_OTHER_BLOCK_MAP.containsKey(name)) {
-			int meta = JiuUtils.item.getMetaFormBlockState(placedBlock);
+			int meta = JiuUtils.item.getMetaFromBlockState(placedBlock);
 			world.setTileEntity(pos, new TileEntityChangeBlock(meta, MCSBlocks.CHANGE_OTHER_BLOCK_MAP.get(name)));
 		}
 	}

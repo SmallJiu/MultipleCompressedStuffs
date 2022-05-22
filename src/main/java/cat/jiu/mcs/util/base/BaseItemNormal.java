@@ -1,14 +1,15 @@
 package cat.jiu.mcs.util.base;
 
 import cat.jiu.mcs.MCS;
-import cat.jiu.mcs.api.IHasModel;
 
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import cat.jiu.core.api.IHasModel;
 import cat.jiu.core.util.RegisterModel;
 import cat.jiu.mcs.util.init.MCSResources;
+
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -29,6 +30,7 @@ public class BaseItemNormal extends Item implements IHasModel {
 		this.setUnlocalizedName("mcs." + this.name);
 		this.setCreativeTab(this.tab);
 		this.setRegistryName(this.name);
+		RegisterModel.NeedToRegistryModel.add(this);
 		MCSResources.ITEMS.add(this);
 		MCSResources.ITEMS_NAME.add(this.name);
 	}
@@ -53,7 +55,7 @@ public class BaseItemNormal extends Item implements IHasModel {
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void registerItemModel() {
+	public void getItemModel() {
 		new RegisterModel(MCS.MODID).registerItemModel(this, "normal/items", this.name);
 	}
 }

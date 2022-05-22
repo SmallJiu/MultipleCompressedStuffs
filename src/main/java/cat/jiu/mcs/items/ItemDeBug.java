@@ -69,10 +69,4 @@ public class ItemDeBug extends BaseItem.Normal {
 			items.add(JiuUtils.nbt.setItemNBT(new ItemStack(this), "nobreak", (byte) 1));
 		}
 	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void getItemModel() {
-		this.model.registerItemModel(this, "normal/items", this.name);
-	}
 }

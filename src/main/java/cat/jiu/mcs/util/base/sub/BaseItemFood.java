@@ -12,8 +12,8 @@ import com.google.common.collect.Maps;
 import cat.jiu.core.util.RegisterModel;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
-import cat.jiu.mcs.api.IHasModel;
 import cat.jiu.mcs.config.Configs;
+import cat.jiu.core.api.IHasModel;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
@@ -39,19 +39,19 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuff {
-	public static BaseItemFood register(String name, ItemStack baseItem, String langModId, CreativeTabs tab) {
+	public static BaseItemFood register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
 		if(baseItem == null || baseItem.isEmpty()) {
 			return null;
 		}
-		if(Loader.isModLoaded(langModId) || langModId.equals("custom")) {
-			return new BaseItemFood(name, baseItem.getItem(), baseItem.getMetadata(), langModId, tab, true);
+		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
+			return new BaseItemFood(name, baseItem.getItem(), baseItem.getMetadata(), ownerMod, tab, true);
 		}else {
 			return null;
 		}
 	}
 
-	public static BaseItemFood register(String name, ItemStack baseItem, String langModId) {
-		return register(name, baseItem, langModId, MCS.COMPERESSED_ITEMS);
+	public static BaseItemFood register(String name, ItemStack baseItem, String ownerMod) {
+		return register(name, baseItem, ownerMod, MCS.COMPERESSED_ITEMS);
 	}
 
 	protected final String name;
@@ -59,11 +59,11 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 	protected Item baseFoodItem = null;
 	protected ItemFood baseFood = null;
 	protected final ItemStack unCompressedItem;
-	protected final String langModId;
+	protected final String ownerMod;
 	protected final boolean baseItemIsNotFood;
 	protected final RegisterModel model = new RegisterModel(MCS.MODID);
 
-	public BaseItemFood(String name, Item baseFood, int meta, String langModId, CreativeTabs tab, float saturation, boolean isWolfFood, boolean hasSubtypes) {
+	public BaseItemFood(String name, Item baseFood, int meta, String ownerMod, CreativeTabs tab, float saturation, boolean isWolfFood, boolean hasSubtypes) {
 		super(8, saturation, isWolfFood);
 		this.name = name;
 		this.tab = tab;
@@ -77,35 +77,36 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 			this.unCompressedItem = new ItemStack(this.baseFood, 1, meta);
 		}
 
-		this.langModId = langModId;
+		this.ownerMod = ownerMod;
 		this.setHasSubtypes(hasSubtypes);
 		this.setUnlocalizedName("mcs." + this.name);
 		this.setCreativeTab(this.tab);
 		this.setNoRepair();
 		this.setRegistryName(this.name);
-		if(!langModId.equals("custom")) {
+		if(!ownerMod.equals("custom")) {
 			MCSResources.ITEMS_NAME.add(name);
 			MCSResources.FOODS_NAME.add(name);
 			MCSResources.ITEMS.add((Item) this);
 			MCSResources.FOODS.add(this);
 			MCSResources.FOODS_MAP.put(this.name, this);
 		}
+		RegisterModel.NeedToRegistryModel.add(this);
 	}
 
-	public BaseItemFood(String name, Item baseFood, int meta, String langModId, CreativeTabs tab, boolean isWolfFood, boolean hasSubtypes) {
-		this(name, baseFood, meta, langModId, tab, 0.6F, isWolfFood, hasSubtypes);
+	public BaseItemFood(String name, Item baseFood, int meta, String ownerMod, CreativeTabs tab, boolean isWolfFood, boolean hasSubtypes) {
+		this(name, baseFood, meta, ownerMod, tab, 0.6F, isWolfFood, hasSubtypes);
 	}
 
-	public BaseItemFood(String name, Item baseFood, int meta, String langModId, CreativeTabs tab, boolean hasSubtypes) {
-		this(name, baseFood, meta, langModId, tab, false, hasSubtypes);
+	public BaseItemFood(String name, Item baseFood, int meta, String ownerMod, CreativeTabs tab, boolean hasSubtypes) {
+		this(name, baseFood, meta, ownerMod, tab, false, hasSubtypes);
 	}
 
-	public BaseItemFood(String name, Item baseFood, int meta, String langModId, CreativeTabs tab) {
-		this(name, baseFood, meta, langModId, tab, true);
+	public BaseItemFood(String name, Item baseFood, int meta, String ownerMod, CreativeTabs tab) {
+		this(name, baseFood, meta, ownerMod, tab, true);
 	}
 
-	public BaseItemFood(String name, Item baseFood, int meta, String langModId) {
-		this(name, baseFood, meta, langModId, MCS.COMPERESSED_ITEMS);
+	public BaseItemFood(String name, Item baseFood, int meta, String ownerMod) {
+		this(name, baseFood, meta, ownerMod, MCS.COMPERESSED_ITEMS);
 	}
 
 	public BaseItemFood(String name, Item baseFood, int meta) {
@@ -137,7 +138,7 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 	}
 
 	public String getOwnerMod() {
-		return this.langModId;
+		return this.ownerMod;
 	}
 
 	private boolean makeRecipe = true;
@@ -498,7 +499,7 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.unCompressedItem, infoStacks);
 		MCSUtil.info.addCompressedInfo(meta, tooltip, this.getUnCompressedItemLocalizedName(), this);
 
-		if(MCS.instance.test_model) {
+		if(MCS.test()) {
 			String[] names = JiuUtils.other.custemSplitString(this.name, "_");
 			tooltip.add(names.length + " : " + this.getUnCompressedName());
 		}
@@ -530,18 +531,15 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 
 		MCSUtil.info.addMetaInfo(meta, tooltip, this.infos, this.metaInfos);
 		MCSUtil.info.addShiftInfo(meta, tooltip, this.shiftInfos, this.metaShiftInfos);
-		if(meta == (Short.MAX_VALUE - 1)) {
-			tooltip.add("感谢喵呜玖大人的恩惠！");
-		}
 	}
 
 	@Override
-	public void registerItemModel() {
+	public void getItemModel() {
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
-			model.registerItemModel(this, meta, this.langModId + "/item/food/" + this.name, this.name + "." + meta);
+			model.registerItemModel(this, meta, this.ownerMod + "/item/food/" + this.name, this.name + "." + meta);
 		}
-		model.registerItemModel(this, (Short.MAX_VALUE - 1), this.langModId + "/item/food/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+		model.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/food/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
 	}
 
 	public final Item getUnCompressedItem() {

@@ -11,10 +11,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cat.jiu.core.util.JiuUtils;
-import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.base.sub.BaseBlockSub.HarvestType;
 import cat.jiu.mcs.util.type.CustomStuffType;
 import cat.jiu.mcs.util.type.CustomStuffType.ToolModifiersType;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
@@ -130,7 +130,7 @@ public class InitCustomItem {
 				JsonObject ContainerObject = obj.get("result").getAsJsonObject();
 				for(Entry<String, JsonElement> container : ContainerObject.entrySet()) {
 					int meta = Integer.parseInt(container.getKey());
-					ItemStack stack = MCSUtil.item.getStack(container.getValue().getAsString());
+					ItemStack stack = JiuUtils.item.toStack(container.getValue());
 
 					if(meta == -1) {
 						for(int meta0 = 0; meta0 < 16; meta0++) {
@@ -141,7 +141,7 @@ public class InitCustomItem {
 					}
 				}
 			}else if(obj.get("result").isJsonPrimitive()) {
-				ItemStack container = MCSUtil.item.getStack(obj.get("result").getAsString());
+				ItemStack container = JiuUtils.item.toStack(obj.get("result"));
 				for(int meta = 0; meta < 16; meta++) {
 					put(ContainerMap, meta, container);
 				}
@@ -217,7 +217,7 @@ public class InitCustomItem {
 
 				for(Entry<String, JsonElement> objEntry : obj.entrySet()) {
 					int meta = Integer.parseInt(objEntry.getKey());
-					ItemStack repair = MCSUtil.item.getStack(objEntry.getValue().getAsString());
+					ItemStack repair = JiuUtils.item.toStack(objEntry.getValue());
 
 					if(meta == -1) {
 						for(int i = 0; i < 16; i++) {
@@ -228,7 +228,7 @@ public class InitCustomItem {
 					}
 				}
 			}else if(json.get("RepairStack").isJsonPrimitive()) {
-				ItemStack repair = MCSUtil.item.getStack(json.get("RepairStack").getAsString());
+				ItemStack repair = JiuUtils.item.toStack(json.get("RepairStack"));
 				for(int meta = 0; meta < 16; meta++) {
 					put(RepairableStackMap, meta, repair);
 				}
@@ -405,7 +405,7 @@ public class InitCustomItem {
 					List<IBlockState> blocks = Lists.newArrayList();
 					if(entryArray.size() > 0) {
 						for(int i = 0; i < entryArray.size(); i++) {
-							ItemStack stack = MCSUtil.item.getStack(entryArray.get(i).getAsString());
+							ItemStack stack = JiuUtils.item.toStack(entryArray.get(i));
 							if(JiuUtils.item.isBlock(stack)) {
 								blocks.add(JiuUtils.item.getStateFromItemStack(stack));
 							}
@@ -424,7 +424,7 @@ public class InitCustomItem {
 				JsonArray array = (JsonArray) e;
 				if(array.size() > 0) {
 					for(int i = 0; i < array.size(); i++) {
-						ItemStack stack = MCSUtil.item.getStack(array.get(i).getAsString());
+						ItemStack stack = JiuUtils.item.toStack(array.get(i));
 						if(JiuUtils.item.isBlock(stack)) {
 							for(int meta = 0; meta < 16; meta++) {
 								put(block, meta, Lists.newArrayList(JiuUtils.item.getStateFromItemStack(stack)));
@@ -433,7 +433,7 @@ public class InitCustomItem {
 					}
 				}
 			}else if(e.isJsonPrimitive()) {
-				ItemStack stack = MCSUtil.item.getStack(e.getAsString());
+				ItemStack stack = JiuUtils.item.toStack(e);
 				if(JiuUtils.item.isBlock(stack)) {
 					for(int meta = 0; meta < 16; meta++) {
 						put(block, meta, Lists.newArrayList(JiuUtils.item.getStateFromItemStack(stack)));
@@ -687,7 +687,7 @@ public class InitCustomItem {
 			Map<Integer, ItemStack> InfoStackMap = Maps.newHashMap();
 
 			if(!obj.get("infoStack").isJsonObject()) {
-				ItemStack infoStack = MCSUtil.item.getStack(obj.get("infoStack").getAsString());
+				ItemStack infoStack = JiuUtils.item.toStack(obj.get("infoStack"));
 				for(int meta = 0; meta < 16; meta++) {
 					put(InfoStackMap, meta, infoStack);
 				}
@@ -695,7 +695,7 @@ public class InitCustomItem {
 				JsonObject infoObject = obj.get("infoStack").getAsJsonObject();
 				for(Entry<String, JsonElement> infoElement : infoObject.entrySet()) {
 					int meta = Integer.parseInt(infoElement.getKey());
-					ItemStack infoStacks = MCSUtil.item.getStack(infoElement.getValue().getAsString());
+					ItemStack infoStacks = JiuUtils.item.toStack(infoElement.getValue());
 					if(meta == -1) {
 						for(int meta0 = 0; meta0 < 16; meta0++) {
 							put(InfoStackMap, meta0, infoStacks);

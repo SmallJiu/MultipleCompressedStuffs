@@ -1,6 +1,8 @@
 package cat.jiu.mcs.command;
 
-import cat.jiu.mcs.util.base.BaseCommand;
+import cat.jiu.core.util.base.BaseCommand;
+import cat.jiu.mcs.MCS;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
@@ -9,9 +11,8 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 
 public class CommandGetModList extends BaseCommand.CommandNormal {
-
-	public CommandGetModList(String name, boolean checkPermission, int level) {
-		super(name, checkPermission, level);
+	public CommandGetModList(String name, int level) {
+		super(name, MCS.MODID, level);
 	}
 
 	@Override

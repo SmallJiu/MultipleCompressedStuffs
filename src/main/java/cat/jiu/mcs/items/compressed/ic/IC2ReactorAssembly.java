@@ -2,7 +2,9 @@ package cat.jiu.mcs.items.compressed.ic;
 
 import java.util.List;
 
+import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
+import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.base.sub.BaseItemSub;
 
 import ic2.api.item.ICustomDamageItem;
@@ -13,12 +15,13 @@ import ic2.core.init.Localization;
 import ic2.core.item.BaseElectricItem;
 import ic2.core.util.LogCategory;
 import ic2.core.util.StackUtil;
-
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 public class IC2ReactorAssembly extends BaseItemSub implements IReactorComponent, ICustomDamageItem {
@@ -31,13 +34,13 @@ public class IC2ReactorAssembly extends BaseItemSub implements IReactorComponent
 		if(baseItem.getItem() instanceof IReactorComponent) {
 			this.baseComponent = (IReactorComponent) baseItem.getItem();
 		}else {
-			throw new RuntimeException(baseItem.toString() + " is NOT ReactorComponent");
+			throw new RuntimeException(JiuUtils.item.toString(baseItem) + " is NOT ReactorComponent");
 		}
 		if(baseItem.getItem() instanceof ICustomDamageItem) {
 			this.baseDamageItem = (ICustomDamageItem) baseItem.getItem();
 		}else {
 			this.baseDamageItem = null;
-			MCS.instance.log.error(baseItem.toString() + " has NOT Damage");
+			MCS.instance.log.error(JiuUtils.item.toString(baseItem) + " has NOT Damage");
 		}
 	}
 
@@ -49,13 +52,18 @@ public class IC2ReactorAssembly extends BaseItemSub implements IReactorComponent
 	@Override
 	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
 		if(this.baseDamageItem != null) {
-			tooltip.add(Localization.translate("ic2.reactoritem.durability") + " " + (this.getMaxBigDamage(stack) - this.getBigDamage(stack)) + "/" + this.getMaxBigDamage(stack));
+			if(stack.getMetadata() == 32766) {
+				tooltip.add(Localization.translate("ic2.reactoritem.durability") + " " + TextFormatting.BOLD + TextFormatting.AQUA + I18n.format("item.unbreakable"));
+			}else {
+				tooltip.add(Localization.translate("ic2.reactoritem.durability") + " " + (this.getMaxBigDamage(stack) - this.getBigDamage(stack)) + "/" + this.getMaxBigDamage(stack));
+			}
 		}
 		super.addInformation(stack, world, tooltip, advanced);
 	}
 
 	@Override
 	public boolean showDurabilityBar(ItemStack stack) {
+		if(stack.getMetadata() == 32766) return false;
 		return this.getBigDamage(stack) > 0;
 	}
 
@@ -77,11 +85,11 @@ public class IC2ReactorAssembly extends BaseItemSub implements IReactorComponent
 	}
 
 	public long getMaxBigDamage(ItemStack stack) {
-		if(this.baseDamageItem != null) {
+		if(this.baseDamageItem != null && stack.getMetadata() < 32766) {
 			int base = this.baseDamageItem.getMaxCustomDamage(this.unCompressedItem);
-			return (long) (base + (base * ((stack.getMetadata() + 1) * 1.968)));
+			return (long) MCSUtil.item.getMetaValue(base, stack);
 		}
-		return Long.MAX_VALUE;
+		return Integer.MAX_VALUE;
 	}
 
 	@Override
@@ -90,8 +98,10 @@ public class IC2ReactorAssembly extends BaseItemSub implements IReactorComponent
 	}
 
 	public void setBigDamage(ItemStack stack, long damage) {
-		NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-		nbt.setLong("advDmg", damage);
+		if(stack.getMetadata() < 32766) {
+			NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
+			nbt.setLong("advDmg", damage);
+		}
 	}
 
 	@Override

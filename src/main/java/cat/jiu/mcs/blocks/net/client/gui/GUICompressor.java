@@ -3,7 +3,7 @@ package cat.jiu.mcs.blocks.net.client.gui;
 import java.awt.Color;
 import java.math.BigInteger;
 
-import cat.jiu.core.energy.EnergyUtils;
+import cat.jiu.core.capability.EnergyUtils;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.net.NetworkHandler;

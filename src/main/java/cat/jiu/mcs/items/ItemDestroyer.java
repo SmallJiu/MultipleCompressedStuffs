@@ -5,6 +5,7 @@ import java.util.List;
 import cat.jiu.core.util.JiuRandom;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.base.BaseItemNormal;
+
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;

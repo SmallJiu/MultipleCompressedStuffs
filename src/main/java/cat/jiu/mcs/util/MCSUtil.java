@@ -4,7 +4,6 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.util.base.BaseBlockItem;
@@ -25,6 +24,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -33,33 +33,6 @@ public class MCSUtil {
 	public static final ItemUtil item = new ItemUtil();
 
 	public static class ItemUtil {
-		public ItemStack getStack(String stack) throws NumberFormatException {
-			if(stack.contains("@")) {
-				String[] name = JiuUtils.other.custemSplitString(stack.toLowerCase(), "@");
-				Item item = null;
-				int meta = 0;
-				int amount = 1;
-
-				if(name.length == 3) {
-					item = Item.getByNameOrId(name[0]);
-					amount = Integer.parseInt(name[1]);
-					meta = Integer.parseInt(name[2]);
-				}else if(name.length == 2) {
-					item = Item.getByNameOrId(name[0]);
-					amount = Integer.parseInt(name[1]);
-				}else {
-					item = Item.getByNameOrId(name[0]);
-				}
-				if(item != null) {
-					return new ItemStack(item, amount, meta);
-				}
-			}else {
-				return new ItemStack(Item.getByNameOrId(stack));
-			}
-
-			return null;
-		}
-
 		public double getMetaValue(double baseValue, ItemStack stack) {
 			return this.getMetaValue(baseValue, stack.getMetadata());
 		}
@@ -68,16 +41,19 @@ public class MCSUtil {
 			return baseValue + (baseValue * ((meta + 1) * 1.527));
 		}
 
-		public void getSubItems(Item item, CreativeTabs tab, NonNullList<ItemStack> items) {
-			if(item.getHasSubtypes()) {
-				if(this.isInCreativeTab(item, tab)) {
+		public void getSubItems(ICompressedStuff compitem, CreativeTabs tab, NonNullList<ItemStack> items) {
+			Item item = compitem.getItem();
+			if(item == null || item == Items.AIR) return;
+			if(this.isInCreativeTab(item, tab)) {
+				if(item.getHasSubtypes()) {
 					for(ModSubtypes type : ModSubtypes.values()) {
-						items.add(new ItemStack(item, 1, type.getMeta()));
+						items.add(compitem.getStack(type.getMeta()));
 					}
-					items.add(new ItemStack(item, 1, Short.MAX_VALUE - 1));
+					items.add(compitem.getStack(Short.MAX_VALUE - 1));
+				}else {
+					items.add(new ItemStack(item));
+//					item.getItem().getSubItems(tab, items);
 				}
-			}else {
-				item.getSubItems(tab, items);
 			}
 		}
 
@@ -107,7 +83,7 @@ public class MCSUtil {
 		}
 
 		public boolean isCompressedItem(ItemStack stack) {
-			if(item == null) {
+			if(stack == null) {
 				return false;
 			}
 			return this.isCompressedItem(stack.getItem());
@@ -117,17 +93,14 @@ public class MCSUtil {
 			if(item == null || item == Items.AIR) {
 				return false;
 			}
-			if(item instanceof ICompressedStuff) {
-				return true;
-			}
-			return false;
+			return item instanceof ICompressedStuff;
 		}
 
-		public int getUnCompressedBurnTime(ItemStack item) {
-			if(item == null) {
+		public int getUnCompressedBurnTime(ItemStack stack) {
+			if(stack == null) {
 				return -1;
 			}
-			return this.getUnCompressedBurnTime(item.getItem());
+			return this.getUnCompressedBurnTime(stack.getItem());
 		}
 
 		public int getUnCompressedBurnTime(Item item) {
@@ -140,11 +113,11 @@ public class MCSUtil {
 			return -1;
 		}
 
-		public boolean canMakeDefaultStackRecipe(ItemStack item) {
-			if(item == null) {
+		public boolean canMakeDefaultStackRecipe(ItemStack stack) {
+			if(stack == null) {
 				return false;
 			}
-			return this.canMakeDefaultStackRecipe(item.getItem());
+			return this.canMakeDefaultStackRecipe(stack.getItem());
 		}
 
 		public boolean canMakeDefaultStackRecipe(Item item) {
@@ -194,6 +167,9 @@ public class MCSUtil {
 						tooltip.add(I18n.format("info.mcs.shift"));
 					}
 				}
+			}
+			if(GuiScreen.isShiftKeyDown() && meta >= Short.MAX_VALUE - 2) {
+				tooltip.add("感谢喵呜玖大人的恩惠！");
 			}
 		}
 

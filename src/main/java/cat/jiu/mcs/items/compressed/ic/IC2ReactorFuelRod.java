@@ -2,47 +2,38 @@ package cat.jiu.mcs.items.compressed.ic;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.List;
 import java.util.Queue;
 
 import cat.jiu.core.api.events.item.IItemInPlayerHandTick;
 import cat.jiu.core.api.events.item.IItemInPlayerInventoryTick;
 import cat.jiu.core.util.JiuCoreEvents;
-import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.base.sub.BaseItemSub;
 
-import ic2.api.item.ICustomDamageItem;
 import ic2.api.reactor.IReactor;
 import ic2.api.reactor.IReactorComponent;
-import ic2.core.IC2;
 import ic2.core.IC2Potion;
-import ic2.core.init.Localization;
-import ic2.core.item.BaseElectricItem;
 import ic2.core.item.armor.ItemArmorHazmat;
 import ic2.core.item.reactor.ItemReactorUranium;
-import ic2.core.util.LogCategory;
-import ic2.core.util.StackUtil;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
 
-public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent, IItemInPlayerInventoryTick, IItemInPlayerHandTick, ICustomDamageItem {
-
+public class IC2ReactorFuelRod extends IC2ReactorAssembly implements IItemInPlayerInventoryTick, IItemInPlayerHandTick {
 	public final int numberOfCells;
 	protected final ItemReactorUranium base;
 	protected final BaseItemSub depletedItem;
-
-	public IC2ReactorFuelRod(String name, ItemStack baseItem, CreativeTabs tab, BaseItemSub depletedItem) {
-		super(name, baseItem, tab);
-		this.setInfoStack(ItemStack.EMPTY);
-		if(baseItem.getItem() instanceof ItemReactorUranium) {
+	
+	public IC2ReactorFuelRod(String name, String baseItem, BaseItemSub depletedItem) {
+		this(name, baseItem, 0, depletedItem);
+	}
+	public IC2ReactorFuelRod(String name, String baseItem, int meta, BaseItemSub depletedItem) {
+		this(name, new ItemStack(Item.getByNameOrId(baseItem), 1, meta), depletedItem);
+	}
+	public IC2ReactorFuelRod(String name, ItemStack baseItem, BaseItemSub depletedItem) {
+		super(name, baseItem);
+		if(this.baseComponent instanceof ItemReactorUranium) {
 			this.base = (ItemReactorUranium) baseItem.getItem();
 		}else {
 			throw new RuntimeException(baseItem.toString() + " is NOT Reactor Fuel Rod");
@@ -50,35 +41,6 @@ public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent,
 		this.numberOfCells = this.base.numberOfCells;
 		this.depletedItem = depletedItem;
 		JiuCoreEvents.addEvent(this);
-	}
-
-	public IC2ReactorFuelRod(String name, ItemStack baseItem, BaseItemSub depletedItem) {
-		this(name, baseItem, MCS.COMPERESSED_ITEMS, depletedItem);
-	}
-
-	public IC2ReactorFuelRod(String name, String baseItem, int meta, CreativeTabs tab, BaseItemSub depletedItem) {
-		this(name, new ItemStack(Item.getByNameOrId(baseItem), 1, meta), tab, depletedItem);
-	}
-
-	public IC2ReactorFuelRod(String name, String baseItem, CreativeTabs tab, BaseItemSub depletedItem) {
-		this(name, baseItem, 0, tab, depletedItem);
-	}
-
-	public IC2ReactorFuelRod(String name, String baseItem, BaseItemSub depletedItem) {
-		this(name, baseItem, MCS.COMPERESSED_ITEMS, depletedItem);
-	}
-
-	@Override
-	public boolean createOreDictionary() {
-		return false;
-	}
-
-	@Override
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
-		if(this.base != null) {
-			tooltip.add(Localization.translate("ic2.reactoritem.durability") + " " + (this.getMaxCustomDamage(stack) - this.getCustomDamage(stack)) + "/" + this.getMaxCustomDamage(stack));
-		}
-		super.addInformation(stack, world, tooltip, advanced);
 	}
 
 	@Override
@@ -103,15 +65,10 @@ public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent,
 		}
 	}
 
-	// 是否可放置于反应堆
-	@Override
-	public boolean canBePlacedIn(ItemStack stack, IReactor reactor) {
-		return true;
-	}
-
 	// 处理逻辑
 	@Override
 	public void processChamber(ItemStack stack, IReactor reactor, int x, final int y, boolean heatRun) {
+		if(this.base == null) return;
 		if(!reactor.produceEnergy()) {
 			return;
 		}
@@ -146,11 +103,10 @@ public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent,
 				if(heat > 0) {
 					reactor.addHeat(heat);
 				}
-
 			}
 		}
 		if(!heatRun && this.getCustomDamage(stack) >= this.getMaxCustomDamage(stack) - 1) {
-			reactor.setItemAt(x, y, new ItemStack(this.depletedItem, 1, stack.getMetadata()));
+			reactor.setItemAt(x, y, this.depletedItem.getStack(stack.getMetadata()));
 		}else if(!heatRun) {
 			this.applyCustomDamage(stack, 1, null);
 		}
@@ -192,62 +148,10 @@ public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent,
 		}
 	}
 
-	@Override
-	public boolean showDurabilityBar(ItemStack stack) {
-		return this.getCustomDamage(stack) > 0;
-	}
-
-	@Override
-	public double getDurabilityForDisplay(ItemStack stack) {
-		return (double) this.getItemDamage(stack) / (double) this.getMaxItemDamage(stack);
-	}
-
-	public long getMaxItemDamage(ItemStack stack) {
-		return (long) MCSUtil.item.getMetaValue(this.base.getMaxCustomDamage(this.unCompressedItem), stack.getMetadata());
-	}
-
-	public long getItemDamage(ItemStack stack) {
-		if(!stack.hasTagCompound()) {
-			return 0;
-		}
-		return stack.getTagCompound().getLong("advDmg");
-	}
-
-	@Override
-	public int getCustomDamage(ItemStack stack) {
-		if(!stack.hasTagCompound()) {
-			return 0;
-		}
-		return stack.getTagCompound().getInteger("advDmg");
-	}
-
-	@Override
-	public int getMaxCustomDamage(ItemStack stack) {
-		return (int) MCSUtil.item.getMetaValue(this.base.getMaxCustomDamage(this.unCompressedItem), stack.getMetadata());
-	}
-
-	@Override
-	public void setCustomDamage(ItemStack stack, int damage) {
-		NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
-		nbt.setInteger("advDmg", damage);
-	}
-
-	@Override
-	public boolean applyCustomDamage(ItemStack stack, int damage, EntityLivingBase p2) {
-		this.setCustomDamage(stack, this.getCustomDamage(stack) + damage);
-		return true;
-	}
-
-	public void setDamage(ItemStack stack, int damage) {
-		final int prev = this.getCustomDamage(stack);
-		if(damage != prev && BaseElectricItem.logIncorrectItemDamaging) {
-			IC2.log.warn(LogCategory.Armor, new Throwable(), "Detected invalid gradual item damage application (%d):", damage - prev);
-		}
-	}
-
 	// 接受铀脉冲
 	@Override
 	public boolean acceptUraniumPulse(ItemStack stack, IReactor reactor, ItemStack pulsingStack, int youX, int youY, int pulseX, int pulseY, boolean heatrun) {
+		if(this.base == null) return false;
 		if(!heatrun) {
 			if(isMOX(this.unCompressedItem)) {
 				float breedereffectiveness = reactor.getHeat() / (float) reactor.getMaxHeat();
@@ -261,27 +165,10 @@ public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent,
 		return true;
 	}
 
-	// 可存储热量
-	@Override
-	public boolean canStoreHeat(ItemStack stack, IReactor reactor, int x, int y) {
-		return this.base.canStoreHeat(stack, reactor, x, y);
-	}
-
-	// 最大热量
-	@Override
-	public int getMaxHeat(ItemStack stack, IReactor reactor, int x, int y) {
-		return this.getMaxCustomDamage(stack);
-	}
-
-	// 获取当前热量
-	@Override
-	public int getCurrentHeat(ItemStack stack, IReactor reactor, final int x, int y) {
-		return this.getCustomDamage(stack);
-	}
-
 	// 热量交换
 	@Override
 	public int alterHeat(ItemStack stack, IReactor reactor, int x, int y, int heat) {
+		if(this.base == null) return 0;
 		int base = this.base.alterHeat(this.unCompressedItem, reactor, x, y, heat);
 		return (int) (base + (base * ((stack.getMetadata() + 1) * 0.579)));
 	}
@@ -289,6 +176,7 @@ public class IC2ReactorFuelRod extends BaseItemSub implements IReactorComponent,
 	// 爆炸影响(爆炸力)
 	@Override
 	public float influenceExplosion(ItemStack stack, IReactor reactor) {
+		if(this.base == null) return 0;
 		float base = this.base.influenceExplosion(stack, reactor);
 		float i = (float) (base + (base * (((stack.getMetadata() + 1)) * 1.921) * (this.numberOfCells + stack.getMetadata())));
 		System.out.println(i);

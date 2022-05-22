@@ -17,10 +17,10 @@ public class CustemItem {
 
 	@Config.RangeDouble(
 		min = 0.001D,
-		max = 0.999D)
+		max = 1.000D)
 	@Config.LangKey("config.mcs.drop_cat_hair_chance")
 	@Config.Comment("set cat drop hair chance")
-	public double drop_cat_hair_chance = 0.950D;
+	public double drop_cat_hair_chance = 0.050D;
 
 	@Config.RangeDouble(
 		min = 0.001D,

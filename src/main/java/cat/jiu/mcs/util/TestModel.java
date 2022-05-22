@@ -30,13 +30,13 @@ public class TestModel implements IEntityJoinWorldEvent, IEntityTickEvent {
 		if(!test) {
 			return;
 		}
-		if(MCS.instance.test_model) {
-			test = MCS.instance.test_model;
+		if(MCS.test()) {
+			test = MCS.test();
 			return;
 		}
 		if(entity instanceof EntityPlayer) {
 			if(entity.getName().indexOf("Player") == 0) {
-				test = MCS.instance.test_model;
+				test = MCS.test();
 				if(entity.world.isRemote) {
 					JiuUtils.entity.sendMessage(entity, "TestMode Is: " + test);
 				}

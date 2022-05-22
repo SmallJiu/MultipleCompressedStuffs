@@ -42,7 +42,6 @@ public class MCSToolsMain {
 		json.setBounds(10, 90, 150, 30);
 		json.addActionListener(event -> {
 			f.dispose();
-
 			JsonWriter.main(args);
 
 		});

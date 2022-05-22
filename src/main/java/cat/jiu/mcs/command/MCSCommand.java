@@ -1,18 +1,20 @@
 package cat.jiu.mcs.command;
 
-import cat.jiu.mcs.util.base.BaseCommand;
+import cat.jiu.core.util.base.BaseCommand;
+import cat.jiu.mcs.MCS;
+
 import net.minecraft.command.ICommand;
 
 public class MCSCommand extends BaseCommand.CommandTree {
 	public MCSCommand() {
 		super(new ICommand[]{
-				new CommandGetMCSBlocks("blocks", true, 0),
-				new CommandGetModList("mods", true, 0),
-				new CommandGetOreDict("ore", true, 2),
-				new CommandHelp("help", true, 0),
-				new CommandTestMode("test", true, 0),
-				new CommandReinitChangeBlock("recb", true, 2),
+				new CommandGetMCSBlocks("blocks", 0),
+				new CommandGetModList("mods", 0),
+				new CommandGetOreDict("ore", 2),
+				new CommandHelp("help", 0),
+				new CommandTestMode("test", 0),
+				new CommandReinitChangeBlock("recb", 2),
 				new CommandGetTexture()
-			}, "mcs", false, true, 2);
+			}, "mcs", MCS.MODID, false, 2);
 	}
 }

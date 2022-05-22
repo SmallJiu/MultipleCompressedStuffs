@@ -49,7 +49,7 @@ public class BlockCompressor extends BaseBlock.Normal implements ITileEntityProv
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if(playerIn.isSneaking()) {
 			if(!world.isRemote) {
-				if(MCS.instance.test_model) {
+				if(MCS.test()) {
 					TileEntity te0 = world.getTileEntity(pos);
 					if(te0 instanceof TileEntityCompressor) {
 						TileEntityCompressor te = (TileEntityCompressor) te0;

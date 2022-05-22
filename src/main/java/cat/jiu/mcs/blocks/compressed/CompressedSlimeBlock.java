@@ -18,7 +18,7 @@ public class CompressedSlimeBlock extends BaseBlockSub {
 
 	public void onLanded(World world, Entity entity) {
 		IBlockState state = world.getBlockState(entity.getPosition().add(0, -0.5, 0));
-		int meta = JiuUtils.item.getMetaFormBlockState(state) + 1;
+		int meta = JiuUtils.item.getMetaFromBlockState(state) + 1;
 
 		if(entity.isSneaking()) {
 			super.onLanded(world, entity);

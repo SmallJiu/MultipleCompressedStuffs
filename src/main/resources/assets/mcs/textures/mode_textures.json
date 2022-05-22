@@ -61,7 +61,10 @@
 	"avaritia": {
 		"block": {
 			"has": {
-				"compressed_infinity_catalyst": "avaritia:blocks/resource/neutronium"
+				"compressed_infinity_catalyst": {
+					"all": "avaritia:blocks/resource/neutronium",
+					"overlay_1": "avaritia:items/resource/infinity_catalyst"
+				}
 			},
 			"normal": {
 				"compressed_crystal_matrix_block": "avaritia:blocks/resource/crystal_matrix",
@@ -369,7 +372,17 @@
 					"down": "minecraft:blocks/tnt_bottom",
 					"side": "minecraft:blocks/tnt_side"
 				},
-				"compressed_wool_block": "minecraft:blocks/wool_colored_white"
+				"compressed_wool_block": "minecraft:blocks/wool_colored_white",
+				"compressed_chest": {
+					"top": "mcs:blocks/un/chest_top",
+					"down": "mcs:blocks/un/chest_top",
+					"side": "mcs:blocks/un/chest_side"
+				},
+				"compressed_shulker_box": {
+					"top": "mcs:blocks/un/shulker_box_top",
+					"down": "mcs:blocks/un/shulker_box_bottom",
+					"side": "mcs:blocks/un/shulker_box_side"
+				}
 			}
 		},
 		"item": {

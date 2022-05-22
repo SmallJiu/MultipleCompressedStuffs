@@ -1,6 +1,7 @@
 package cat.jiu.mcs.command;
 
-import cat.jiu.mcs.util.base.BaseCommand;
+import cat.jiu.core.util.base.BaseCommand;
+import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.util.base.sub.BaseBlockSub;
 import cat.jiu.mcs.util.init.MCSResources;
 
@@ -10,8 +11,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentKeybind;
 
 public class CommandGetMCSBlocks extends BaseCommand.CommandNormal {
-	public CommandGetMCSBlocks(String name, boolean checkPermission, int level) {
-		super(name, checkPermission, level);
+	public CommandGetMCSBlocks(String name, int level) {
+		super(name, MCS.MODID, level);
 	}
 
 	@Override
