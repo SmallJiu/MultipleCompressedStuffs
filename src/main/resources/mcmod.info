@@ -1,0 +1,15 @@
+ [
+	{
+	 "modid": "modid",
+	 "name": "ModID",
+	 "description": "info",
+	 "version": "0.0.1",
+	 "mcversion": "1.12.2",
+	 "url": "url",
+	 "updateUrl": "",
+	 "authorList": ["owner"],
+	 "logoFile": "logo",
+	 "screenshots": [],
+	 "dependencies": []
+	}
+ ]
