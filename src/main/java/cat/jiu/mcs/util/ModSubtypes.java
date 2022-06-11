@@ -1,11 +1,10 @@
 package cat.jiu.mcs.util;
 
 import cat.jiu.core.api.IMetadataToolMaterial;
-
+import cat.jiu.core.api.ISubBlockSerializable;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IStringSerializable;
 
-public enum ModSubtypes implements IStringSerializable, IMetadataToolMaterial {
+public enum ModSubtypes implements ISubBlockSerializable, IMetadataToolMaterial {
 	LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5, LEVEL_6, LEVEL_7, LEVEL_8, LEVEL_9, LEVEL_10, LEVEL_11, LEVEL_12, LEVEL_13, LEVEL_14, LEVEL_15, LEVEL_16;
 
 	private static final ModSubtypes[] METADATA_LOOKUP = new ModSubtypes[values().length];

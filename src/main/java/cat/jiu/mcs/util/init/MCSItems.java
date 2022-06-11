@@ -70,16 +70,19 @@ public class MCSItems {
 				JiuUtils.item.registerCompressedOre(food.getUnCompressedName(), food, false);
 			}
 		}
-		for(BaseItemSub item : MCSResources.SUB_ITEMS) {
-			if(item.createOreDictionary()) {
-				if(!item.addOtherOreDictionary().isEmpty()) {
-					List<String> ores = item.addOtherOreDictionary();
-					for(int i = 0; i < 16; i++) {
-						String ore = ores.get(i);
-						OreDictionary.registerOre((i + 1) + "x" + ore, new ItemStack(item, 1, i));
+		for(Item ii : MCSResources.ITEMS) {
+			if(ii instanceof BaseItemSub) {
+				BaseItemSub item = (BaseItemSub) ii;
+				if(item.createOreDictionary()) {
+					if(!item.addOtherOreDictionary().isEmpty()) {
+						List<String> ores = item.addOtherOreDictionary();
+						for(int i = 0; i < 16; i++) {
+							String ore = ores.get(i);
+							OreDictionary.registerOre((i + 1) + "x" + ore, new ItemStack(item, 1, i));
+						}
 					}
+					JiuUtils.item.registerCompressedOre(item.getUnCompressedName(), item, false);
 				}
-				JiuUtils.item.registerCompressedOre(item.getUnCompressedName(), item, false);
 			}
 		}
 	}

@@ -1,7 +1,0 @@
-{
-"parent": "mcs:block/overlay_model",
-	"textures": {
-		"all": "minecraft:blocks/prismarine_dark",
-		"overlay": "mcs:blocks/compressed_9"
-	}
-}

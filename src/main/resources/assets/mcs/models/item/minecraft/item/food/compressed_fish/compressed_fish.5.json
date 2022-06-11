@@ -1,7 +1,0 @@
-{
-    "parent": "item/generated",
-    "textures": {
-		"layer0": "minecraft:items/fish_cod_raw",
-		"layer1": "mcs:items/compressed_6"
-    }
-}

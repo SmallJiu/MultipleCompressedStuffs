@@ -1,7 +1,0 @@
-{
-    "parent": "mcs:block/overlay_model",
-	"textures": {
-        "all": "minecraft:blocks/glowstone",
-		"overlay": "mcs:blocks/compressed_3"
-    }
-}

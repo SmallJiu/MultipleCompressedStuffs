@@ -1,7 +1,0 @@
-{
-    "parent": "mcs:block/overlay_model",
-	"textures": {
-        "all": "minecraft:blocks/sponge",
-		"overlay": "mcs:blocks/compressed_10"
-    }
-}

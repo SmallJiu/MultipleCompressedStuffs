@@ -29,9 +29,9 @@ public class CreativeTabCompressedStuffsItems extends CreativeTabs {
 	public ItemStack getTabIconItem() {
 		Random rand = new Random();
 
-		if(!MCSResources.SUB_ITEMS.isEmpty()) {
-			int item = rand.nextInt(MCSResources.SUB_ITEMS.size());
-			return new ItemStack(MCSResources.SUB_ITEMS.get(item), 1, rand.nextInt(15));
+		if(!MCSResources.ITEMS.isEmpty()) {
+			int item = rand.nextInt(MCSResources.ITEMS.size());
+			return new ItemStack(MCSResources.ITEMS.get(item), 1, rand.nextInt(15));
 		}else {
 			return new ItemStack(Items.APPLE);
 		}

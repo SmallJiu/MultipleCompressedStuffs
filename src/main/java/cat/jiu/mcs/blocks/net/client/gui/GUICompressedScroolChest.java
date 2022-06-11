@@ -10,6 +10,7 @@ import cat.jiu.mcs.blocks.net.container.ContainerCompressedScroolChest;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -19,9 +20,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GUICompressedScroolChest extends BaseUI.BaseGui {
+public class GUICompressedScroolChest extends BaseUI.BaseGui<ContainerCompressedScroolChest, TileEntity> {
 	private static ResourceLocation TEXTURE = new ResourceLocation(MCS.MODID + ":textures/gui/container/compressed_chest.png");
-	private ContainerCompressedScroolChest container = null;
 	private float currentScroll;
 	private int selectRows = 0;
 	private boolean isScrolling;
@@ -30,18 +30,14 @@ public class GUICompressedScroolChest extends BaseUI.BaseGui {
 
 	public GUICompressedScroolChest(EntityPlayer player, World world, BlockPos pos) {
 		super(new ContainerCompressedScroolChest(player, world, pos), player, world, pos, TEXTURE, 192, 222);
-		this.container = (ContainerCompressedScroolChest) this.inventorySlots;
 		this.chest = JiuUtils.item.getStackFromBlockState(world.getBlockState(pos));
 	}
 
 	@Override
-	public void init() { }
+	public void init() {}
 	
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		super.drawDefaultBackground();
-		super.drawScreen(mouseX, mouseY, partialTicks);
-		super.renderHoveredToolTip(mouseX, mouseY);
+	public void drawGuiScreen(int mouseX, int mouseY, float partialTicks) {
 		this.scrollBar(mouseX, mouseY);
 	}
 	

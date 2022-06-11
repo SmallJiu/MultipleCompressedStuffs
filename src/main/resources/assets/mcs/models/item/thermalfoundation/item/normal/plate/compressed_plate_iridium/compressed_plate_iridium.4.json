@@ -1,7 +1,0 @@
-{
-    "parent": "item/generated",
-    "textures": {
-		"layer0": "thermalfoundation:items/material/plate_iridium",
-		"layer1": "mcs:items/compressed_5"
-    }
-}

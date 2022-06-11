@@ -1,7 +1,0 @@
-{
-    "parent": "item/generated",
-    "textures": {
-		"layer0": "minecraft:items/mutton_cooked",
-		"layer1": "mcs:items/compressed_8"
-    }
-}

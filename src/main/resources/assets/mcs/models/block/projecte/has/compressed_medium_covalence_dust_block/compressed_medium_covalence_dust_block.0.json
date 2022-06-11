@@ -1,6 +1,0 @@
-{
-    "parent": "mcs:block/normal_model",
-	"textures": {
-        "all": "minecraft:blocks/concrete_powder_light_blue"
-    }
-}

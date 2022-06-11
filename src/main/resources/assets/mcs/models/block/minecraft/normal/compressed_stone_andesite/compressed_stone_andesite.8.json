@@ -1,7 +1,0 @@
-{
-"parent": "mcs:block/overlay_model",
-	"textures": {
-		"all": "minecraft:blocks/stone_andesite",
-		"overlay": "mcs:blocks/compressed_9"
-	}
-}

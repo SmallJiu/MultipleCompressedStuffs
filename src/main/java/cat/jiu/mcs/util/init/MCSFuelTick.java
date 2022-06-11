@@ -1,6 +1,5 @@
 package cat.jiu.mcs.util.init;
 
-import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.util.MCSUtil;
 
 import net.minecraft.item.ItemStack;
@@ -20,7 +19,6 @@ public class MCSFuelTick {
 				if(baseBurnTime > 1) {
 					double burnTime = baseBurnTime + (baseBurnTime * ((stack.getMetadata() + 1) * 0.794));
 					if(burnTime <= 20) {
-						MCS.instance.log.info(stack.toString());
 						return;
 					}
 					event.setBurnTime((int) burnTime);

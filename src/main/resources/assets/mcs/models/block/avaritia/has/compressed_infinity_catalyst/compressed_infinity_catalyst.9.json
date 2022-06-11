@@ -1,8 +1,0 @@
-{
-    "parent": "mcs:block/overlay_model_2",
-	"textures": {
-        "all": "avaritia:blocks/resource/neutronium",
-		"overlay_1": "avaritia:items/resource/infinity_catalyst",
-		"overlay_2": "mcs:blocks/compressed_9"
-    }
-}

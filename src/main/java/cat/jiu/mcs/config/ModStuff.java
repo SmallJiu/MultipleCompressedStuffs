@@ -19,6 +19,11 @@ public class ModStuff {
 	public boolean Avaritia = false;
 
 	@Config.RequiresMcRestart
+	@Config.LangKey("config.mcs.enable_mod_stuff.ava")
+	@Config.Comment("Enable Other Mod Stuffs")
+	public boolean Torcherino = false;
+	
+	@Config.RequiresMcRestart
 	@Config.LangKey("config.mcs.enable_mod_stuff.ic2")
 	@Config.Comment("Enable Other Mod Stuffs")
 	public boolean IndustrialCraft = false;

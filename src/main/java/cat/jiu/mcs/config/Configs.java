@@ -29,9 +29,13 @@ public class Configs {
 	@Config.RequiresMcRestart
 	public static boolean use_3x3_recipes = true;
 	
-	@Config.LangKey("config.mcs.use_scrool_gui")
-	@Config.Comment("Use scrool compressed chest gui, if is 'false', will use page gui")
+	@Config.LangKey("config.mcs.recipe.infinite")
+	@Config.Comment("enable infinite compressed state recipe")
 	@Config.RequiresMcRestart
+	public static boolean enable_infinite_recipe = false;
+	
+	@Config.LangKey("config.mcs.use_scrool_gui")
+	@Config.Comment("Use scrool compressed chest gui, false will use page gui")
 	public static boolean use_scrool_gui = true;
 
 	@Config.LangKey("config.mcs.recipe.cancel_oredict_for_recipe")
@@ -42,7 +46,8 @@ public class Configs {
 			"woolWhite", "blockWool", "leadHardenedGlass", "listAllmeatcooked", "fish",
 			"dye", "dyeWhite", "clathrateEnder", "clathrateGlowstone", "clathrateRedstone",
 			"clathrateOil", "machineBlockCasing", "machineBlockAdvanced", "machineBlockAdvancedCasing", "sandstone",
-			"dyeBrown", "dyeGreen", "dyeBlack", "chest"
+			"dyeBrown", "dyeGreen", "dyeBlack", "chest", "sandstone",
+			"dirt", "chestWood"
 		};
 
 	public static final CustomCompressedBlock Custom = new CustomCompressedBlock();
@@ -88,6 +93,10 @@ public class Configs {
 		@Config.LangKey("config.mcs.can_custom_specific_number")
 		@Config.Comment("Can Custom Specific Number of unCompressedItem in Tooltip Information")
 		public boolean can_custom_specific_number = false;
+		
+		@Config.LangKey("config.mcs.waila.remaining_time")
+		@Config.Comment("static to show the change block remaining time")
+		public boolean Static_Show_Change_Block_Remaining_Time = true;
 	}
 
 	@SubscribeEvent

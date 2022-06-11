@@ -1,5 +1,6 @@
 package cat.jiu.mcs.blocks.tileentity;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -9,29 +10,20 @@ import cat.jiu.core.capability.CapabilityJiuEnergy;
 import cat.jiu.core.capability.JiuEnergyStorage;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
+import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.util.MCSUtil;
-import cat.jiu.mcs.util.base.sub.BaseBlockSub;
-import cat.jiu.mcs.util.base.sub.BaseItemFood;
-import cat.jiu.mcs.util.base.sub.BaseItemSub;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemAxe;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemHoe;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemPickaxe;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemShovel;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemSword;
 import cat.jiu.mcs.util.init.MCSBlocks;
 import cat.jiu.mcs.util.init.MCSResources;
 
 import ic2.api.item.IElectricItem;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 
@@ -44,13 +36,10 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
 public class TileEntityCompressor extends TileEntity implements ITickable {
-	/**
-	 * Energy
-	 */
-	public final String ENERGY = "Energy";
+	/** Energy */ public final String ENERGY = "Energy";
 	public final long maxEnergy = 5000000;
 	// public final long maxEnergy = Long.MAX_VALUE;
-	public final JiuEnergyStorage storage = new JiuEnergyStorage(maxEnergy, 10000);
+	public final JiuEnergyStorage storage = new JiuEnergyStorage(maxEnergy, 1000000, 1000000);
 	public final ItemStackHandler energySlot = new ItemStackHandler();
 	public final BigItemStackHandler compressedSlot = new BigItemStackHandler(17, this);
 	private final List<Boolean> activate = Lists.newArrayList(true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true);
@@ -83,6 +72,11 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 			this.shrinkCount = shrinkCount;
 		}
 	}
+	
+	private boolean canBreak = true;
+	public boolean canBreak() {
+		return this.canBreak;
+	}
 
 	@Override
 	public void update() {
@@ -95,49 +89,61 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 			// 能量是否大于等于20，大于等于20是为了避免同时有4个多重的物品同时合成导致没有能量
 			if(this.storage.getEnergyStoredWithLong() >= 20) {
 				if(this.compressedSlot.getStackInSlot(0) != null && !this.compressedSlot.getStackInSlot(0).isEmpty()) {
-					this.onBlockCrafting();// 未压缩方块合成为一重压缩方块
-					this.onItemCrafting();// 未压缩物品合成为一重压缩物品
-					// this.onToolCraft();// 未压缩工具合成为一重压缩工具
+					this.craftUnCompressedItem();// 未压缩方块合成为一重压缩方块
 				}
 				this.craftCompressedItem();// 全部压缩物品合成为下一重的压缩物品
-				this.checkItemCount();// 检查slot物品，大于一定数禁止破坏，防止过多物品掉地上卡死
+				this.checkBreakState();
 			}
 		}
 	}
-
-	private void checkItemCount() {
-		if(this.checkCount()) {
-			return;
-		}
-		return;
-	}
-
-	private boolean checkCount() {
-		for(int i = 1; i < this.compressedSlot.getSlots(); i++) {
-			ItemStack cStack = this.compressedSlot.getStackInSlot(i);
-			if(cStack.getCount() >= 5000) {
-				return true;
+	
+	private void checkBreakState() {
+		for(int i = 0; i < this.compressedSlot.getSlots(); i++) {
+			ItemStack slotStack = this.compressedSlot.getStackInSlot(i);
+			if(slotStack.getCount() >= 2304) {
+				this.canBreak = false;
+				return;
 			}
 		}
-		return false;
+		this.canBreak = true;
+	}
+	
+	// 方块的合成
+	private void craftUnCompressedItem() {
+		ItemStack unBlock = this.compressedSlot.getStackInSlot(0);
+		ICompressedStuff block = MCSResources.getCompressedStuff(unBlock);
+		int shirkC = Configs.use_3x3_recipes ? 9 : 4;
+		if(block != null) {
+			int amount = unBlock.getCount() / shirkC;
+			if(!block.isStuff()) return;
+			ItemStack stack = block.getStack(amount, 0);
+			
+			if(JiuUtils.item.addItemToSlot(compressedSlot, stack, true)) {
+				if(this.debug || MCS.test()) {this.storage.extractEnergyWithLong(1, false);}else {
+					unBlock.shrink(amount * shirkC);
+					this.storage.extractEnergyWithLong(5 * amount, false);
+				}
+				JiuUtils.item.addItemToSlot(compressedSlot, stack, false);
+			}
+		}
 	}
 
 	private void craftCompressedItem() {
+		int shirkC = Configs.use_3x3_recipes ? 9 : 4;
 		for(int i = 1; i < this.compressedSlot.getSlots(); i++) {
-			ItemStack cStack = this.compressedSlot.getStackInSlot(i);
-			if(cStack.getCount() >= this.getShrinkCount()) {
-				if(cStack.getMetadata() < 15 && i + 1 < this.compressedSlot.getSlots()) {
-					if(this.slotCanCraft(i) && cStack.getMetadata() + 1 == i) {
-						int amount = cStack.getCount() / 9;
-						if(this.compressedSlot.getStackInSlot(i + 1).getCount() < Integer.MAX_VALUE) {
-							if(this.compressedSlot.insertItem(i + 1, new ItemStack(cStack.getItem(), amount, cStack.getMetadata() + 1), true).isEmpty()) {
-								cStack.shrink(amount * 9);
-								if(this.debug || MCS.test()) {
-									
-								}else {
+			ItemStack slotStack = this.compressedSlot.getStackInSlot(i);
+			if(slotStack.getCount() >= this.getShrinkCount()) {
+				if(slotStack.getMetadata() < 15 && i + 1 < this.compressedSlot.getSlots()) {
+					if(this.slotCanCraft(i) && slotStack.getMetadata() + 1 == i) {
+						int amount = slotStack.getCount() / shirkC;
+						if(this.compressedSlot.getStackInSlot(i + 1).getCount() < Integer.MAX_VALUE-2) {
+							ItemStack stack = new ItemStack(slotStack.getItem(), amount, slotStack.getMetadata() + 1);
+							if(this.compressedSlot.insertItem(i + 1, stack, true).isEmpty()) {
+								slotStack.shrink(amount * shirkC);
+								if(this.debug || MCS.test()) {this.storage.extractEnergyWithLong(1, false);}else {
 									this.storage.extractEnergyWithLong(5 * amount, false);
 								}
-								this.compressedSlot.insertItem(i + 1, new ItemStack(cStack.getItem(), amount, cStack.getMetadata() + 1), false);
+								this.compressedSlot.insertItem(i + 1, stack, false);
 							}
 						}
 					}else {
@@ -151,7 +157,6 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 	}
 
 	public boolean debug = false;
-
 	public void setDebug() {
 		this.debug = !this.debug;
 	}
@@ -159,11 +164,12 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 	private void addEnergy() {
 		ItemStack stack = this.energySlot.getStackInSlot(0);
 		if(!stack.isEmpty() && stack != null) {
-			if(this.getEnergy(stack) > 0) {
-				long i = this.storage.getEnergyStoredWithLong() + this.getEnergy(stack);
+			int itemEnergy = TileEntityFurnace.getItemBurnTime(stack) / 10;
+			if(itemEnergy > 0) {
+				long i = this.storage.getEnergyStoredWithLong() + itemEnergy;
 
 				if(i <= this.storage.getMaxEnergyStoredWithLong()) {
-					this.storage.receiveEnergyWithLong(this.getEnergy(stack), false);
+					this.storage.receiveEnergyWithLong(itemEnergy, false);
 					if(stack.getItem() == Items.LAVA_BUCKET) {
 						this.energySlot.setStackInSlot(0, new ItemStack(Items.BUCKET));
 					}else {
@@ -172,7 +178,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 					return;
 				}
 			}else if(stack.hasCapability(CapabilityEnergy.ENERGY, (EnumFacing) null)) {
-				long i = this.storage.getEnergyStoredWithLong() + this.getEnergy(stack);
+				long i = this.storage.getEnergyStoredWithLong() + itemEnergy;
 				if(!(i > this.maxEnergy)) {
 					if(i < this.storage.getMaxEnergyStoredWithLong()) {
 						IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, (EnumFacing) null);
@@ -181,7 +187,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 					}
 				}
 			}else if(stack.hasCapability(CapabilityJiuEnergy.ENERGY, (EnumFacing) null)) {
-				long i = this.storage.getEnergyStoredWithLong() + this.getEnergy(stack);
+				long i = this.storage.getEnergyStoredWithLong() + itemEnergy;
 				if(!(i > this.maxEnergy)) {
 					if(i < this.storage.getMaxEnergyStoredWithLong()) {
 						IJiuEnergyStorage energy = stack.getCapability(CapabilityJiuEnergy.ENERGY, (EnumFacing) null);
@@ -192,7 +198,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 			}else if(Loader.isModLoaded("ic2")) {
 				if(stack.getItem() instanceof IElectricItem) {
 					// JiuUtils.nbt.setItemNBT(stack, "charge", (JiuUtils.nbt.getItemNBTDouble(stack, "charge")-1));
-					// this.storage.receiveEnergyWithLong(4, false);
+					// this.storage.receiveEnergy(4, false);
 				}
 			}else if(JiuUtils.item.isBlock(stack)) {
 				if(JiuUtils.item.getBlockFromItemStack(stack) == MCSBlocks.creative_energy) {
@@ -204,189 +210,6 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 				}
 			}
 		}
-	}
-
-	// 方块的合成
-	private void onBlockCrafting() {
-		for(BaseBlockSub c : MCSResources.SUB_BLOCKS) {
-			ItemStack unBlock = this.compressedSlot.getStackInSlot(0);
-			if(JiuUtils.item.equalsStack(unBlock, c.getUnCompressedStack())) {
-				if(unBlock.getCount() >= this.getShrinkCount()) {
-					int amount = unBlock.getCount() / 9;
-					if(JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.test()) {
-
-						}else {
-							unBlock.shrink(amount * 9);
-							this.storage.extractEnergyWithLong(5 * amount, false);
-						}
-						JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), false);
-					}
-				}
-			}
-		}
-	}
-
-	// 物品的合成
-	private void onItemCrafting() {
-		for(BaseItemSub c : MCSResources.SUB_ITEMS) {
-			ItemStack unItem = this.compressedSlot.getStackInSlot(0);
-			if(JiuUtils.item.equalsStack(unItem, c.getUnCompressedStack())) {
-				if(unItem.getCount() >= this.getShrinkCount()) {
-					int amount = unItem.getCount() / 9;
-					if(JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.test()) {
-
-						}else {
-							unItem.shrink(amount * 9);
-							this.storage.extractEnergyWithLong(5 * amount, false);
-						}
-						JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), false);
-					}
-				}
-			}
-		}
-		for(BaseItemFood c : MCSResources.FOODS) {
-			ItemStack unItem = this.compressedSlot.getStackInSlot(0);
-			if(JiuUtils.item.equalsStack(unItem, c.getUnCompressedStack())) {
-				if(unItem.getCount() >= this.getShrinkCount()) {
-					int amount = unItem.getCount() / 9;
-					if(JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.test()) {
-
-						}else {
-							unItem.shrink(amount * 9);
-							this.storage.extractEnergyWithLong(5 * amount, false);
-						}
-						JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), false);
-					}
-				}
-			}
-		}
-	}
-
-	@SuppressWarnings("unused")
-	private void onToolCraft() {
-		for(BaseItemSword c : MCSResources.SWORDS) {
-			ItemStack unItem = this.compressedSlot.getStackInSlot(0);
-			if(JiuUtils.item.equalsStack(unItem, c.getUnCompressedStack())) {
-				if(unItem.getCount() >= this.getShrinkCount()) {
-					int amount = unItem.getCount() / 9;
-					if(!JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.test()) {
-
-						}else {
-							unItem.shrink(amount * 9);
-							this.storage.extractEnergyWithLong(5 * amount, false);
-						}
-						JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), false);
-					}
-				}
-			}
-		}
-		for(BaseItemPickaxe c : MCSResources.PICKAXES) {
-			ItemStack unItem = this.compressedSlot.getStackInSlot(0);
-			if(JiuUtils.item.equalsStack(unItem, c.getUnCompressedStack())) {
-				if(unItem.getCount() >= this.getShrinkCount()) {
-					int amount = unItem.getCount() / 9;
-					if(JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.test()) {
-
-						}else {
-							unItem.shrink(amount * 9);
-							this.storage.extractEnergyWithLong(5 * amount, false);
-						}
-						JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), false);
-					}
-				}
-			}
-		}
-		for(BaseItemShovel c : MCSResources.SHOVELS) {
-			ItemStack unItem = this.compressedSlot.getStackInSlot(0);
-			if(JiuUtils.item.equalsStack(unItem, c.getUnCompressedStack())) {
-				if(unItem.getCount() >= this.getShrinkCount()) {
-					int amount = unItem.getCount() / 9;
-					if(JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.test()) {
-
-						}else {
-							unItem.shrink(amount * 9);
-							this.storage.extractEnergyWithLong(5 * amount, false);
-						}
-						JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), false);
-					}
-				}
-			}
-		}
-		for(BaseItemAxe c : MCSResources.AXES) {
-			ItemStack unItem = this.compressedSlot.getStackInSlot(0);
-			if(JiuUtils.item.equalsStack(unItem, c.getUnCompressedStack())) {
-				if(unItem.getCount() >= this.getShrinkCount()) {
-					int amount = unItem.getCount() / 9;
-					if(JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.test()) {
-
-						}else {
-							unItem.shrink(amount * 9);
-							this.storage.extractEnergyWithLong(5 * amount, false);
-						}
-						JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), false);
-					}
-				}
-			}
-		}
-		for(BaseItemHoe c : MCSResources.HOES) {
-			ItemStack unItem = this.compressedSlot.getStackInSlot(0);
-			if(JiuUtils.item.equalsStack(unItem, c.getUnCompressedStack())) {
-				if(unItem.getCount() >= this.getShrinkCount()) {
-					int amount = unItem.getCount() / 9;
-					if(JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), true)) {
-						if(this.debug || MCS.test()) {
-
-						}else {
-							unItem.shrink(amount * 9);
-							this.storage.extractEnergyWithLong(5 * amount, false);
-						}
-						JiuUtils.item.addItemToSlot(compressedSlot, new ItemStack(c, amount), false);
-					}
-				}
-			}
-		}
-	}
-
-	// BlockChest
-	private int getEnergy(ItemStack stack) {
-		Item item = stack.getItem();
-		if(item instanceof ItemBlock) {
-			Block block = JiuUtils.item.getBlockFromItemStack(stack);
-			if(block == Blocks.REDSTONE_BLOCK) {
-				return 9000;
-			}else if(block == Blocks.COAL_BLOCK) {
-				return 7200;
-			}
-		}else {
-			if(item == Items.REDSTONE) {
-				return 1000;
-			}else if(item == Items.COAL && stack.getMetadata() == 0) {
-				return 800;
-			}else if(item == Items.COAL && stack.getMetadata() == 1) {
-				return 750;
-			}else if(item == Items.LAVA_BUCKET) {
-				return 9000;
-			}else if(item == Items.BLAZE_ROD) {
-				return 5000;
-			}else if(item == Items.BLAZE_POWDER) {
-				return 2500;
-			}else if(item == Items.NETHER_STAR) {
-				return 10000;
-			}else if(item == Items.MAGMA_CREAM) {
-				return 1500;
-			}else if(item == Items.FIRE_CHARGE) {
-				return 500;
-			}
-		}
-
-		return -1;
 	}
 
 	public ItemStackHandler getEnergySlotItems() {
@@ -405,7 +228,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 
 		nbt.setTag("EnergySlot", this.energySlot.serializeNBT());
 		nbt.setTag("CompressedSlot", this.compressedSlot.serializeNBT());
-		nbt.setTag("Energy", this.storage.writeToNBT(new NBTTagCompound()));
+		nbt.setTag("Energy", this.storage.writeToNBT(null, false));
 
 		NBTTagList activates = new NBTTagList();
 		for(int i = 0; i < this.activate.size(); i++) {
@@ -422,7 +245,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
-		this.storage.readFromNBT(nbt.getCompoundTag("Energy"));
+		this.storage.readFromNBT(nbt.getCompoundTag("Energy"), false);
 		this.shrinkCount = nbt.getInteger("ShrinkCount") < 8 ? 10 : nbt.getInteger("ShrinkCount");
 		this.debug = nbt.getBoolean("Debug");
 
@@ -438,26 +261,30 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 
 	@Override
 	public boolean hasCapability(Capability<?> cap, EnumFacing side) {
-		if(cap == CapabilityEnergy.ENERGY) {
-			return true;
-		}
-		if(cap == CapabilityJiuEnergy.ENERGY) {
-			return true;
-		}
-		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+		if(cap == CapabilityEnergy.ENERGY
+		|| cap == CapabilityJiuEnergy.ENERGY
+		|| cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			return true;
 		}
 
 		return super.hasCapability(cap, side);
 	}
+	final JiuEnergyStorage capStorage = new JiuEnergyStorage(0,0,0,0) {
+		public BigInteger receiveEnergyWithBigInteger(BigInteger maxReceive, boolean simulate) {return storage.receiveEnergyWithBigInteger(maxReceive, simulate);}
+		public java.math.BigInteger extractEnergyWithBigInteger(java.math.BigInteger maxExtract, boolean simulate) {return BigInteger.ZERO;}
+		public boolean canReceive() {return storage.canReceive();}
+		public boolean canExtract() {return false;}
+		public BigInteger getEnergyStoredWithBigInteger() {return storage.getEnergyStoredWithBigInteger();}
+		public BigInteger getMaxEnergyStoredWithBigInteger() {return storage.getMaxEnergyStoredWithBigInteger();}
+	};
 
 	@Override
 	public <T> T getCapability(Capability<T> cap, EnumFacing side) {
 		if(cap == CapabilityEnergy.ENERGY) {
-			return CapabilityEnergy.ENERGY.cast(this.storage.toFEStorage());
+			return CapabilityEnergy.ENERGY.cast(this.capStorage.toFEStorage());
 		}
 		if(cap == CapabilityJiuEnergy.ENERGY) {
-			return CapabilityJiuEnergy.ENERGY.cast(this.storage);
+			return CapabilityJiuEnergy.ENERGY.cast(this.capStorage);
 		}
 		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			if(side == EnumFacing.UP) {
@@ -479,14 +306,10 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 
 		@Override
 		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-			if(!this.isItemValid(slot, stack) && slot < 0 || slot >= stacks.size()) {
-				return stack;
-			}
-
-			if(this.getStackInSlot(slot).isEmpty()) {
-				return super.insertItem(slot, stack, simulate);
-			}
-
+			if(!this.isItemValid(slot, stack) && slot < 0 || slot >= stacks.size()) return stack;
+			if(this.getStackInSlot(slot).getCount() >= Integer.MAX_VALUE-2) return stack;
+			if(this.getStackInSlot(slot).isEmpty()) return super.insertItem(slot, stack, simulate);
+			
 			int emptySlot = -1;
 			for(int i = 0; i < this.stacks.size(); i++) {
 				ItemStack slotStack = this.stacks.get(i);

@@ -169,7 +169,7 @@ public class MCSUtil {
 				}
 			}
 			if(GuiScreen.isShiftKeyDown() && meta >= Short.MAX_VALUE - 2) {
-				tooltip.add("感谢喵呜玖大人的恩惠！");
+				tooltip.add("\u611f\u8c22\u55b5\u545c\u7396\u5927\u4eba\u7684\u6069\u60e0\uff01");
 			}
 		}
 

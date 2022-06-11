@@ -1,6 +1,8 @@
 package cat.jiu.mcs.util.base;
 
 import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.util.CompressedLevel;
+import net.minecraft.block.Block;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
@@ -10,11 +12,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BaseBlockItem extends ItemBlock implements ICompressedStuff {
-	protected final BaseBlock subBlock;
+	protected final ICompressedStuff subBlock;
 
-	public BaseBlockItem(BaseBlock block) {
+	public <T extends Block & ICompressedStuff> BaseBlockItem(T block) {
 		super(block);
-		this.subBlock = (BaseBlock) this.block;
+		this.subBlock = block;
 		this.setHasSubtypes(true);
 		this.setMaxDamage(0);
 	}
@@ -48,7 +50,7 @@ public class BaseBlockItem extends ItemBlock implements ICompressedStuff {
 	
 	@SideOnly(Side.CLIENT)
 	public String getUnCompressedItemLocalizedName() {
-		return this.subBlock.getUnCompressedItemLocalizedName();
+		return this.subBlock.getUnCompressedStack().getDisplayName();
 	}
 
 	public ItemStack getUnCompressedStack() {
@@ -67,5 +69,10 @@ public class BaseBlockItem extends ItemBlock implements ICompressedStuff {
 	@Override
 	public String getUnCompressedName() {
 		return this.subBlock.getUnCompressedName();
+	}
+	
+	@Override
+	public CompressedLevel getLevel() {
+		return this.subBlock.getLevel();
 	}
 }

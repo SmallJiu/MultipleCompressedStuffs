@@ -1,59 +1,53 @@
 package cat.jiu.mcs.util.init;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import cat.jiu.core.util.base.BaseItemTool;
-import cat.jiu.mcs.util.base.sub.BaseBlockSub;
+import com.google.common.collect.Maps;
+
+import cat.jiu.core.util.JiuUtils;
+import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.util.base.sub.BaseItemFood;
-import cat.jiu.mcs.util.base.sub.BaseItemSub;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemAxe;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemHoe;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemPickaxe;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemShovel;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemSword;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
-public class MCSResources {
+public final class MCSResources {
+	private static final Map<ItemStack, ICompressedStuff> compressed_stuff = Maps.newHashMap();
+	public static ICompressedStuff putCompressedStuff(ItemStack unCompressed, ICompressedStuff stuff) {
+		if(unCompressed == null || stuff == null) throw new NullPointerException();
+		return compressed_stuff.put(unCompressed, stuff);
+	}
+	public static boolean hasCompressedStuff(ItemStack key) {
+		for(ItemStack base : compressed_stuff.keySet()) {
+			if(JiuUtils.item.equalsStack(key, base)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public static ICompressedStuff getCompressedStuff(ItemStack key) {
+		for(ItemStack base : compressed_stuff.keySet()) {
+			if(JiuUtils.item.equalsStack(key, base)) {
+				return compressed_stuff.get(base);
+			}
+		}
+		return null;
+	}
+	
+	public static Collection<ICompressedStuff> getStuffs() {
+		return Collections.unmodifiableCollection(compressed_stuff.values());
+	}
+	
 	public static final List<Item> ITEMS = new ArrayList<>();
-	public static final List<String> ITEMS_NAME = new ArrayList<>();
-	public static final Map<String, Item> ITEMS_MAP = new HashMap<>();
-
-	public static final List<BaseItemFood> FOODS = new ArrayList<>();
-	public static final List<String> FOODS_NAME = new ArrayList<>();
-	public static final Map<String, BaseItemFood> FOODS_MAP = new HashMap<>();
-
-	public static final List<BaseItemSub> SUB_ITEMS = new ArrayList<>();
-	public static final List<String> SUB_ITEMS_NAME = new ArrayList<>();
-	public static final Map<String, BaseItemSub> SUB_ITEMS_MAP = new HashMap<>();
-
-	public static final List<BaseItemTool.MetaTool> SUB_TOOLS = new ArrayList<>();
-	public static final List<String> SUB_TOOLS_NAME = new ArrayList<>();
-	public static final Map<String, BaseItemTool.MetaTool> SUB_TOOLS_MAP = new HashMap<>();
-
-	public static final List<BaseItemSword> SWORDS = new ArrayList<>();
-	public static final List<String> SWORDS_NAME = new ArrayList<>();
-
-	public static final List<BaseItemPickaxe> PICKAXES = new ArrayList<>();
-	public static final List<String> PICKAXES_NAME = new ArrayList<>();
-
-	public static final List<BaseItemShovel> SHOVELS = new ArrayList<>();
-	public static final List<String> SHOVEL_NAME = new ArrayList<>();
-
-	public static final List<BaseItemAxe> AXES = new ArrayList<>();
-	public static final List<String> AXES_NAME = new ArrayList<>();
-
-	public static final List<BaseItemHoe> HOES = new ArrayList<>();
-	public static final List<String> HOES_NAME = new ArrayList<>();
-
 	public static final List<Block> BLOCKS = new ArrayList<>();
-	public static final Map<String, Block> BLOCKS_MAP = new HashMap<>();
+	
+	public static final List<String> STUFF_NAME = new ArrayList<>();
+	public static final List<String> ITEMS_NAME = new ArrayList<>();
 	public static final List<String> BLOCKS_NAME = new ArrayList<>();
-
-	public static final List<String> SUB_BLOCKS_NAME = new ArrayList<>();
-	public static final List<BaseBlockSub> SUB_BLOCKS = new ArrayList<>();
-	public static final Map<String, BaseBlockSub> SUB_BLOCKS_MAP = new HashMap<>();
+	public static final List<BaseItemFood> FOODS = new ArrayList<>();
 }

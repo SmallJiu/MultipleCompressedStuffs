@@ -1,7 +1,0 @@
-{
-"parent": "mcs:block/overlay_model",
-	"textures": {
-		"all": "minecraft:blocks/stone_diorite_smooth",
-		"overlay": "mcs:blocks/compressed_12"
-	}
-}

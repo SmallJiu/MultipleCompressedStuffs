@@ -32,6 +32,7 @@ import cat.jiu.mcs.util.base.sub.tool.BaseItemHoe;
 import cat.jiu.mcs.util.base.sub.tool.BaseItemPickaxe;
 import cat.jiu.mcs.util.base.sub.tool.BaseItemShovel;
 import cat.jiu.mcs.util.base.sub.tool.BaseItemSword;
+import cat.jiu.mcs.util.client.CompressedStuffResourcePack;
 import cat.jiu.mcs.util.base.sub.BaseBlockSub.HarvestType;
 import cat.jiu.mcs.util.type.CustomStuffType;
 import cat.jiu.mcs.util.type.CustomType;
@@ -57,7 +58,7 @@ public class InitCustom {
 						JsonObject subObject = mainArray.get(i).getAsJsonObject();// 子清单
 
 						String type_tmp = subObject.get("type").getAsString();
-						String[] main_type = type_tmp.indexOf(":") != -1 ? JiuUtils.other.custemSplitString(type_tmp, ":") : new String[]{type_tmp};
+						String[] main_type = type_tmp.contains(":") ? JiuUtils.other.custemSplitString(type_tmp, ":") : new String[]{type_tmp};
 
 						CustomType type = CustomType.getType(main_type);
 						if(type == CustomType.UNKNOWN) {
@@ -69,7 +70,6 @@ public class InitCustom {
 								JsonObject itemObject = entries.get(m).getAsJsonObject();
 								
 								String name = itemObject.get("id").getAsString();
-								MCS.instance.log.info(itemObject.toString());
 								ItemStack unItem = JiuUtils.item.toStack(itemObject.get("unItem"));
 								if(unItem == null || unItem.isEmpty()) {
 									String crashMsg = "\n\ncustom.json -> unknown item:\n -> " + fileObject.getKey() + ":\n  -> (" + i + "): \n   -> \"unItem\": \"" + (itemObject.get("unItem").isJsonObject() ? itemObject.get("unItem").getAsJsonObject().get("name").getAsString() : itemObject.get("unItem").getAsString()) + "\"\n";
@@ -114,7 +114,7 @@ public class InitCustom {
 		}
 	}
 
-	public static void initBlock(JsonObject blockObject, String name, JsonElement unItemE, CreativeTabs tab) {
+	public static void initBlock(JsonObject json, String name, JsonElement unItemE, CreativeTabs tab) {
 		ItemStack unItem = JiuUtils.item.toStack(unItemE);
 		boolean lag = false;
 		if(unItem == null || unItem.isEmpty()) {
@@ -127,170 +127,169 @@ public class InitCustom {
 			unSetUnItem.put(name, block);
 		}
 		block.setCreativeTab(tab);
-
-		if(blockObject.has("enableDefaultRecipe")) {
-			block.setMakeDefaultStackRecipe(blockObject.get("enableDefaultRecipe").getAsBoolean());
+		
+		if(json.has("texture")) {
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
 		}
 
-		Map<Integer, ItemStack> InfoStackMap = InitCustomItem.initInfoStack(blockObject);
+		if(json.has("enableDefaultRecipe")) {
+			block.setMakeDefaultStackRecipe(json.get("enableDefaultRecipe").getAsBoolean());
+		}
+
+		Map<Integer, ItemStack> InfoStackMap = InitCustomItem.initInfoStack(json);
 		if(InfoStackMap != null) {
 			block.setInfoStack(InfoStackMap);
 		}
 
-		Map<Integer, List<String>> infos = InitCustomItem.initInfos(blockObject);
+		Map<Integer, List<String>> infos = InitCustomItem.initInfos(json);
 		if(infos != null) {
 			block.addCustemInformation(infos);
 		}
 
-		Map<Integer, List<String>> shiftInfos = InitCustomItem.initShiftInfos(blockObject);
+		Map<Integer, List<String>> shiftInfos = InitCustomItem.initShiftInfos(json);
 		if(shiftInfos != null) {
 			block.addCustemShiftInformation(shiftInfos);
 		}
 
-		Map<Integer, HarvestType> HarvestMap = InitCustomItem.initHarvest(blockObject);
+		Map<Integer, HarvestType> HarvestMap = InitCustomItem.initHarvest(json);
 		if(HarvestMap != null) {
 			block.setHarvestMap(HarvestMap);
 		}
 
-		Map<Integer, Float> HardnessMap = InitCustomItem.initHardness(blockObject);
+		Map<Integer, Float> HardnessMap = InitCustomItem.initHardness(json);
 		if(HardnessMap != null) {
 			block.setHardnessMap(HardnessMap);
 		}
 
-		Map<Integer, Boolean> BeaconBaseMap = InitCustomItem.initBeaconBase(blockObject);
+		Map<Integer, Boolean> BeaconBaseMap = InitCustomItem.initBeaconBase(json);
 		if(BeaconBaseMap != null) {
 			block.setBeaconBaseMap(BeaconBaseMap);
 		}
 
-		Map<Integer, Integer> LightValueMap = InitCustomItem.initLightValue(blockObject);
+		Map<Integer, Integer> LightValueMap = InitCustomItem.initLightValue(json);
 		if(LightValueMap != null) {
 			block.setLightValueMap(LightValueMap);
 		}
 
-		Map<Integer, Float> ExplosionResistanceMap = InitCustomItem.initExplosionResistance(blockObject);
+		Map<Integer, Float> ExplosionResistanceMap = InitCustomItem.initExplosionResistance(json);
 		if(ExplosionResistanceMap != null) {
 			block.setExplosionResistanceMap(ExplosionResistanceMap);
 		}
 
-		Map<Integer, Boolean> UseWrenchBreakMap = InitCustomItem.initUseWrenchBreak(blockObject);
+		Map<Integer, Boolean> UseWrenchBreakMap = InitCustomItem.initUseWrenchBreak(json);
 		if(UseWrenchBreakMap != null) {
 			block.canUseWrenchBreak(UseWrenchBreakMap);
 		}
 
-		MCSResources.SUB_BLOCKS_NAME.add(name);
-		MCSResources.SUB_BLOCKS.add(block);
-		MCSResources.SUB_BLOCKS_MAP.put(name, block);
+		MCSResources.BLOCKS_NAME.add(name);
+		MCSResources.BLOCKS.add(block);
 	}
 
-	public static void initNormalItem(JsonObject itemObject, String name, ItemStack unItem, CreativeTabs tab) {
+	public static void initNormalItem(JsonObject json, String name, ItemStack unItem, CreativeTabs tab) {
 		BaseItemSub item = BaseItemSub.register(name, unItem, "custom", tab);
 		if(item == null)
 			return;
 		item.setCreativeTab(tab);
-
-		if(itemObject.has("enableDefaultRecipe")) {
-			item.setMakeDefaultStackRecipe(itemObject.get("enableDefaultRecipe").getAsBoolean());
+		if(json.has("texture")) {
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
 		}
 
-		Map<Integer, ItemStack> InfoStackMap = InitCustomItem.initInfoStack(itemObject);
+		if(json.has("enableDefaultRecipe")) {
+			item.setMakeDefaultStackRecipe(json.get("enableDefaultRecipe").getAsBoolean());
+		}
+
+		Map<Integer, ItemStack> InfoStackMap = InitCustomItem.initInfoStack(json);
 		if(InfoStackMap != null) {
 			item.setInfoStack(InfoStackMap);
 		}
 
-		Map<Integer, List<String>> infos = InitCustomItem.initInfos(itemObject);
+		Map<Integer, List<String>> infos = InitCustomItem.initInfos(json);
 		if(infos != null) {
 			item.setCustemInformation(infos);
 		}
 
-		Map<Integer, List<String>> shiftInfos = InitCustomItem.initShiftInfos(itemObject);
+		Map<Integer, List<String>> shiftInfos = InitCustomItem.initShiftInfos(json);
 		if(shiftInfos != null) {
 			item.setCustemShiftInformation(shiftInfos);
 		}
 
-		Map<Integer, Boolean> HasEffectMap = InitCustomItem.initHasEffect(itemObject);
+		Map<Integer, Boolean> HasEffectMap = InitCustomItem.initHasEffect(json);
 		if(HasEffectMap != null) {
 			item.setHasEffectMap(HasEffectMap);
 		}
 
 		MCSResources.ITEMS.add(item);
 		MCSResources.ITEMS_NAME.add(name);
-		MCSResources.SUB_ITEMS.add(item);
-		MCSResources.SUB_ITEMS_NAME.add(name);
-		MCSResources.SUB_ITEMS_MAP.put(name, item);
 	}
 
-	public static void initFood(JsonObject itemObject, String name, ItemStack unItem, CreativeTabs tab, Entry<String, JsonElement> fileObject, int i) {
+	public static void initFood(JsonObject json, String name, ItemStack unItem, CreativeTabs tab, Entry<String, JsonElement> fileObject, int i) {
 		BaseItemFood item = BaseItemFood.register(name, unItem, "custom", tab);
-		if(item == null)
-			return;
 		item.setCreativeTab(tab);
-
-		if(itemObject.has("enableDefaultRecipe")) {
-			item.setMakeDefaultStackRecipe(itemObject.get("enableDefaultRecipe").getAsBoolean());
-			MCS.instance.log.info(itemObject.get("enableDefaultRecipe").getAsBoolean() + "");
+		if(json.has("texture")) {
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
+		}
+		
+		if(json.has("enableDefaultRecipe")) {
+			item.setMakeDefaultStackRecipe(json.get("enableDefaultRecipe").getAsBoolean());
 		}
 
 		if(!BaseItemFood.isFood(unItem)) {
-			if(!itemObject.has("healAmount")) {
+			if(!json.has("healAmount")) {
 				String crashMsg = "\n\ncustom.json -> element not found:\n -> " + fileObject.getKey() + ":\n  -> (" + i + "): \n   -> \"healAmount\": <Number>\n";
 				throw new JsonElementNotFoundException(crashMsg);
 			}
-			if(!itemObject.has("saturation")) {
+			if(!json.has("saturation")) {
 				String crashMsg = "\n\ncustom.json -> element not found:\n -> " + fileObject.getKey() + ":\n  -> (" + i + "): \n   -> \"saturation\": <Number>\n";
 				throw new JsonElementNotFoundException(crashMsg);
 			}
-			if(!itemObject.has("isWolfFood")) {
+			if(!json.has("isWolfFood")) {
 				String crashMsg = "\n\ncustom.json -> element not found:\n -> " + fileObject.getKey() + ":\n  -> (" + i + "): \n   -> \"isWolfFood\": <Boolean>\n";
 				throw new JsonElementNotFoundException(crashMsg);
 			}
-			item.setFoodEntry(itemObject.get("healAmount").getAsInt(), itemObject.get("saturation").getAsFloat(), itemObject.get("isWolfFood").getAsBoolean());
+			item.setFoodEntry(json.get("healAmount").getAsInt(), json.get("saturation").getAsFloat(), json.get("isWolfFood").getAsBoolean());
 		}
 
-		Map<Integer, ItemStack> InfoStackMap = InitCustomItem.initInfoStack(itemObject);
+		Map<Integer, ItemStack> InfoStackMap = InitCustomItem.initInfoStack(json);
 		if(InfoStackMap != null) {
 			item.setInfoStack(InfoStackMap);
 		}
 
-		Map<Integer, List<String>> infos = InitCustomItem.initInfos(itemObject);
+		Map<Integer, List<String>> infos = InitCustomItem.initInfos(json);
 		if(infos != null) {
 			item.addCustemInformation(infos);
 		}
 
-		Map<Integer, List<String>> shiftInfos = InitCustomItem.initShiftInfos(itemObject);
+		Map<Integer, List<String>> shiftInfos = InitCustomItem.initShiftInfos(json);
 		if(shiftInfos != null) {
 			item.addCustemShiftInformation(shiftInfos);
 		}
 
-		Map<Integer, Boolean> HasEffectMap = InitCustomItem.initHasEffect(itemObject);
+		Map<Integer, Boolean> HasEffectMap = InitCustomItem.initHasEffect(json);
 		if(HasEffectMap != null) {
 			item.setHasEffectMap(HasEffectMap);
 		}
 
-		Map<Integer, ItemStack> ContainerMap = InitCustomItem.initContainerMap(itemObject);
+		Map<Integer, ItemStack> ContainerMap = InitCustomItem.initContainerMap(json);
 		if(ContainerMap != null) {
 			item.setContainerMap(ContainerMap);
 		}
 
-		Map<Integer, List<CustomStuffType.PotionEffectType>> PotionEffectMap = InitCustomItem.initPotionEffectMap(itemObject);
+		Map<Integer, List<CustomStuffType.PotionEffectType>> PotionEffectMap = InitCustomItem.initPotionEffectMap(json);
 		if(PotionEffectMap != null) {
 			item.addPotionEffect(PotionEffectMap);
 		}
 
-		Map<Integer, Integer> HealAmountMap = InitCustomItem.initHealAmountMap(itemObject);
+		Map<Integer, Integer> HealAmountMap = InitCustomItem.initHealAmountMap(json);
 		if(HealAmountMap != null) {
 			item.setHealAmountMap(HealAmountMap);
 		}
 
-		Map<Integer, Float> SaturationModifierMap = InitCustomItem.initSaturationModifierMap(itemObject);
+		Map<Integer, Float> SaturationModifierMap = InitCustomItem.initSaturationModifierMap(json);
 		if(SaturationModifierMap != null) {
 			item.setSaturationModifierMap(SaturationModifierMap);
 		}
 
-		MCSResources.ITEMS_NAME.add(name);
-		MCSResources.FOODS_NAME.add(name);
 		MCSResources.ITEMS.add(item);
-		MCSResources.FOODS.add(item);
-		MCSResources.FOODS_MAP.put(name, item);
 	}
 
 	public static void initSword(JsonObject json, String name, ItemStack unItem, CreativeTabs tab) {
@@ -298,6 +297,9 @@ public class InitCustom {
 		if(item == null)
 			return;
 		item.setCreativeTab(tab);
+		if(json.has("texture")) {
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
+		}
 
 		if(json.has("enableDefaultRecipe")) {
 			item.setMakeDefaultStackRecipe(json.get("enableDefaultRecipe").getAsBoolean());
@@ -340,8 +342,6 @@ public class InitCustom {
 
 		MCSResources.ITEMS.add(item);
 		MCSResources.ITEMS_NAME.add(name);
-		MCSResources.SWORDS.add(item);
-		MCSResources.SWORDS_NAME.add(name);
 	}
 
 	public static void initPickaxe(JsonObject json, String name, ItemStack unItem, CreativeTabs tab) {
@@ -349,6 +349,9 @@ public class InitCustom {
 		if(item == null)
 			return;
 		item.setCreativeTab(tab);
+		if(json.has("texture")) {
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
+		}
 
 		if(json.has("enableDefaultRecipe")) {
 			item.setMakeDefaultStackRecipe(json.get("enableDefaultRecipe").getAsBoolean());
@@ -411,8 +414,6 @@ public class InitCustom {
 
 		MCSResources.ITEMS.add(item);
 		MCSResources.ITEMS_NAME.add(name);
-		MCSResources.PICKAXES.add(item);
-		MCSResources.PICKAXES_NAME.add(name);
 	}
 
 	public static void initShovel(JsonObject json, String name, ItemStack unItem, CreativeTabs tab) {
@@ -420,6 +421,9 @@ public class InitCustom {
 		if(item == null)
 			return;
 		item.setCreativeTab(tab);
+		if(json.has("texture")) {
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
+		}
 
 		if(json.has("enableDefaultRecipe")) {
 			item.setMakeDefaultStackRecipe(json.get("enableDefaultRecipe").getAsBoolean());
@@ -472,8 +476,6 @@ public class InitCustom {
 
 		MCSResources.ITEMS.add(item);
 		MCSResources.ITEMS_NAME.add(name);
-		MCSResources.SHOVELS.add(item);
-		MCSResources.SHOVEL_NAME.add(name);
 	}
 
 	public static void initAxe(JsonObject json, String name, ItemStack unItem, CreativeTabs tab) {
@@ -481,6 +483,9 @@ public class InitCustom {
 		if(item == null)
 			return;
 		item.setCreativeTab(tab);
+		if(json.has("texture")) {
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
+		}
 
 		if(json.has("enableDefaultRecipe")) {
 			item.setMakeDefaultStackRecipe(json.get("enableDefaultRecipe").getAsBoolean());
@@ -533,8 +538,6 @@ public class InitCustom {
 
 		MCSResources.ITEMS.add(item);
 		MCSResources.ITEMS_NAME.add(name);
-		MCSResources.AXES.add(item);
-		MCSResources.AXES_NAME.add(name);
 	}
 
 	public static void initHoe(JsonObject json, String name, ItemStack unItem, CreativeTabs tab) {
@@ -542,6 +545,9 @@ public class InitCustom {
 		if(item == null)
 			return;
 		item.setCreativeTab(tab);
+		if(json.has("texture")) {
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
+		}
 
 		if(json.has("enableDefaultRecipe")) {
 			item.setMakeDefaultStackRecipe(json.get("enableDefaultRecipe").getAsBoolean());
@@ -587,14 +593,7 @@ public class InitCustom {
 			item.setMaxDamage(MaxDamageMap);
 		}
 
-		Map<Integer, List<IBlockState>> CanHarvestBlock = InitCustomItem.initCanHarvestBlock(json);;
-		if(CanHarvestBlock != null) {
-			item.setCanHarvestBlockMap(CanHarvestBlock);
-		}
-
 		MCSResources.ITEMS.add(item);
 		MCSResources.ITEMS_NAME.add(name);
-		MCSResources.HOES.add(item);
-		MCSResources.HOES_NAME.add(name);
 	}
 }

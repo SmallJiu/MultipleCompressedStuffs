@@ -1,7 +1,0 @@
-{
-	"parent":"item/generated",
-	"textures": {
-		"layer0": "ic2:items/reactor/containment_plating",
-		"layer1": "mcs:items/compressed_14"
-	}
-}

@@ -40,9 +40,10 @@ public class ItemDeBug extends BaseItem.Normal {
 
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if(!world.isRemote && player.isSneaking() && player.getHeldItem(hand).getItem() == MCSItems.normal.debug) {
+		if(!world.isRemote && player.getHeldItem(hand).getItem() == MCSItems.normal.debug) {
 			TileEntity te0 = world.getTileEntity(pos);
-			if(te0 instanceof TileEntityCompressor) {
+			MCS.getLogOS().info("PosTileEntityClass: {}", te0 == null ? null : te0.getClass());
+			if(player.isSneaking() && te0 instanceof TileEntityCompressor) {
 				if(!JiuUtils.nbt.hasNBT(player.getHeldItem(hand), "nobreak")) {
 					if(player.getHeldItem(hand).getCount() < 2) {
 						player.setItemStackToSlot(hand == EnumHand.MAIN_HAND ? EntityEquipmentSlot.MAINHAND : EntityEquipmentSlot.OFFHAND, ItemStack.EMPTY);
@@ -51,7 +52,7 @@ public class ItemDeBug extends BaseItem.Normal {
 					}
 				}
 				world.playEvent(2005, pos, 500);
-				MCS.instance.log.info(player.getName() + " Use Debug Item in: Save:" + world.getSaveHandler().loadWorldInfo().getWorldName() + ", Dimension:" + player.dimension + ", X:" + pos.getX() + ", Y:" + pos.getY() + ", Z:" + pos.getZ());
+				MCS.getLogOS().info(player.getName() + " Use Debug Item in: Save:" + world.getSaveHandler().loadWorldInfo().getWorldName() + ", Dimension:" + player.dimension + ", X:" + pos.getX() + ", Y:" + pos.getY() + ", Z:" + pos.getZ());
 				((TileEntityCompressor) te0).setDebug();
 			}
 		}

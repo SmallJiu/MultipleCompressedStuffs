@@ -2,10 +2,12 @@ package cat.jiu.mcs.util.init;
 
 import java.util.Random;
 
+import cat.jiu.core.util.base.BaseItemTool;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.config.Configs;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -28,9 +30,11 @@ public class CreativeTabCompressedStuffsTools extends CreativeTabs {
 	public ItemStack getTabIconItem() {
 		Random rand = new Random();
 
-		if(!MCSResources.SUB_TOOLS.isEmpty()) {
-			int block = rand.nextInt(MCSResources.SUB_TOOLS.size());
-			return new ItemStack(MCSResources.SUB_TOOLS.get(block), 1, rand.nextInt(15));
+		if(!MCSResources.ITEMS.isEmpty()) {
+			int block = rand.nextInt(MCSResources.ITEMS.size());
+			Item item = MCSResources.ITEMS.get(block);
+			if(item instanceof BaseItemTool.MetaTool) return new ItemStack(item, 1, rand.nextInt(15));
+			return getTabIconItem();
 		}else {
 			return new ItemStack(Items.DIAMOND_PICKAXE);
 		}

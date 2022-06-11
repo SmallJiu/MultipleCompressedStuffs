@@ -24,13 +24,13 @@ public class BlockTest extends BaseBlock.Normal {
 		super.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
 		String[] res = this.getBlockModelResourceLocation();
 		if(world.isRemote) {
-			MCS.instance.log.info("ResLeg: " + res.length + " FileDirName: " + res[0] + " FileName: " + res[1]);
+			MCS.getLogOS().info("ResLeg: " + res.length + " FileDirName: " + res[0] + " FileName: " + res[1]);
 		}
 		return true;
 	}
 
 	@Override
 	public ItemBlock getRegisterItemBlock() {
-		return new BaseBlock.BaseBlockItem(this);
+		return new ItemBlock(this);
 	}
 }

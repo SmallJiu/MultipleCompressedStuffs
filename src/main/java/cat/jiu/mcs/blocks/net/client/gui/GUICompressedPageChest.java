@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -16,15 +17,13 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GUICompressedPageChest extends BaseUI.BaseGui {
+public class GUICompressedPageChest extends BaseUI.BaseGui<ContainerCompressedPageChest, TileEntity> {
 	private static ResourceLocation TEXTURE = new ResourceLocation("textures/gui/container/generic_54.png");
-	private ContainerCompressedPageChest container = null;
 	private final ItemStack chest;
 	private int page = 0;
 
 	public GUICompressedPageChest(EntityPlayer player, World world, BlockPos pos) {
 		super(new ContainerCompressedPageChest(player, world, pos), player, world, pos, TEXTURE, 192, 222);
-		this.container = (ContainerCompressedPageChest) this.inventorySlots;
 		this.chest = JiuUtils.item.getStackFromBlockState(world.getBlockState(pos));
 	}
 
@@ -53,13 +52,6 @@ public class GUICompressedPageChest extends BaseUI.BaseGui {
 				container.toPage(page);
 			}
 		});
-	}
-	
-	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		super.drawDefaultBackground();
-		super.drawScreen(mouseX, mouseY, partialTicks);
-		super.renderHoveredToolTip(mouseX, mouseY);
 	}
 
 	@Override

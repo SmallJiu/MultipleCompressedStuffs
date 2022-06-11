@@ -1,7 +1,0 @@
-{
-    "parent": "mcs:block/overlay_model",
-	"textures": {
-        "all": "mcs:blocks/un/block_blaze",
-		"overlay": "mcs:blocks/compressed_3"
-    }
-}

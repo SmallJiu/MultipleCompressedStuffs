@@ -2,6 +2,8 @@ itemGroup.compressed_stuffs_blocks=多重压缩-方块
 itemGroup.compressed_stuffs_items=多重压缩-物品
 itemGroup.compressed_stuffs_tools=多重压缩-工具
 
+info.mcs.energy=能量
+
 info.mcs.warn.ic.craft_energy=警告：将不会继承合成材料的电量到成品上
 
 info.mcs.cat_ingot=我是不是要被吃掉或者拿去发电了...
@@ -28,6 +30,12 @@ info.mcs.entry.shovel.name=铲
 info.mcs.entry.axe.name=斧
 info.mcs.entry.hoe.name=锄
 
+info.mcs.waila.less_time=剩余时间
+info.mcs.waila.day=天
+info.mcs.waila.hour=时
+info.mcs.waila.minute=分
+info.mcs.waila.second=秒
+
 item.mcs.cat_hammer.name=猫猫锤
 item.mcs.cat_hammer.info.0=已破坏的基岩总数
 item.mcs.cat_hammer.info.1=右键将有 %s/10 的几率破坏基岩并掉落
@@ -39,6 +47,7 @@ tile.mcs.creative_energy.name=创造能源组件
 tile.mcs.creative_energy.info.0=创造模式独享
 tile.mcs.creative_energy.info.1=最大输出：%s
 tile.mcs.compressor.name=压缩器
+tile.mcs.compressor_slave.name=压缩器传动方块
 
 tile.mcs.block.name=块
 
@@ -113,10 +122,11 @@ advancement.mcs.compressed_32766.info=合成一个无限重的压缩物品
 
 #{
 config.mcs.recipe.3x3=使用3x3合成表,反之使用2x2合成表
-config.mcs.recipe.cancel_oredict_for_recipe=设置不参与合成的矿词
+config.mcs.recipe.cancel_oredict_for_recipe=不参与合成的矿词
 config.mcs.recipe.all=启用默认合成表
 config.mcs.recipe.ore=启用默认矿物词典
-config.mcs.use_scrool_gui=启用压缩箱子的滚动物品栏,否则使用翻页物品栏
+config.mcs.use_scrool_gui=启用压缩箱子的滚动物品栏
+config.mcs.recipe.infinite=启用无限重的合成表
 
 config.mcs.enable_mod_stuff=启用联动物品(需在ModStuff开启具体mod)
 config.mcs.enable_test_stuff=使用mod预览内容
@@ -145,6 +155,7 @@ config.mcs.show_burn_time=显示燃烧时间
 config.mcs.show_specific_number=显示不是科学计数法的未压缩方块数
 config.mcs.can_custom_specific_number=可以自定义未压缩的方块数
 config.mcs.show_owner_mod=显示所属mod
+config.mcs.waila.remaining_time=固定格式显示变换方块的剩余时间
 #	{
 config.mcs.custem_info.item=自定义压缩物品的tag栏内容显示
 config.mcs.custem_info.block=自定义压缩方块的tag栏内容显示

@@ -3,11 +3,11 @@ package cat.jiu.mcs.util.base;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.util.ModSubtypes;
-import cat.jiu.mcs.util.init.MCSResources;
 
 import cofh.api.item.IToolHammer;
 
@@ -17,6 +17,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -35,7 +36,6 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SuppressWarnings("deprecation")
 @InterfaceList({
 	@Interface(
 		iface = "buildcraft.api.tools.IToolWrench",
@@ -46,6 +46,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 	@Interface(
 		iface = "cofh.api.item.IToolHammer",
 		modid = "cofhcore")})
+@SuppressWarnings("deprecation")
 public abstract class BaseBlock extends Block implements ICompressedStuff {
 	protected final String name;
 	protected final CreativeTabs tab;
@@ -64,8 +65,6 @@ public abstract class BaseBlock extends Block implements ICompressedStuff {
 		this.setUnlocalizedName("mcs." + this.name);
 		this.setCreativeTab(this.tab);
 		this.setRegistryName("mcs", this.name);
-		MCSResources.BLOCKS.add(this);
-		MCSResources.BLOCKS_NAME.add(this.name);
 		if(hardness < 0) {
 			this.setHardness(99999999);
 		}else {
@@ -84,8 +83,16 @@ public abstract class BaseBlock extends Block implements ICompressedStuff {
 			this.setSoundType(unBlock.getSoundType());
 		}
 
-		ForgeRegistries.ITEMS.register(new BaseBlockItem(this).setRegistryName(this.name));
+		ForgeRegistries.ITEMS.register(new BaseBlockItem(this).setRegistryName(this.getRegistryName()));
 	}
+	
+	@Override
+	public SoundType getSoundType(IBlockState state, World world, BlockPos pos, @Nullable Entity entity) {
+        if(JiuUtils.item.isBlock(this.unCompressedItem)) {
+        	return JiuUtils.item.getBlockFromItemStack(this.unCompressedItem).getSoundType(JiuUtils.item.getStateFromItemStack(this.unCompressedItem), world, pos, entity);
+        }
+		return super.getSoundType(state, world, pos, entity);
+    }
 
 	@Override
 	@SideOnly(Side.CLIENT)
@@ -94,7 +101,7 @@ public abstract class BaseBlock extends Block implements ICompressedStuff {
 	}
 
 	public BaseBlock setUnCompressed(ItemStack stack) {
-		if(stack.isEmpty()) {
+		if(stack == null || stack.isEmpty()) {
 			throw new RuntimeException(this.name + ": unCompressedItem can NOT be EMPTY!");
 		}
 		if(this.unCompressedItem == null || this.unCompressedItem.isEmpty()) {
@@ -137,7 +144,6 @@ public abstract class BaseBlock extends Block implements ICompressedStuff {
 	}
 
 	boolean canUseWrenchBreak = false;
-
 	public BaseBlock canUseWrenchBreak(boolean canbe) {
 		if(Loader.isModLoaded("thermalfoundation") || Loader.isModLoaded("buildcraftcore") || Loader.isModLoaded("enderio")) {
 			this.canUseWrenchBreak = canbe;
@@ -146,7 +152,6 @@ public abstract class BaseBlock extends Block implements ICompressedStuff {
 	}
 
 	Map<Integer, Boolean> canUseWrenchBreaks = null;
-
 	public BaseBlock canUseWrenchBreak(Map<Integer, Boolean> canbe) {
 		if(Loader.isModLoaded("thermalfoundation") || Loader.isModLoaded("buildcraftcore") || Loader.isModLoaded("enderio")) {
 			this.canUseWrenchBreaks = canbe;
@@ -166,7 +171,6 @@ public abstract class BaseBlock extends Block implements ICompressedStuff {
 	}
 
 	private boolean useWrenchBreak(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, boolean useMap) {
-		boolean lag = false;
 		ItemStack handitem = player.getHeldItem(hand);
 
 		if(player.isSneaking()) {
@@ -191,7 +195,7 @@ public abstract class BaseBlock extends Block implements ICompressedStuff {
 				}
 			}
 		}
-		return lag;
+		return false;
 	}
 
 	public boolean getHasSubtypes() {

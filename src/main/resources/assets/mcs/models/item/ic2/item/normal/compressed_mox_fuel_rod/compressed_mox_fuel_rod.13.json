@@ -1,7 +1,0 @@
-{
-"parent":"item/generated",
-	"textures": {
-		"layer0": "ic2:items/reactor/fuel_rod/mox",
-		"layer1": "mcs:items/compressed_14"
-	}
-}

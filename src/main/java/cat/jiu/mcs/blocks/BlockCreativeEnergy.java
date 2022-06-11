@@ -41,6 +41,6 @@ public class BlockCreativeEnergy extends BaseBlock.Normal implements ITileEntity
 
 	@Override
 	public ItemBlock getRegisterItemBlock() {
-		return (ItemBlock) new ItemBlock(this).setRegistryName(this.getRegistryName());
+		return new ItemBlock(this);
 	}
 }

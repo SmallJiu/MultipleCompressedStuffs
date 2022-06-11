@@ -15,6 +15,7 @@ import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.core.api.IHasModel;
 import cat.jiu.core.util.JiuUtils;
+import cat.jiu.mcs.util.CompressedLevel;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
 import cat.jiu.mcs.util.init.MCSResources;
@@ -40,9 +41,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuff {
 	public static BaseItemFood register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
-		if(baseItem == null || baseItem.isEmpty()) {
-			return null;
-		}
+		if(baseItem == null || baseItem.isEmpty()) return null;
 		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
 			return new BaseItemFood(name, baseItem.getItem(), baseItem.getMetadata(), ownerMod, tab, true);
 		}else {
@@ -84,11 +83,14 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 		this.setNoRepair();
 		this.setRegistryName(this.name);
 		if(!ownerMod.equals("custom")) {
-			MCSResources.ITEMS_NAME.add(name);
-			MCSResources.FOODS_NAME.add(name);
-			MCSResources.ITEMS.add((Item) this);
-			MCSResources.FOODS.add(this);
-			MCSResources.FOODS_MAP.put(this.name, this);
+			MCSResources.ITEMS.add(this);
+			MCSResources.STUFF_NAME.add(name);
+			MCSResources.putCompressedStuff(this.unCompressedItem, this);
+		}
+		if(name.equalsIgnoreCase(ownerMod)) {
+			throw new RuntimeException("name must not be owner mod. Name: " + name + ", OwnerMod: " + ownerMod);
+		}else if(name.equalsIgnoreCase(unCompressedItem.getItem().getRegistryName().getResourceDomain())) {
+			throw new RuntimeException("name must not be owner mod. Name: " + name + ", OwnerMod: " + unCompressedItem.getItem().getRegistryName().getResourceDomain());
 		}
 		RegisterModel.NeedToRegistryModel.add(this);
 	}
@@ -169,7 +171,7 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 		StringBuffer sb = new StringBuffer();
 		for(String s : unNames) {
 			if(!"compressed".equals(s)) {
-				sb.append(JiuUtils.other.upperCaseToFirstLetter(s));
+				sb.append(JiuUtils.other.upperFirst(s));
 			}
 		}
 		return sb.toString();
@@ -537,9 +539,9 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 	public void getItemModel() {
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
-			model.registerItemModel(this, meta, this.ownerMod + "/item/food/" + this.name, this.name + "." + meta);
+			model.registerItemModel(this, meta, this.ownerMod +"/item/food/" + this.name, this.name + "." + meta);
 		}
-		model.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/food/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+		model.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod +"/item/food/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
 	}
 
 	public final Item getUnCompressedItem() {
@@ -558,21 +560,10 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 	public final String getUnCompressedItemLocalizedName() {
 		return this.unCompressedItem.getDisplayName();
 	}
-
-	public final ItemStack Level_1 = new ItemStack(this, 1, 0);
-	public final ItemStack Level_2 = new ItemStack(this, 1, 1);
-	public final ItemStack Level_3 = new ItemStack(this, 1, 2);
-	public final ItemStack Level_4 = new ItemStack(this, 1, 3);
-	public final ItemStack Level_5 = new ItemStack(this, 1, 4);
-	public final ItemStack Level_6 = new ItemStack(this, 1, 5);
-	public final ItemStack Level_7 = new ItemStack(this, 1, 6);
-	public final ItemStack Level_8 = new ItemStack(this, 1, 7);
-	public final ItemStack Level_9 = new ItemStack(this, 1, 8);
-	public final ItemStack Level_10 = new ItemStack(this, 1, 9);
-	public final ItemStack Level_11 = new ItemStack(this, 1, 10);
-	public final ItemStack Level_12 = new ItemStack(this, 1, 11);
-	public final ItemStack Level_13 = new ItemStack(this, 1, 12);
-	public final ItemStack Level_14 = new ItemStack(this, 1, 13);
-	public final ItemStack Level_15 = new ItemStack(this, 1, 14);
-	public final ItemStack Level_16 = new ItemStack(this, 1, 15);
+	
+	private final CompressedLevel type = new CompressedLevel(this);
+	@Override
+	public CompressedLevel getLevel() {
+		return this.type;
+	}
 }

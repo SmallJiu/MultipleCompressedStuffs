@@ -11,6 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cat.jiu.core.util.JiuUtils;
+import cat.jiu.core.util.Time;
 import cat.jiu.mcs.util.base.sub.BaseBlockSub.HarvestType;
 import cat.jiu.mcs.util.type.CustomStuffType;
 import cat.jiu.mcs.util.type.CustomStuffType.ToolModifiersType;
@@ -75,7 +76,7 @@ public class InitCustomItem {
 						int m = Integer.parseInt(effectElement[2]);
 						int s = Integer.parseInt(effectElement[3]);
 						int tick = Integer.parseInt(effectElement[4]);
-						type.add(new CustomStuffType.PotionEffectType(potion, level, m, s, tick));
+						type.add(new CustomStuffType.PotionEffectType(potion, new Time(m, s, tick), level));
 					}
 
 					if(meta == -1) {
@@ -99,7 +100,7 @@ public class InitCustomItem {
 					int m = Integer.parseInt(effectElement[2]);
 					int s = Integer.parseInt(effectElement[3]);
 					int tick = Integer.parseInt(effectElement[4]);
-					type.add(new CustomStuffType.PotionEffectType(potion, level, m, s, tick));
+					type.add(new CustomStuffType.PotionEffectType(potion, new Time(m, s, tick), level));
 				}
 				for(int meta = 0; meta < 16; meta++) {
 					put(PotionEffectMap, meta, type);
@@ -111,12 +112,11 @@ public class InitCustomItem {
 				int m = Integer.parseInt(effectElement[2]);
 				int s = Integer.parseInt(effectElement[3]);
 				int tick = Integer.parseInt(effectElement[4]);
-				List<CustomStuffType.PotionEffectType> type = Lists.newArrayList(new CustomStuffType.PotionEffectType(potion, level, m, s, tick));
+				List<CustomStuffType.PotionEffectType> type = Lists.newArrayList(new CustomStuffType.PotionEffectType(potion, new Time(m, s, tick), level));
 
 				for(int meta = 0; meta < 16; meta++) {
 					put(PotionEffectMap, meta, type);
 				}
-
 			}
 			return PotionEffectMap;
 		}

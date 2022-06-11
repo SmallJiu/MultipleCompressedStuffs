@@ -1,7 +1,0 @@
-1.txt
-change.bat
-compressed_diamond_axe
-compressed_golden_axe
-compressed_iron_axe
-compressed_stone_axe
-compressed_wooden_axe

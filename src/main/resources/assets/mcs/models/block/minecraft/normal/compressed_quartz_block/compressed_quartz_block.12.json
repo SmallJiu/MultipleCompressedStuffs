@@ -1,7 +1,0 @@
-{
-    "parent": "mcs:block/overlay_model",
-	"textures": {
-        "all": "minecraft:blocks/quartz_block_side",
-		"overlay": "mcs:blocks/compressed_13"
-    }
-}

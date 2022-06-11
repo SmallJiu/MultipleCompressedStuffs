@@ -1,7 +1,0 @@
-{
-	"parent": "mcs:block/overlay_model",
-	"textures": {
-		"all": "environmentaltech:blocks/pladium_normal",
-		"overlay": "mcs:blocks/compressed_1"
-	}
-}

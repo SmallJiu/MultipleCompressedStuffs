@@ -1,7 +1,0 @@
-{
-"parent": "mcs:block/overlay_model",
-	"textures": {
-		"all": "minecraft:blocks/red_nether_brick",
-		"overlay": "mcs:blocks/compressed_11"
-	}
-}

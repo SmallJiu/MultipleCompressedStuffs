@@ -29,10 +29,10 @@ public class CreativeTabCompressedStuffsBlocks extends CreativeTabs {
 	public ItemStack getTabIconItem() {
 		Random rand = new Random();
 
-		if(!MCSResources.SUB_BLOCKS.isEmpty()) {
-			int block = rand.nextInt(MCSResources.SUB_BLOCKS.size());
+		if(!MCSResources.BLOCKS.isEmpty()) {
+			int block = rand.nextInt(MCSResources.BLOCKS.size());
 
-			return new ItemStack(MCSResources.SUB_BLOCKS.get(block), 1, rand.nextInt(15));
+			return new ItemStack(MCSResources.BLOCKS.get(block), 1, rand.nextInt(15));
 		}else {
 			return new ItemStack(Blocks.BEDROCK);
 		}

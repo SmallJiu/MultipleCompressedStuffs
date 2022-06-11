@@ -16,6 +16,7 @@ import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.exception.NonToolException;
+import cat.jiu.mcs.util.CompressedLevel;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
 import cat.jiu.mcs.util.init.MCSResources;
@@ -30,7 +31,6 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
@@ -45,9 +45,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuff {
 	public static BaseItemHoe register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
-		if(baseItem == null || baseItem.isEmpty()) {
-			return null;
-		}
+		if(baseItem == null || baseItem.isEmpty()) return null;
 		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
 			return new BaseItemHoe(name, baseItem, ownerMod, tab);
 		}else {
@@ -78,13 +76,14 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 		this.setMaxMetadata(16);
 
 		if(!ownerMod.equals("custom")) {
-			MCSResources.SUB_TOOLS.add(this);
-			MCSResources.SUB_TOOLS_NAME.add(name);
 			MCSResources.ITEMS.add(this);
-			MCSResources.ITEMS_NAME.add(name);
-			MCSResources.HOES.add(this);
-			MCSResources.HOES_NAME.add(name);
-			MCSResources.SUB_TOOLS_MAP.put(name, this);
+			MCSResources.STUFF_NAME.add(name);
+			MCSResources.putCompressedStuff(this.baseToolStack, this);
+		}
+		if(name.equalsIgnoreCase(ownerMod)) {
+			throw new RuntimeException("name must not be owner mod. Name: " + name + ", OwnerMod: " + ownerMod);
+		}else if(name.equalsIgnoreCase(baseTool.getItem().getRegistryName().getResourceDomain())) {
+			throw new RuntimeException("name must not be owner mod. Name: " + name + ", OwnerMod: " + baseTool.getItem().getRegistryName().getResourceDomain());
 		}
 	}
 
@@ -104,7 +103,7 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 		StringBuffer i = new StringBuffer();
 		for(String s : unNames) {
 			if(!"compressed".equals(s)) {
-				i.append(JiuUtils.other.upperCaseToFirstLetter(s));
+				i.append(JiuUtils.other.upperFirst(s));
 			}
 		}
 		return i.toString();
@@ -173,7 +172,6 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 	}
 
 	Map<Integer, CustomStuffType.ToolModifiersType> AttributeModifierMap = Maps.newHashMap();
-
 	public BaseItemHoe setAttributeModifierMap(Map<Integer, CustomStuffType.ToolModifiersType> attributeModifierMap) {
 		this.AttributeModifierMap = attributeModifierMap;
 		return this;
@@ -189,75 +187,30 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 		Multimap<String, AttributeModifier> multimap = HashMultimap.create();
 
 		if(slot == EntityEquipmentSlot.MAINHAND) {
-			boolean lag = false;
 			if(!this.AttributeModifierMap.isEmpty() && this.AttributeModifierMap.containsKey(stack.getMetadata())) {
 				CustomStuffType.ToolModifiersType type = this.AttributeModifierMap.get(stack.getMetadata());
-				lag = true;
 				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", type.damage, 0));
 				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", type.speed, 0));
-			}
-			if(!lag) {
-				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", MCSUtil.item.getMetaValue(-1, stack.getMetadata()), 0));
-				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", (double) ((stack.getMetadata() + 1) * 0.0973) - 2.43D, 0));
+			}else {
+				return this.baseTool.getAttributeModifiers(slot, this.baseToolStack);
 			}
 		}
 		return multimap;
 	}
-
-	public Map<Integer, Integer> HarvestLevelMap = Maps.newHashMap();
-
-	public BaseItemHoe setHarvestLevelMap(Map<Integer, Integer> HarvestLevelMap) {
-		this.HarvestLevelMap = HarvestLevelMap;
-		return this;
-	}
-
+	
 	@Override
 	public int getHarvestLevel(ItemStack stack, String toolClass, EntityPlayer player, IBlockState blockState) {
-		if(!this.HarvestLevelMap.isEmpty() && this.HarvestLevelMap.containsKey(stack.getMetadata())) {
-			return this.HarvestLevelMap.get(stack.getMetadata());
-		}
-		int level = this.baseTool.getHarvestLevel(stack, toolClass, player, blockState);
-		level += (int) ((stack.getMetadata() + 1) * 0.339341);
-		return level;
-	}
-
-	public Map<Integer, List<IBlockState>> CanHarvestBlock = Maps.newHashMap();
-
-	public BaseItemHoe setCanHarvestBlockMap(Map<Integer, List<IBlockState>> CanHarvestBlock) {
-		this.CanHarvestBlock = CanHarvestBlock;
-		return this;
+		return this.baseTool.getHarvestLevel(this.baseToolStack, toolClass, player, blockState);
 	}
 
 	@Override
 	public boolean canHarvestBlock(IBlockState state, ItemStack stack) {
-		boolean lag = false;
-		if(this.CanHarvestBlock.containsKey(stack.getMetadata())) {
-			lag = this.CanHarvestBlock.get(stack.getMetadata()).contains(state);
-		}
-		return this.baseTool.canHarvestBlock(state, this.baseToolStack) || lag;
+		return this.baseTool.canHarvestBlock(state, this.baseToolStack);
 	}
-
-	Map<Integer, EnumRarity> RarityMap = null;
-
-	public BaseItemHoe setRarityMap(Map<Integer, EnumRarity> map) {
-		this.RarityMap = map;
-		return this;
-	}
-
 	@SideOnly(Side.CLIENT)
 	@Override
 	public IRarity getForgeRarity(ItemStack stack) {
-		if(this.RarityMap != null) {
-			if(!this.RarityMap.isEmpty()) {
-				if(this.RarityMap.containsKey(stack.getMetadata())) {
-					return this.RarityMap.get(stack.getMetadata());
-				}
-			}
-		}
-		if(!this.baseToolStack.isEmpty()) {
-			return this.baseToolStack.getItem().getForgeRarity(this.baseToolStack);
-		}
-		return super.getForgeRarity(stack);
+		return this.baseToolStack.getItem().getForgeRarity(this.baseToolStack);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -416,5 +369,11 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 	@SideOnly(Side.CLIENT)
 	public final String getUnCompressedItemLocalizedName() {
 		return this.baseToolStack.getDisplayName();
+	}
+	
+	private final CompressedLevel type = new CompressedLevel(this);
+	@Override
+	public CompressedLevel getLevel() {
+		return this.type;
 	}
 }

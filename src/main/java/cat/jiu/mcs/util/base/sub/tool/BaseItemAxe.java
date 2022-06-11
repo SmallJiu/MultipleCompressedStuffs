@@ -16,6 +16,7 @@ import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.exception.NonToolException;
+import cat.jiu.mcs.util.CompressedLevel;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
 import cat.jiu.mcs.util.init.MCSResources;
@@ -45,9 +46,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuff {
 	public static BaseItemAxe register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
-		if(baseItem == null || baseItem.isEmpty()) {
-			return null;
-		}
+		if(baseItem == null || baseItem.isEmpty()) return null;
 		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
 			return new BaseItemAxe(name, baseItem, ownerMod, tab);
 		}else {
@@ -80,13 +79,14 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 		this.setMaxMetadata(16);
 
 		if(!ownerMod.equals("custom")) {
-			MCSResources.SUB_TOOLS.add(this);
-			MCSResources.SUB_TOOLS_NAME.add(name);
 			MCSResources.ITEMS.add(this);
-			MCSResources.ITEMS_NAME.add(name);
-			MCSResources.AXES.add(this);
-			MCSResources.AXES_NAME.add(name);
-			MCSResources.SUB_TOOLS_MAP.put(name, this);
+			MCSResources.STUFF_NAME.add(name);
+			MCSResources.putCompressedStuff(this.baseToolStack, this);
+		}
+		if(name.equalsIgnoreCase(ownerMod)) {
+			throw new RuntimeException("name must not be owner mod. Name: " + name + ", OwnerMod: " + ownerMod);
+		}else if(name.equalsIgnoreCase(baseTool.getItem().getRegistryName().getResourceDomain())) {
+			throw new RuntimeException("name must not be owner mod. Name: " + name + ", OwnerMod: " + baseTool.getItem().getRegistryName().getResourceDomain());
 		}
 	}
 
@@ -413,9 +413,14 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 		StringBuffer i = new StringBuffer();
 		for(String s : unNames) {
 			if(!"compressed".equals(s)) {
-				i.append(JiuUtils.other.upperCaseToFirstLetter(s));
+				i.append(JiuUtils.other.upperFirst(s));
 			}
 		}
 		return i.toString();
+	}
+	private final CompressedLevel type = new CompressedLevel(this);
+	@Override
+	public CompressedLevel getLevel() {
+		return this.type;
 	}
 }

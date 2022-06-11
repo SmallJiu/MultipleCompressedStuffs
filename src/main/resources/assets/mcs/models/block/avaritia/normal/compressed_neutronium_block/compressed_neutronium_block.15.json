@@ -1,7 +1,0 @@
-{
-    "parent": "mcs:block/overlay_model",
-	"textures": {
-        "all": "avaritia:blocks/resource/neutronium",
-		"overlay": "mcs:blocks/compressed_16"
-    }
-}

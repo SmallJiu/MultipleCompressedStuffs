@@ -1,7 +1,0 @@
-{
-    "parent": "item/generated",
-    "textures": {
-		"layer0": "mcs:items/un/chaos_shard",
-		"layer1": "mcs:items/compressed_10"
-    }
-}

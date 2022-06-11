@@ -1,9 +1,0 @@
-{
-    "parent": "mcs:block/overlay_model_side",
-	"textures": {
-        "top": "minecraft:blocks/sandstone_top",
-		"down": "minecraft:blocks/sandstone_bottom",
-        "side": "minecraft:blocks/sandstone_normal",
-		"overlay": "mcs:blocks/compressed_3"
-    }
-}

@@ -39,7 +39,7 @@ public class IC2HeatVent extends IC2HeatStorage {
 			}else {
 				this.sideVent = -1;
 			}
-			MCS.instance.log.error(baseItem.toString() + " is NOT ReactorVent");
+			MCS.getLogOS().error(baseItem.toString() + " is NOT ReactorVent");
 		}
 	}
 

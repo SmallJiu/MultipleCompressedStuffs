@@ -3,6 +3,7 @@ package cat.jiu.mcs.blocks.net;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.net.msg.MsgCompressorScroolChest;
 import cat.jiu.mcs.blocks.net.msg.MsgCompressorCount;
+import cat.jiu.mcs.blocks.net.msg.MsgCompressorEnergy;
 import cat.jiu.mcs.blocks.net.msg.MsgCompressorPageChest;
 import cat.jiu.mcs.blocks.net.msg.MsgCompressorSlotActivate;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -23,6 +24,7 @@ public class NetworkHandler {
 		INSTANCE.registerMessage(MsgCompressorSlotActivate::handler, MsgCompressorSlotActivate.class, nextID(), Side.SERVER);
 		INSTANCE.registerMessage(MsgCompressorScroolChest::handler, MsgCompressorScroolChest.class, nextID(), Side.SERVER);
 		INSTANCE.registerMessage(MsgCompressorPageChest::handler, MsgCompressorPageChest.class, nextID(), Side.SERVER);
+		INSTANCE.registerMessage(MsgCompressorEnergy::handler, MsgCompressorEnergy.class, nextID(), Side.CLIENT);
 		
 	}
 }

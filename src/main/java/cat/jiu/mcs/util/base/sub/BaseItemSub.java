@@ -14,6 +14,7 @@ import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.core.api.IHasModel;
 import cat.jiu.core.util.JiuUtils;
+import cat.jiu.mcs.util.CompressedLevel;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
 import cat.jiu.mcs.util.init.MCSResources;
@@ -48,9 +49,7 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 	}
 
 	public static BaseItemSub register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab, boolean hasSubtypes) {
-		if(baseItem == null || baseItem.isEmpty()) {
-			return null;
-		}
+		if(baseItem == null || baseItem.isEmpty()) return null;
 		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
 			return new BaseItemSub(name, baseItem, ownerMod, tab, hasSubtypes);
 		}else {
@@ -79,10 +78,13 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 		this.setNoRepair();
 		if(!this.ownerMod.equals("custom")) {
 			MCSResources.ITEMS.add(this);
-			MCSResources.ITEMS_NAME.add(this.name);
-			MCSResources.SUB_ITEMS.add(this);
-			MCSResources.SUB_ITEMS_NAME.add(this.name);
-			MCSResources.SUB_ITEMS_MAP.put(this.name, this);
+			MCSResources.STUFF_NAME.add(name);
+			MCSResources.putCompressedStuff(this.unCompressedItem, this);
+		}
+		if(name.equalsIgnoreCase(ownerMod)) {
+			throw new RuntimeException("name must not be owner mod. Name: " + name + ", OwnerMod: " + ownerMod);
+		}else if(name.equalsIgnoreCase(unCompressedItem.getItem().getRegistryName().getResourceDomain())) {
+			throw new RuntimeException("name must not be owner mod. Name: " + name + ", OwnerMod: " + unCompressedItem.getItem().getRegistryName().getResourceDomain());
 		}
 		RegisterModel.NeedToRegistryModel.add(this);
 	}
@@ -143,7 +145,7 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 		StringBuffer i = new StringBuffer();
 		for(String s : unNames) {
 			if(!"compressed".equals(s)) {
-				i.append(JiuUtils.other.upperCaseToFirstLetter(s));
+				i.append(JiuUtils.other.upperFirst(s));
 			}
 		}
 		return i.toString();
@@ -331,21 +333,9 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 	public final String getUnCompressedItemLocalizedName() {
 		return this.unCompressedItem.getDisplayName();
 	}
-
-	public final ItemStack Level_1 = new ItemStack(this, 1, 0);
-	public final ItemStack Level_2 = new ItemStack(this, 1, 1);
-	public final ItemStack Level_3 = new ItemStack(this, 1, 2);
-	public final ItemStack Level_4 = new ItemStack(this, 1, 3);
-	public final ItemStack Level_5 = new ItemStack(this, 1, 4);
-	public final ItemStack Level_6 = new ItemStack(this, 1, 5);
-	public final ItemStack Level_7 = new ItemStack(this, 1, 6);
-	public final ItemStack Level_8 = new ItemStack(this, 1, 7);
-	public final ItemStack Level_9 = new ItemStack(this, 1, 8);
-	public final ItemStack Level_10 = new ItemStack(this, 1, 9);
-	public final ItemStack Level_11 = new ItemStack(this, 1, 10);
-	public final ItemStack Level_12 = new ItemStack(this, 1, 11);
-	public final ItemStack Level_13 = new ItemStack(this, 1, 12);
-	public final ItemStack Level_14 = new ItemStack(this, 1, 13);
-	public final ItemStack Level_15 = new ItemStack(this, 1, 14);
-	public final ItemStack Level_16 = new ItemStack(this, 1, 15);
+	private final CompressedLevel type = new CompressedLevel(this);
+	@Override
+	public CompressedLevel getLevel() {
+		return this.type;
+	}
 }

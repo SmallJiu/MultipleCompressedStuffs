@@ -40,7 +40,7 @@ public class IC2ReactorAssembly extends BaseItemSub implements IReactorComponent
 			this.baseDamageItem = (ICustomDamageItem) baseItem.getItem();
 		}else {
 			this.baseDamageItem = null;
-			MCS.instance.log.error(JiuUtils.item.toString(baseItem) + " has NOT Damage");
+			MCS.getLogOS().error(JiuUtils.item.toString(baseItem) + " has NOT Damage");
 		}
 	}
 

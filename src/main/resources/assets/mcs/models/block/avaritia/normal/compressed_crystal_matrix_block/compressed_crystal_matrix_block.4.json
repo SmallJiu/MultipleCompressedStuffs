@@ -1,7 +1,0 @@
-{
-    "parent": "mcs:block/overlay_model",
-	"textures": {
-        "all": "avaritia:blocks/resource/crystal_matrix",
-		"overlay": "mcs:blocks/compressed_5"
-    }
-}

@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.brandon3055.draconicevolution.DEFeatures;
 
@@ -22,14 +23,16 @@ import appeng.api.definitions.IItemDefinition;
 
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.BlockCompressor;
+import cat.jiu.mcs.blocks.BlockCompressorSlave;
 import cat.jiu.mcs.blocks.BlockCreativeEnergy;
 import cat.jiu.mcs.blocks.BlockTest;
 import cat.jiu.mcs.blocks.compressed.*;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.util.base.sub.BaseBlockSub;
+import cat.jiu.mcs.util.base.sub.BaseBlockSubT;
 import cat.jiu.mcs.util.type.CustomStuffType;
-
+import cat.jiu.mcs.util.type.CustomStuffType.ChangeBlockType;
 import cofh.thermalfoundation.init.TFBlocks;
 
 import moze_intel.projecte.gameObjs.ObjHandler;
@@ -45,13 +48,13 @@ import net.minecraftforge.oredict.OreDictionary;
 import slimeknights.tconstruct.shared.TinkerCommons;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 
-import vazkii.botania.common.block.ModFluffBlocks;
-
 @SuppressWarnings("static-access")
 public class MCSBlocks {
 	public static final BlockCompressor compressor = new BlockCompressor();
+	public static final BlockCompressorSlave compressor_slave = new BlockCompressorSlave();
 	public static final BlockCreativeEnergy creative_energy = new BlockCreativeEnergy();
 	public static final BaseBlockSub C_creative_energy_B = new CompressedCreativeEnergy("compressed_creative_energy", new ItemStack(creative_energy));
+	
 	public static cat.jiu.core.util.base.BaseBlock.Normal TEST_BLOCK = null;
 	static {
 		if(MCS.test()) {
@@ -71,6 +74,7 @@ public class MCSBlocks {
 	public static BotaniaBlock botania = null;
 	public static IndustrialCraft ic2 = null;
 	public static AppliedEnergistics2 ae2 = null;
+	public static Torcherino torcherino = null;
 
 	public MCSBlocks() {
 		if(Configs.Custom.Enable_Mod_Stuff) {
@@ -80,6 +84,7 @@ public class MCSBlocks {
 			ic2 = Configs.Custom.Mod_Stuff.IndustrialCraft ? new IndustrialCraft() : null;
 			ae2 = Configs.Custom.Mod_Stuff.AppliedEnergistics2 ? new AppliedEnergistics2() : null;
 			
+			torcherino = Configs.Custom.Mod_Stuff.Torcherino ? new Torcherino() : null;
 			enderio = Configs.Custom.Mod_Stuff.EnderIO ? new EnderIOBlock() : null;
 			projecte = Configs.Custom.Mod_Stuff.ProjectE ? new ProjectEBlock() : null;
 			environmental_tech = Configs.Custom.Mod_Stuff.EnvironmentalTech ? new EnvironmentalTechBlock() : null;
@@ -89,16 +94,19 @@ public class MCSBlocks {
 	}
 
 	public static final void registerOreDict() {
-		for(BaseBlockSub block : MCSResources.SUB_BLOCKS) {
-			if(block.createOreDictionary()) {
-				if(!block.addOtherOreDictionary().isEmpty()) {
-					List<String> ores = block.addOtherOreDictionary();
-					for(int i = 0; i < 16; i++) {
-						String ore = ores.get(i);
-						OreDictionary.registerOre((i + 1) + "x" + ore, new ItemStack(block, 1, i));
+		for(Block sblock : MCSResources.BLOCKS) {
+			if(sblock instanceof BaseBlockSub) {
+				BaseBlockSub block = (BaseBlockSub) sblock;
+				if(block.createOreDictionary()) {
+					if(!block.addOtherOreDictionary().isEmpty()) {
+						List<String> ores = block.addOtherOreDictionary();
+						for(int i = 0; i < 16; i++) {
+							String ore = ores.get(i);
+							OreDictionary.registerOre((i + 1) + "x" + ore, new ItemStack(block, 1, i));
+						}
 					}
+					JiuUtils.item.registerCompressedOre(block.getUnCompressedName(), block, block.isHas());
 				}
-				JiuUtils.item.registerCompressedOre(block.getUnCompressedName(), block, block.isHas());
 			}
 		}
 	}
@@ -108,7 +116,7 @@ public class MCSBlocks {
 		public final Has has = new Has();
 
 		public class Normal {
-			public final BaseBlockSub C_BONE_B = new BaseBlockSub("compressed_bone_block", new ItemStack(Blocks.BONE_BLOCK));
+			public final BaseBlockSubT C_BONE_B = new BaseBlockSubT("compressed_bone_block", new ItemStack(Blocks.BONE_BLOCK));
 			public final BaseBlockSub C_DIAMOND_B = new BaseBlockSub("compressed_diamond_block", new ItemStack(Blocks.DIAMOND_BLOCK));
 			public final BaseBlockSub C_DIRT_B = new BaseBlockSub("compressed_dirt_block", new ItemStack(Blocks.DIRT));
 			public final BaseBlockSub C_EMERALD_B = new BaseBlockSub("compressed_emerald_block", new ItemStack(Blocks.EMERALD_BLOCK));
@@ -148,12 +156,12 @@ public class MCSBlocks {
 			public final BaseBlockSub C_LOG_B = new BaseBlockSub("compressed_log_block", new ItemStack(Blocks.LOG));
 			public final BaseBlockSub C_OBSIDIAN_B = new BaseBlockSub("compressed_obsidian_block", new ItemStack(Blocks.OBSIDIAN));
 			public final BaseBlockSub C_LAPIS_B = new BaseBlockSub("compressed_lapis_block", new ItemStack(Blocks.LAPIS_BLOCK));
-			public final BaseBlockSub C_BEDROCK_B = new BaseBlockSub("compressed_bedrock_block", new ItemStack(Blocks.BEDROCK)).addChangeBlock(7, new int[]{0, 0, 30}, true, new ItemStack(Blocks.COMMAND_BLOCK));
-			public final BaseBlockSub C_COAL_B = new BaseBlockSub("compressed_coal_block", new ItemStack(Blocks.COAL_BLOCK)).addChangeBlock(7, new int[]{0, 0, 10}, true, new ItemStack(C_DIAMOND_B, 1, 6));
-			public final BaseBlockSub C_COBBLE_STONE_B = new BaseBlockSub("compressed_cobblestone_block", new ItemStack(Blocks.COBBLESTONE)).addChangeBlock(15, new int[]{0, 20, 0}, true, new ItemStack(C_BEDROCK_B, 1, 6));
+			public final BaseBlockSub C_BEDROCK_B = new BaseBlockSub("compressed_bedrock_block", new ItemStack(Blocks.BEDROCK)).addChangeBlock(7, 0, 0, 30, true, new ItemStack(Blocks.COMMAND_BLOCK));
+			public final BaseBlockSub C_COAL_B = new BaseBlockSub("compressed_coal_block", new ItemStack(Blocks.COAL_BLOCK)).addChangeBlock(7, 0, 0, 10, true, new ItemStack(C_DIAMOND_B, 1, 6));
+			public final BaseBlockSub C_COBBLE_STONE_B = new BaseBlockSub("compressed_cobblestone_block", new ItemStack(Blocks.COBBLESTONE)).addChangeBlock(15, 0, 20, 0, true, new ItemStack(C_BEDROCK_B, 1, 6));
 
-			public final BaseBlockSub C_SLIME_BLOCK_B = new CompressedSlimeBlock("compressed_slime_block", new ItemStack(Blocks.SLIME_BLOCK)).setNoToolBreak();
-			public final BaseBlockSub C_TNT_B = new CompressedTNT("compressed_tnt_block", new ItemStack(Blocks.TNT)).setNoToolBreak();
+			public final BaseBlockSub C_SLIME_BLOCK_B = new CompressedSlimeBlock("compressed_slime_block", new ItemStack(Blocks.SLIME_BLOCK)).setNotNeedToolBreak();
+			public final BaseBlockSub C_TNT_B = new CompressedTNT("compressed_tnt_block", new ItemStack(Blocks.TNT)).setNotNeedToolBreak();
 
 			// Update 3.0.0
 			public final BaseBlockSub C_stone_granite_B = new BaseBlockSub("compressed_stone_granite", new ItemStack(Blocks.STONE, 1, 1));
@@ -182,6 +190,15 @@ public class MCSBlocks {
 			// Update 3.0.1
 			public final BaseBlockSub C_chest_B = new CompressedChest("compressed_chest", new ItemStack(Blocks.CHEST), 54);
 			public final BaseBlockSub C_shulker_box_B = new CompressedChest("compressed_shulker_box", new ItemStack(Blocks.PURPLE_SHULKER_BOX), 32);
+			
+			// updata 3.0.3
+			public final BaseBlockSub C_grass_block_B = new BaseBlockSub("compressed_grass_block", new ItemStack(Blocks.GRASS));
+			public final BaseBlockSub C_coarse_dirt_B = new BaseBlockSub("compressed_coarse_dirt", new ItemStack(Blocks.DIRT, 1, 1));
+			public final BaseBlockSub C_podzol_B = new BaseBlockSub("compressed_podzol", new ItemStack(Blocks.DIRT, 1, 2));
+			public final BaseBlockSub C_wet_sponge_B = new BaseBlockSub("compressed_wet_sponge", new ItemStack(Blocks.SPONGE, 1, 1));
+			public final BaseBlockSub C_red_sandstone_B = new BaseBlockSub("compressed_red_sandstone", new ItemStack(Blocks.RED_SANDSTONE));
+			public final BaseBlockSub C_red_sandstone_carved_B = new BaseBlockSub("compressed_red_sandstone_carved", new ItemStack(Blocks.RED_SANDSTONE, 1, 1));
+			public final BaseBlockSub C_red_sandstone_smooth_B = new BaseBlockSub("compressed_red_sandstone_smooth", new ItemStack(Blocks.RED_SANDSTONE, 1, 2));
 			
 		}
 
@@ -427,29 +444,29 @@ public class MCSBlocks {
 	// Fix in 3.0.1
 	public static class BotaniaBlock {
 		public final Normal normal = new Normal();
-		private static vazkii.botania.common.block.ModBlocks blocks = new vazkii.botania.common.block.ModBlocks();
 
 		public class Normal {
-			public final BaseBlockSub C_MANA_STEEL_B = register("compressed_mana_stell_block", new ItemStack(blocks.storage, 1, 0)).setModelState("normal");
-			public final BaseBlockSub C_TERRASTELL_STEEL_B = register("compressed_terrasteel_stell_block", new ItemStack(blocks.storage, 1, 1)).setModelState("normal");
-			public final BaseBlockSub C_ELEMENTIUM_STELL_B = register("compressed_elementium_block", new ItemStack(blocks.storage, 1, 2)).setModelState("normal");
-			public final BaseBlockSub C_MANA_DIAMOND_B = register("compressed_mana_diamond_block", new ItemStack(blocks.storage, 1, 3)).setModelState("normal");
-			public final BaseBlockSub C_DRAGONSTONE_B = register("compressed_dragonstone_block", new ItemStack(blocks.storage, 1, 4)).setModelState("normal");
+			public final BaseBlockSub C_MANA_STEEL_B = register("compressed_mana_stell_block", ItemStack.EMPTY).setModelState("normal");
+			public final BaseBlockSub C_TERRASTELL_STEEL_B = register("compressed_terrasteel_stell_block", ItemStack.EMPTY).setModelState("normal");
+			public final BaseBlockSub C_ELEMENTIUM_STELL_B = register("compressed_elementium_block", ItemStack.EMPTY).setModelState("normal");
+			public final BaseBlockSub C_MANA_DIAMOND_B = register("compressed_mana_diamond_block", ItemStack.EMPTY).setModelState("normal");
+			public final BaseBlockSub C_DRAGONSTONE_B = register("compressed_dragonstone_block", ItemStack.EMPTY).setModelState("normal");
 
-			public final BaseBlockSub C_LIVING_WOOD_B = register("compressed_livingwood_block", new ItemStack(blocks.livingwood)).setModelState("normal");
-			public final BaseBlockSub C_LIVING_ROCK_B = register("compressed_livingrock_block", new ItemStack(blocks.livingrock)).setModelState("normal");
-			public final BaseBlockSub C_DREAMWOOD_B = register("compressed_dreamwood_block", new ItemStack(blocks.dreamwood)).setModelState("normal");
-			public final BaseBlockSub C_ELFGLASS_B = register("compressed_elfglass_block", new ItemStack(blocks.elfGlass)).setModelState("normal");
-			public final BaseBlockSub C_MANA_GLASS_B = register("compressed_managlass_block", new ItemStack(blocks.manaGlass)).setModelState("normal");
-			public final BaseBlockSub C_SHIMMERROCK_B = register("compressed_shimmerrock_block", new ItemStack(blocks.shimmerrock)).setModelState("normal");
+			public final BaseBlockSub C_LIVING_WOOD_B = register("compressed_livingwood_block", ItemStack.EMPTY).setModelState("normal");
+			public final BaseBlockSub C_LIVING_ROCK_B = register("compressed_livingrock_block", ItemStack.EMPTY).setModelState("normal");
+			public final BaseBlockSub C_DREAMWOOD_B = register("compressed_dreamwood_block", ItemStack.EMPTY).setModelState("normal");
+			
+			public final BaseBlockSub C_ELFGLASS_B = register("compressed_elfglass_block", ItemStack.EMPTY).setModelState("normal");
+			public final BaseBlockSub C_MANA_GLASS_B = register("compressed_managlass_block", ItemStack.EMPTY).setModelState("normal");
+			public final BaseBlockSub C_SHIMMERROCK_B = register("compressed_shimmerrock_block", ItemStack.EMPTY).setModelState("normal");
 
-			public final BaseBlockSub C_QUARTZ_TYPE_DARK_B = register("compressed_quartz_dark_block", new ItemStack(ModFluffBlocks.darkQuartz)).setModelState("normal");
-			public final BaseBlockSub C_QUARTZ_TYPE_MANA_B = register("compressed_quartz_mana_block", new ItemStack(ModFluffBlocks.manaQuartz)).setModelState("normal");
-			public final BaseBlockSub C_QUARTZ_TYPE_BLAZE_B = register("compressed_quartz_blaze_block", new ItemStack(ModFluffBlocks.blazeQuartz)).setModelState("normal");
-			public final BaseBlockSub C_QUARTZ_TYPE_LAVENDER_B = register("compressed_quartz_lavender_block", new ItemStack(ModFluffBlocks.lavenderQuartz)).setModelState("normal");
-			public final BaseBlockSub C_QUARTZ_TYPE_RED_B = register("compressed_quartz_red_block", new ItemStack(ModFluffBlocks.redQuartz)).setModelState("normal");
-			public final BaseBlockSub C_QUARTZ_TYPE_EELF_B = register("compressed_quartz_eelf_block", new ItemStack(ModFluffBlocks.elfQuartz)).setModelState("normal");
-			public final BaseBlockSub C_QUARTZ_TYPE_SUNNY_B = register("compressed_quartz_sunny_block", new ItemStack(ModFluffBlocks.sunnyQuartz)).setModelState("normal");
+			public final BaseBlockSub C_QUARTZ_TYPE_DARK_B = register("compressed_quartz_dark_block", ItemStack.EMPTY).setModelState("normal");
+			public final BaseBlockSub C_QUARTZ_TYPE_MANA_B = register("compressed_quartz_mana_block", ItemStack.EMPTY).setModelState("normal");
+			public final BaseBlockSub C_QUARTZ_TYPE_BLAZE_B = register("compressed_quartz_blaze_block", ItemStack.EMPTY).setModelState("normal");
+			public final BaseBlockSub C_QUARTZ_TYPE_LAVENDER_B = register("compressed_quartz_lavender_block", ItemStack.EMPTY).setModelState("normal");
+			public final BaseBlockSub C_QUARTZ_TYPE_RED_B = register("compressed_quartz_red_block", ItemStack.EMPTY).setModelState("normal");
+			public final BaseBlockSub C_QUARTZ_TYPE_EELF_B = register("compressed_quartz_eelf_block", ItemStack.EMPTY).setModelState("normal");
+			public final BaseBlockSub C_QUARTZ_TYPE_SUNNY_B = register("compressed_quartz_sunny_block", ItemStack.EMPTY).setModelState("normal");
 		}
 
 		private BaseBlockSub register(String nameIn, ItemStack unCompressedItem) {
@@ -470,8 +487,8 @@ public class MCSBlocks {
 			public final BaseBlockSub C_Advanced_machine_B = register("compressed_advanced_machine", "resource", 13);
 			public final BaseBlockSub C_reactor_vessel_B = register("compressed_reactor_vessel", "resource", 14);
 			public final BaseBlockSub C_REFRACTORY_BRICKS_B = register("compressed_refractory_bricks", "refractory_bricks");
-			public final BaseBlockSub C_CONSTRUCTION_FOAM_B = register("compressed_construction_foam", "foam").setNoToolBreak();
-			public final BaseBlockSub C_CONSTRUCTION_FOAM_REINFORCED_B = register("compressed_construction_foam_reinforced", "foam", 1).setNoToolBreak();
+			public final BaseBlockSub C_CONSTRUCTION_FOAM_B = register("compressed_construction_foam", "foam").setNotNeedToolBreak().setCanThroughBlock();
+			public final BaseBlockSub C_CONSTRUCTION_FOAM_REINFORCED_B = register("compressed_construction_foam_reinforced", "foam", 1).setNotNeedToolBreak().setCanThroughBlock();
 
 			public final BaseBlockSub C_rubber_wood_B = register("compressed_rubber_wood", "rubber_wood");
 		}
@@ -511,6 +528,20 @@ public class MCSBlocks {
 			return BaseBlockSub.register(nameIn, stack, "appliedenergistics2");
 		}
 	}
+	
+	public static class Torcherino {
+		public final Normal normal = new Normal();
+
+		public class Normal {
+			// updata 3.0.3
+			public final BaseBlockSub C_torcherino_B = new CompressedTorcherino("compressed_torcherino", new ItemStack(Block.getBlockFromName("torcherino:blocktorcherino")));
+		}
+	}
+	
+	@SuppressWarnings("unused")
+	private static ItemStack getStack(String modid, String name, int meta) {
+		return new ItemStack(Item.getByNameOrId(modid + ":" + name), 1, meta);
+	}
 
 	private static final Map<String, Map<Integer, CustomStuffType.ChangeBlockType>> CHANGE_BLOCK_MAP = Maps.newHashMap();
 
@@ -518,12 +549,9 @@ public class MCSBlocks {
 	public static final Map<String, Map<Integer, CustomStuffType.ChangeBlockType>> CHANGE_OTHER_BLOCK_MAP = Maps.newHashMap();
 
 	public static void reinitChangeBlock() throws JsonIOException, JsonSyntaxException, FileNotFoundException {
-		for(int i = 0; i < CHANGE_BLOCK_MAP.size() + 2; i++) {
-			CHANGE_BLOCK_MAP.clear();
-			CHANGE_MCS_BLOCK_MAP.clear();
-			CHANGE_OTHER_BLOCK_MAP.clear();
-		}
-
+		CHANGE_BLOCK_MAP.clear();
+		CHANGE_MCS_BLOCK_MAP.clear();
+		CHANGE_OTHER_BLOCK_MAP.clear();
 		initChangeBlock();
 	}
 
@@ -533,7 +561,7 @@ public class MCSBlocks {
 			JsonObject file = new JsonParser().parse(new FileReader(config)).getAsJsonObject();
 			for(Map.Entry<String, JsonElement> jobj : file.entrySet()) {
 
-				JsonArray arr = (JsonArray) jobj.getValue();// 主清单
+				JsonArray arr = jobj.getValue().getAsJsonArray();// 主清单
 				for(int i = 0; i < arr.size(); ++i) {
 					JsonObject obj = (JsonObject) arr.get(i);// 子清单
 
@@ -547,11 +575,11 @@ public class MCSBlocks {
 			}
 		}
 
-		for(String name : CHANGE_BLOCK_MAP.keySet()) {
-			if(MCSResources.SUB_BLOCKS_NAME.contains(name)) {
-				CHANGE_MCS_BLOCK_MAP.put(name, CHANGE_BLOCK_MAP.get(name));
+		for(Entry<String, Map<Integer, ChangeBlockType>> entry : CHANGE_BLOCK_MAP.entrySet()) {
+			if(MCSResources.BLOCKS_NAME.contains(entry.getKey())) {
+				CHANGE_MCS_BLOCK_MAP.put(entry.getKey(), entry.getValue());
 			}else {
-				CHANGE_OTHER_BLOCK_MAP.put(name, CHANGE_BLOCK_MAP.get(name));
+				CHANGE_OTHER_BLOCK_MAP.put(entry.getKey(), entry.getValue());
 			}
 		}
 	}

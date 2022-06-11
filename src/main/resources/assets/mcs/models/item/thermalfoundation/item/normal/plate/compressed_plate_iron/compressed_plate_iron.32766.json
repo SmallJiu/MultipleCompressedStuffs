@@ -1,7 +1,0 @@
-{
-    "parent": "item/generated",
-    "textures": {
-		"layer0": "thermalfoundation:items/material/plate_iron",
-		"layer1": "mcs:items/infinity"
-    }
-}

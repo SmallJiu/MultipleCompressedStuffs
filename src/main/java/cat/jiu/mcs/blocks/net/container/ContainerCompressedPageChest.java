@@ -18,53 +18,29 @@ import net.minecraft.world.World;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.items.SlotItemHandler;
 
-public class ContainerCompressedPageChest extends BaseUI.BaseContainer {
+public class ContainerCompressedPageChest extends BaseUI.BaseContainer<TileEntityCompressedChest> {
 	protected final int meta;
 	protected final int slots;
 	private final int maxPage;
-	protected TileEntityCompressedChest te = null;
 	private final SoundEvent closeSound;
 
 	public ContainerCompressedPageChest(EntityPlayer player, World world, BlockPos pos) {
 		super(player, world, pos);
 		this.meta = JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos));
-		TileEntity te = world.getTileEntity(pos);
 		
-		if(te instanceof TileEntityCompressedChest) this.te = (TileEntityCompressedChest) te;
 		if(this.te != null) {
 			this.closeSound = this.te.getCloseSound();
 			this.slots = this.te.getSlotSize();
 			this.maxPage = this.slots / 54;
-
-			int slotIndex = 0;
-			for(int y = 0; y < 6; y++) {
-				for(int x = 0; x < 9; x++) {
-					this.addSlotToContainer(new SlotItemHandler(this.te.getSlots(), slotIndex, 8 + 18 * x, 18 + 18 * y));
-					slotIndex += 1;
-				}
-			}
-			int x = 8;
-			int y = 140;
-			
-			slotIndex = 0;
-			for(int slotX = 0; slotX < 9; slotX++) {
-				this.addSlotToContainer(new Slot(this.inventory, slotIndex, x + 18 * slotX, y + (18 * 2) + 22));
-				slotIndex += 1;
-			}
-			
-			for(int slotY = 0; slotY < 3; slotY++) {
-				for(int slotX = 0; slotX < 9; slotX++) {
-					this.addSlotToContainer(new Slot(this.inventory, slotIndex, x + 18 * slotX, y + (18 * slotY)));
-					slotIndex += 1;
-				}
-			}
+			super.addHandlerSlot(this.te.getSlots(), 8, 18, 9, 6);
+			super.addPlayerInventorySlot(8, 140);
 			this.toPage(0);
 		}else {
 			throw new RuntimeException("It is not Compressed Chest! : " + pos.toString());
 		}
 	}
+	
 	public boolean toPage(int page) {
 		if(!this.canNextPage()) return false; // 检查能不能翻页
 		if(page < 0) return false; // 检查页数是不是小于0
@@ -73,7 +49,7 @@ public class ContainerCompressedPageChest extends BaseUI.BaseContainer {
 		if(this.world.isRemote) {
 			NetworkHandler.INSTANCE.sendToServer(new MsgCompressorPageChest(page));
 		}
-		TileEntity te = this.world.getTileEntity(this.blockPos);
+		TileEntity te = this.world.getTileEntity(this.pos);
 		if(te instanceof TileEntityCompressedChest) {
 			this.te = (TileEntityCompressedChest) te;
 			int stackIndex = page * 54;
@@ -108,7 +84,7 @@ public class ContainerCompressedPageChest extends BaseUI.BaseContainer {
 
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int index) {
-		TileEntity te = this.world.getTileEntity(blockPos);
+		TileEntity te = this.world.getTileEntity(this.pos);
 		if(te instanceof TileEntityCompressedChest)
 			this.te = (TileEntityCompressedChest) te;
 		Slot slot = this.inventorySlots.get(index);
@@ -139,7 +115,7 @@ public class ContainerCompressedPageChest extends BaseUI.BaseContainer {
 	@Override
 	public void onContainerClosed(EntityPlayer playerIn) {
 		if(this.closeSound != null) {
-			this.world.playSound(null, this.blockPos, this.closeSound, SoundCategory.BLOCKS, 1, 1);
+			this.world.playSound(null, this.pos, this.closeSound, SoundCategory.BLOCKS, 1, 1);
 		}
 		super.onContainerClosed(playerIn);
 	}
@@ -147,9 +123,6 @@ public class ContainerCompressedPageChest extends BaseUI.BaseContainer {
 
 	@Override
 	public void sendChanges() {
-		if(this.world.getTileEntity(this.blockPos) instanceof TileEntityCompressedChest) {
-			this.te = (TileEntityCompressedChest) this.world.getTileEntity(this.blockPos);
-		}
 		if(!this.te.getWorld().isRemote) {
 			int emptySlot = this.te.getEmptySlots();
 			if(this.emptySlots != emptySlot) {

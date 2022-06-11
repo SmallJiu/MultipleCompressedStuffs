@@ -9,7 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cat.jiu.core.util.JiuUtils;
-
+import cat.jiu.core.util.Time;
 import cat.jiu.mcs.util.type.CustomStuffType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -23,15 +23,15 @@ public class InitChangeBlock {
 				List<ItemStack> drop = new ArrayList<>();
 				int meta = Integer.parseInt(dropobj.getKey());
 				boolean canDrop = true;
-				int[] time = new int[3];
+				Time time = new Time();
 				loadMeta.add(meta);
 
 				if(dropE instanceof JsonObject) {
 					JsonObject dropo = (JsonObject) dropE;
 					if(dropo.has("time")) {
-						time = parseTime(dropo.get("time").getAsString());
+						time = Time.getTime(obj.get("time"));
 					}else {
-						time = parseTime(obj.get("time").getAsString());
+						time = Time.getTime(obj.get("time"));
 					}
 					if(dropo.has("item")) {
 						JsonArray dropa = dropo.getAsJsonArray("item");
@@ -49,7 +49,7 @@ public class InitChangeBlock {
 					}
 				}else if(dropE instanceof JsonArray) {
 					JsonArray dropa = (JsonArray) dropE;
-					time = parseTime(dropa.get(0).getAsString());
+					time = Time.getTime(dropa.get(0));
 
 					if(dropa.size() == 1) {
 						if(MCSResources.BLOCKS_NAME.contains(name)) {
@@ -71,7 +71,7 @@ public class InitChangeBlock {
 				typeMap.put(meta, new CustomStuffType.ChangeBlockType(drop, time, canDrop));
 			}
 
-			int[] time = parseTime(obj.get("time").getAsString());
+			Time time = Time.getTime(obj.get("time"));
 			boolean canDrop = true;
 			if(obj.has("canDrop")) {
 				canDrop = obj.get("canDrop").getAsBoolean();
@@ -88,7 +88,7 @@ public class InitChangeBlock {
 				}
 			}
 		}else {
-			int[] time = parseTime(obj.get("time").getAsString());
+			Time time = Time.getTime(obj.get("time"));
 			boolean canDrop = true;
 			if(obj.has("canDrop")) {
 				canDrop = obj.get("canDrop").getAsBoolean();
@@ -103,16 +103,5 @@ public class InitChangeBlock {
 				typeMap.put(meta, new CustomStuffType.ChangeBlockType(drop, time, canDrop));
 			}
 		}
-	}
-
-	private static int[] parseTime(String times) throws NumberFormatException {
-		String[] name = JiuUtils.other.custemSplitString(times, ":");
-		int tick_temp = Integer.parseInt(name[2]);
-		int tick = tick_temp > 20 ? 19 : tick_temp;
-		int s = Integer.parseInt(name[1]) > 60 ? 59 : Integer.parseInt(name[1]);
-		int m = Integer.parseInt(name[0]);
-		int[] time = {tick, s, m};
-
-		return time;
 	}
 }

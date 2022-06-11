@@ -1,7 +1,0 @@
-{
-    "parent": "mcs:block/overlay_model",
-	"textures": {
-        "all": "draconicevolution:blocks/animated/creative_rf_source",
-		"overlay": "mcs:blocks/compressed_10"
-    }
-}

@@ -1,7 +1,0 @@
-{
-	"parent": "mcs:block/overlay_model",
-	"textures": {
-		"all": "thermalfoundation:blocks/ore/ore_nickel",
-		"overlay": "mcs:blocks/compressed_9"
-	}
-}

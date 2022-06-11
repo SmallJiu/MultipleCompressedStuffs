@@ -119,6 +119,7 @@ public class ContainerCompressor extends Container {
 		if(this.world.getTileEntity(this.pos) instanceof TileEntityCompressor) {
 			this.te = (TileEntityCompressor) this.world.getTileEntity(this.pos);
 			this.bigEnergy = this.te.storage.getEnergyStoredWithBigInteger();
+			this.activate = this.te.getActivateList();
 		}
 
 		if(!this.te.getWorld().isRemote) {
@@ -146,7 +147,7 @@ public class ContainerCompressor extends Container {
 					slot = this.te.slotCanCraft(i);
 					this.activate.set(i, this.te.slotCanCraft(i));
 					for(IContainerListener listener : this.listeners) {
-						listener.sendWindowProperty(this, 10000 + i, (byte) (slot ? 1 : 0));
+						listener.sendWindowProperty(this, 10000 + i, slot ? 1 : 0);
 					}
 				}
 			}
@@ -197,6 +198,10 @@ public class ContainerCompressor extends Container {
 
 	public BigInteger getBigEnergy() {
 		return this.bigEnergy;
+	}
+	
+	public void setBigEnergy(BigInteger energy) {
+		this.bigEnergy = energy;
 	}
 
 	public int getShrinkCount() {

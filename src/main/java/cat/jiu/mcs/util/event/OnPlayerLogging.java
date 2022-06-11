@@ -18,7 +18,6 @@ public class OnPlayerLogging {
 	@SubscribeEvent
 	public static void onPlayerLogging(PlayerLoggedInEvent event) {
 		EntityPlayer player = event.player;
-		MCS.instance.log.info(player.getEntityWorld().isRemote + "");
 
 		if(player.getName().equals(MCS.OWNER)) {
 			if(JiuUtils.day.isTheDay(9, 7)) {

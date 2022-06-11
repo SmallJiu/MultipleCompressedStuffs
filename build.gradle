@@ -12,7 +12,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.12.2-3.0.2-20220522225805"
+version = "1.12.2-3.0.3-20220610234154"
 group = "cat.jiu.mcs"
 archivesBaseName = "MultipleCompressedStuffs"
 
@@ -90,8 +90,9 @@ repositories {
 }
 
 dependencies {
-	compile fileTree(dir:'./libs', include:['JiuCore-1.12.2-1.0.10-20220522225957-dev.jar'])
+	compile fileTree(dir:'./libs', include:['JiuCore-1.12.2-1.1.0-20220608013004-dev.jar'])
 	
+	deobfCompile "curse.maven:Hwyla-253449:2568751" // 1.8.26-B41
 	deobfCompile 'curse.maven:baubles-227083:2518667' //1.5.2
 	deobfCompile "curse.maven:brandons-core-231382:3051539" // 2.4.19.214
 	deobfCompile "curse.maven:codechicken-lib-1-8-242818:2779848" // 3.2.3.358
@@ -101,6 +102,7 @@ dependencies {
 	deobfCompile 'cofh:RedstoneFlux:1.12-2.1.0.7:universal'
 	deobfCompile "curse.maven:valkyrielib-245480:2691542" // 2.0.20.1
 	
+	deobfCompile 'curse.maven:torcherino-236794:2661356'// 7.6.0
 	deobfCompile 'curse.maven:industrialcraft-242638:2746892'
 	deobfCompile 'cofh:ThermalFoundation:1.12.2-2.6.3.27:universal'
 	deobfCompile "curse.maven:applied_energistics2-223794:2747063" //rv6-stable-7

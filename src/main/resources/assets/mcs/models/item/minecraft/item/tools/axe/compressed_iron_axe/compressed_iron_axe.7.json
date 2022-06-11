@@ -1,7 +1,0 @@
-{
-"parent":"item/handheld",
-	"textures": {
-		"layer0": "minecraft:items/iron_axe",
-		"layer1": "mcs:items/tools/compressed_8"
-	}
-}

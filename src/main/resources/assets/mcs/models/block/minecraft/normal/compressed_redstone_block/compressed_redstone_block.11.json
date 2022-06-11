@@ -1,7 +1,0 @@
-{
-    "parent": "mcs:block/overlay_model",
-	"textures": {
-        "all": "minecraft:blocks/redstone_block",
-		"overlay": "mcs:blocks/compressed_12"
-    }
-}

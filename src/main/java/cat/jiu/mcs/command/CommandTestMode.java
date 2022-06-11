@@ -23,7 +23,7 @@ public class CommandTestMode extends BaseCommand.CommandNormal {
 		|| sender instanceof MinecraftServer
 		|| sender instanceof RConConsoleSource) {
 			TestModel.test = !TestModel.test;
-			MCS.instance.log.info("Test Model is " + (TestModel.test ? "Enable" : "Disable"));
+			MCS.getLogOS().info("Test Model is " + (TestModel.test ? "Enable" : "Disable"));
 			sender.sendMessage(new TextComponentKeybind("Test Model is " + (TestModel.test ? "Enable" : "Disable")));
 		}
 	}

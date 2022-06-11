@@ -1,7 +1,0 @@
-{
-    "parent": "mcs:block/overlay_model",
-	"textures": {
-        "all": "mcs:blocks/un/daylight_detector_side",
-		"overlay": "mcs:blocks/compressed_1"
-    }
-}

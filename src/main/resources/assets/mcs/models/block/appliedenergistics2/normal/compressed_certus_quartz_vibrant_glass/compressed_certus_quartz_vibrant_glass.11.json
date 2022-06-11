@@ -1,7 +1,0 @@
-{
-	"parent": "mcs:block/overlay_model",
-	"textures": {
-		"all": "mcs:blocks/un/quartz_glass",
-		"overlay": "mcs:blocks/compressed_12"
-	}
-}
