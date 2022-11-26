@@ -1,6 +1,7 @@
 package cat.jiu.mcs.util.base;
 
 import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.api.recipe.ISmeltingRecipe;
 import cat.jiu.mcs.util.CompressedLevel;
 import net.minecraft.block.Block;
 import net.minecraft.client.resources.I18n;
@@ -11,10 +12,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BaseBlockItem extends ItemBlock implements ICompressedStuff {
+public class BaseCompressedBlockItem extends ItemBlock implements ICompressedStuff, ISmeltingRecipe {
 	protected final ICompressedStuff subBlock;
 
-	public <T extends Block & ICompressedStuff> BaseBlockItem(T block) {
+	public <T extends Block & ICompressedStuff> BaseCompressedBlockItem(T block) {
 		super(block);
 		this.subBlock = block;
 		this.setHasSubtypes(true);
@@ -74,5 +75,13 @@ public class BaseBlockItem extends ItemBlock implements ICompressedStuff {
 	@Override
 	public CompressedLevel getLevel() {
 		return this.subBlock.getLevel();
+	}
+	@Override
+	public boolean canCreateRecipe(int meta) {
+		return this.subBlock instanceof ISmeltingRecipe ? ((ISmeltingRecipe) this.subBlock).canCreateRecipe(meta) : false;
+	}
+	@Override
+	public ItemStack getSmeltingOutput(int meta) {
+		return this.subBlock instanceof ISmeltingRecipe ? ((ISmeltingRecipe) this.subBlock).getSmeltingOutput(meta) : null;
 	}
 }

@@ -3,20 +3,22 @@ package cat.jiu.mcs.util.client;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.util.client.model.block.*;
 import cat.jiu.mcs.util.client.model.item.*;
+import cat.jiu.mcs.util.client.model.texture.BlockTextures;
+import cat.jiu.mcs.util.client.model.texture.ItemTextures;
+import cat.jiu.mcs.util.client.model.texture.MCSTexture;
+import cat.jiu.mcs.util.client.model.texture.ModTextures;
 import cat.jiu.mcs.util.init.MCSResources;
 
 import net.minecraft.client.resources.IResourcePack;
@@ -30,7 +32,7 @@ import net.minecraftforge.fml.common.ModContainer;
 
 public class CompressedStuffResourcePack implements IResourcePack {
 	protected final IResourcePack modPack;
-	public static final HashMap<String, JsonElement> customTextures = Maps.newHashMap();
+	public static final HashMap<String, MCSTexture> customTextures = Maps.newHashMap();
 	
 	public CompressedStuffResourcePack() {
 		ModContainer mod = Loader.instance().getIndexedModList().get(MCS.MODID);
@@ -53,22 +55,23 @@ public class CompressedStuffResourcePack implements IResourcePack {
 			return steam;
 		}
 		
-		if(location.toString().equals("mcs:models/block/compressed_torcherino.json")) {
+		if("mcs:models/block/compressed_torcherino.json".equals(location.toString())) {
 			InputStream steam = this.getClass().getResourceAsStream("/" + resource);
 			MCS.startmodel += System.currentTimeMillis() - i;
 			return steam;
 		}else if(resource.contains("blockstates")) {
-			ArrayList<String> list = Lists.newArrayList(Lists.newArrayList(resource.split("/")));
-			return new BlockStateJson(this.getOwnerMod(resource, list), this.getResourceName(list), this.getHasState(resource), i).toStream();
+			List<String> list = Lists.newArrayList(resource.split("/"));
+			return new BlockStateJson(this.getOwnerMod(resource, list), this.getResourceName(list), this.isHasModel(resource), i).toStream();
 		}else if(resource.contains("models/block")) {
-			ArrayList<String> list = Lists.newArrayList(Lists.newArrayList(resource.split("/")));
-			JsonElement originalTexture = this.getOriginalTexture(resource, list);
-			if(originalTexture != null) {
+			List<String> list = Lists.newArrayList(resource.split("/"));
+			MCSTexture texture = this.getOriginalTexture(resource, list);
+			if(texture != null) {
+				JsonElement originalTexture = texture.toJson();
 				String owner = this.getOwnerMod(resource, list);
 				String name = this.getResourceName(list);
 				int meta = this.getMeta(list);
 				
-				if(this.getHasState(resource)) {
+				if(this.isHasModel(resource)) {
 					if(this.isSideModel(originalTexture)) {
 						return new SideBlockModel(originalTexture.getAsJsonObject(), owner, name, meta, true, i).toStream();
 					}else if(this.isOverlayModel(originalTexture)) {
@@ -89,24 +92,25 @@ public class CompressedStuffResourcePack implements IResourcePack {
 				}
 			}
 		}else if(this.isItemBlock(resource)) {
-			ArrayList<String> list = Lists.newArrayList(Lists.newArrayList(resource.split("/")));
+			List<String> list = Lists.newArrayList(resource.split("/"));
 			String owner = this.getOwnerMod(resource, list);
 			String name = this.getResourceName(list);
 			int meta = this.getMeta(list);
-			if(this.getHasState(resource)) {
+			if(this.isHasModel(resource)) {
 				return new ItemBlockModel(owner, name, meta, true, i).toStream();
 			}else {
 				return new ItemBlockModel(owner, name, meta, false, i).toStream();
 			}
 		}else if(resource.contains("models/item") || resource.contains("item/food")) {
-			ArrayList<String> list = Lists.newArrayList(Lists.newArrayList(resource.split("/")));
-			JsonElement originalTexture = this.getOriginalTexture(resource, list);
-			if(originalTexture != null) {
+			List<String> list = Lists.newArrayList(resource.split("/"));
+			MCSTexture texture = this.getOriginalTexture(resource, list);
+			if(texture != null) {
+				JsonElement originalTexture = texture.toJson();
 				String owner = this.getOwnerMod(resource, list);
 				String name = this.getResourceName(list);
 				int meta = this.getMeta(list);
 				
-				if(this.isTool(resource)) {
+				if(resource.contains("item/tools")) {
 					return new ToolItemModel(originalTexture, owner, name, meta, i).toStream();
 				}else {
 					return new NormalItemModel(originalTexture, owner, name, meta, i).toStream();
@@ -117,42 +121,31 @@ public class CompressedStuffResourcePack implements IResourcePack {
 		return modPack.getInputStream(location);
 	}
 	
-	protected JsonElement getOriginalTexture(String resource, List<String> list) {
-		JsonObject file = MCS.getTextures();
-		String owner = this.getOwnerMod(resource, list);
-		boolean ItemOrBlock = resource.contains("models/item");
-		String has = this.getHasState(resource) ? "has" : "normal";
+	protected MCSTexture getOriginalTexture(String resource, List<String> list) {
 		String name = this.getResourceName(list);
 		
 		if(customTextures.containsKey(name)) {
 			return customTextures.get(name);
 		}
 		
-		if(file.has(owner)) {
-			JsonObject mod = file.getAsJsonObject(owner);
+		String owner = this.getOwnerMod(resource, list);
+		boolean ItemOrBlock = resource.contains("models/item");
+		if(!ItemOrBlock) {
+//			MCS.hasModTextures(owner);
+		}
+		
+		if(MCS.hasModTextures(owner)) {
+			ModTextures mod = MCS.getTextures(owner);
 			if(ItemOrBlock) {
-				JsonObject items = mod.getAsJsonObject("item");
-				
-				if(this.isTool(resource)) {
-					JsonObject tools = items.getAsJsonObject("tools").getAsJsonObject(this.getToolClass(list));
-					if(tools.has(name)) {
-						return tools.get(name);
-					}
-				}else if(this.isFood(resource)) {
-					JsonObject foods = items.getAsJsonObject("foods");
-					if(foods.has(name)) {
-						return foods.get(name);
-					}
-				}else {
-					return items.get(name);
+				ItemTextures items = mod.getItems();
+				if(items.hasTexture(name)) {
+					return items.getTexture(name);
 				}
 			}else {
-				JsonObject blocks = mod.getAsJsonObject("block");
-				if(blocks.has(has)) {
-					JsonObject hasObj = blocks.getAsJsonObject(has);
-					if(hasObj.has(name)) {
-						return hasObj.get(name);
-					}
+				BlockTextures blocks = mod.getBlocks();
+				boolean isHas = this.isHasModel(resource);
+				if(blocks.hasTexture(isHas, name)) {
+					return blocks.getTexture(isHas, name);
 				}
 			}
 		}
@@ -178,22 +171,6 @@ public class CompressedStuffResourcePack implements IResourcePack {
 		return false;
 	}
 	
-	protected String getToolClass(List<String> list) {
-		int index = this.startIndexOf(list, "tools");
-		if(index == -1) {
-			return "sword";
-		}
-		return list.get(index + 1);
-	}
-	
-	protected boolean isFood(String resource) {
-		return resource.contains("item/food");
-	}
-	
-	protected boolean isTool(String resource) {
-		return resource.contains("item/tools");
-	}
-	
 	protected String getOwnerMod(String resource, List<String> list) {
 		if(resource.contains("blockstates")) {
 			return list.get(3);
@@ -204,7 +181,7 @@ public class CompressedStuffResourcePack implements IResourcePack {
 		return "minecraft";
 	}
 	
-	protected boolean getHasState(String resource) {
+	protected boolean isHasModel(String resource) {
 		return resource.contains("has/compressed");
 	}
 	
@@ -225,38 +202,20 @@ public class CompressedStuffResourcePack implements IResourcePack {
 	protected <T> T getLast(List<T> list) {
 		if(list.size() > 0) {
 			return list.get(list.size()-1);
-		}else if(list.size() == 0) {
-			return list.get(0);
 		}
 		return null;
 	}
 	
-	protected int startIndexOf(List<String> list, String o) {
-		if (o == null) {
-			for(int i = 0; i < list.size(); i++) {
-				if(list.get(i) == null) return i;
-			}
-        }else {
-            for (int i = 0; i < list.size(); i++)
-                if(o.equalsIgnoreCase(list.get(i))) return i;
-        }
-        return -1;
-	}
-	
 	@Override
 	public boolean resourceExists(ResourceLocation location) {
-		long i = System.currentTimeMillis();
 		if(this.modPack.resourceExists(location)) {
-			MCS.startmodel += System.currentTimeMillis() - i;
 			return true;
 		}
-		
+
+		long i = System.currentTimeMillis();
 		String resource = String.format("%s/%s/%s", "assets", location.getResourceDomain(), location.getResourcePath());
 		if(resource.startsWith("assets/mcs/blockstates/") || resource.startsWith("assets/mcs/models/")) {
-			if(resource.endsWith(".json.mcmeta")) {
-				MCS.startmodel += System.currentTimeMillis() - i;
-				return false;
-			}
+			if(resource.endsWith(".json.mcmeta")) return false;
 			String name = this.getResourceName(Lists.newArrayList(resource.split("/")));
             if(MCSResources.STUFF_NAME.contains(name)) {
     			MCS.startmodel += System.currentTimeMillis() - i;
@@ -267,23 +226,8 @@ public class CompressedStuffResourcePack implements IResourcePack {
 		return false;
 	}
 	
-	@Override
-	public Set<String> getResourceDomains() {
-		return Sets.newHashSet("mcs");
-	}
-	
-	@Override
-	public BufferedImage getPackImage() throws IOException {
-		return modPack.getPackImage();
-	}
-	
-	@Override
-	public String getPackName() {
-		return "MCS Models";
-	}
-
-	@Override
-	public <T extends IMetadataSection> T getPackMetadata(MetadataSerializer metadataSerializer, String metadataSectionName) throws IOException {
-		return this.modPack.getPackMetadata(metadataSerializer, metadataSectionName);
-	}
+	public Set<String> getResourceDomains() {return modPack.getResourceDomains();}
+	public BufferedImage getPackImage() throws IOException {return modPack.getPackImage();}
+	public String getPackName() {return "MCS Models";}
+	public <T extends IMetadataSection> T getPackMetadata(MetadataSerializer metadataSerializer, String metadataSectionName) throws IOException {return this.modPack.getPackMetadata(metadataSerializer, metadataSectionName);}
 }

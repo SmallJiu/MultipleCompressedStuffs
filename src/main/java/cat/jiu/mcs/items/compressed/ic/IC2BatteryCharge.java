@@ -5,13 +5,13 @@ import java.util.Locale;
 
 import com.google.common.collect.Lists;
 
-import cat.jiu.core.api.events.item.IItemInPlayerInventoryTick;
-import cat.jiu.core.api.events.player.IPlayerCraftedItemEvent;
+import cat.jiu.core.api.events.iface.item.IItemInPlayerInventoryTick;
+import cat.jiu.core.api.events.iface.player.IPlayerCraftedItemEvent;
 import cat.jiu.core.util.JiuCoreEvents;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.util.MCSUtil;
-import cat.jiu.mcs.util.base.sub.BaseItemSub;
+import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
 import cat.jiu.mcs.util.init.CraftCompressedStuffTrigger;
 
 import ic2.api.item.ElectricItem;
@@ -37,13 +37,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class IC2BatteryCharge extends BaseItemSub implements IItemInPlayerInventoryTick, IPlayerCraftedItemEvent, IElectricItem, IPseudoDamageItem, ICustomDamageItem {
+public class IC2BatteryCharge extends BaseCompressedItem implements IItemInPlayerInventoryTick, IPlayerCraftedItemEvent, IElectricItem, IPseudoDamageItem, ICustomDamageItem {
 	protected final double baseMaxEnergy;
 	protected final int energyLevel;
 	protected final double fransferLimit;
@@ -106,8 +104,8 @@ public class IC2BatteryCharge extends BaseItemSub implements IItemInPlayerInvent
 	}
 
 	@Override
-	public void onPlayerCraftedItemInGui(EntityPlayer player, IInventory gui, ItemStack stack, World world, BlockPos pos) {
-		if(!world.isRemote) {
+	public void onPlayerCraftedItemInGui(EntityPlayer player, IInventory gui, ItemStack stack) {
+		if(!player.world.isRemote) {
 			if(stack.getItem() == this) {
 				List<ItemStack> craftIn = Lists.newArrayList();
 

@@ -1,5 +1,6 @@
 package cat.jiu.mcs.util.base.sub.tool;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,14 +12,17 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 import cat.jiu.core.util.JiuUtils;
+import cat.jiu.core.util.RegisterModel;
 import cat.jiu.core.util.base.BaseItemTool;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.api.recipe.IToolRecipe;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.exception.NonToolException;
 import cat.jiu.mcs.util.CompressedLevel;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
+import cat.jiu.mcs.util.init.MCSItems;
 import cat.jiu.mcs.util.init.MCSResources;
 import cat.jiu.mcs.util.type.CustomStuffType;
 
@@ -29,53 +33,67 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemPickaxe;
-import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemSword;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.common.IRarity;
 
+import net.minecraftforge.common.IRarity;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompressedStuff {
-	public static BaseItemShovel register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
+public class BaseCompressedSword extends BaseItemTool.MetaSword implements ICompressedStuff, IToolRecipe {
+	public static BaseCompressedSword register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab, ICompressedStuff craftMaterialStack, ICompressedStuff craftRodStack) {
 		if(baseItem == null || baseItem.isEmpty()) return null;
 		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
-			return new BaseItemShovel(name, baseItem, ownerMod, tab);
+			return new BaseCompressedSword(name, baseItem, ownerMod, tab, craftMaterialStack, craftRodStack);
 		}else {
 			return null;
 		}
 	}
+	
+	public static BaseCompressedSword register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
+		return register(name, baseItem, ownerMod, tab, null, null);
+	}
 
-	public static BaseItemShovel register(String name, ItemStack baseItem, String ownerMod) {
-		return register(name, baseItem, ownerMod, MCS.COMPERESSED_ITEMS);
+	public static BaseCompressedSword register(String name, ItemStack baseItem, String ownerMod) {
+		return register(name, baseItem, ownerMod, MCS.COMPERESSED_TOOLS);
 	}
 
 	protected final ItemStack baseToolStack;
-	protected final ItemSpade baseTool;
+	protected final ItemSword baseTool;
 	protected final float baseAttackDamage;
 	protected final String ownerMod;
-
-	public BaseItemShovel(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab) {
+	protected final ICompressedStuff craftMaterialStack;
+	protected final ICompressedStuff craftRodStack;
+	public BaseCompressedSword(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab) {
+		this(name, baseTool, ownerMod, tab, null, null);
+	}
+	public BaseCompressedSword(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab, ICompressedStuff craftMaterialStack) {
+		this(name, baseTool, ownerMod, tab, craftMaterialStack, MCSItems
+				.minecraft
+				.normal
+				.C_STICK_I);
+	}
+	public BaseCompressedSword(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab, ICompressedStuff craftMaterialStack, ICompressedStuff craftRodStack) {
 		super(MCS.MODID, name, tab, true, getToolMaterial(baseTool), ModSubtypes.values());
 		this.baseToolStack = baseTool;
-		if(baseTool.getItem() instanceof ItemSpade) {
-			this.baseTool = (ItemSpade) baseTool.getItem();
+		if(baseTool.getItem() instanceof ItemSword) {
+			this.baseTool = (ItemSword) baseTool.getItem();
 		}else {
 			this.baseTool = null;
-			throw new NonToolException(baseTool, "Shovel");
+			throw new NonToolException(baseTool, "Sword");
 		}
 		this.ownerMod = ownerMod;
-		this.baseAttackDamage = 3.0F + this.baseTool.attackDamage;
+		this.baseAttackDamage = 3.0F + (baseTool.getItem() instanceof ItemSword ? ((ItemSword) baseTool.getItem()).getAttackDamage() : 0);
 		this.setMaxMetadata(16);
+		this.craftMaterialStack = craftMaterialStack;
+		this.craftRodStack = craftRodStack;
 
 		if(!ownerMod.equals("custom")) {
 			MCSResources.ITEMS.add(this);
@@ -88,14 +106,19 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 			throw new RuntimeException("name must not be owner mod. Name: " + name + ", OwnerMod: " + baseTool.getItem().getRegistryName().getResourceDomain());
 		}
 	}
-
-	public BaseItemShovel(String name, ItemStack baseTool) {
+	public BaseCompressedSword(String name, ItemStack baseTool, ICompressedStuff craftMaterialStack, ICompressedStuff craftRodStack) {
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS, craftMaterialStack, craftRodStack);
+	}
+	public BaseCompressedSword(String name, ItemStack baseTool, ICompressedStuff craftMaterialStack) {
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS, craftMaterialStack);
+	}
+	public BaseCompressedSword(String name, ItemStack baseTool) {
 		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS);
 	}
 
 	private static ToolMaterial getToolMaterial(ItemStack baseItem) {
-		if(baseItem.getItem() instanceof ItemPickaxe) {
-			return ((ItemPickaxe) baseItem.getItem()).toolMaterial;
+		if(baseItem.getItem() instanceof ItemSword) {
+			return ((ItemSword) baseItem.getItem()).material;
 		}
 		return ToolMaterial.WOOD;
 	}
@@ -111,9 +134,14 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 		return i.toString();
 	}
 
+	@Override
+	public boolean canHarvestBlock(IBlockState state, ItemStack stack) {
+		return this.baseTool.canHarvestBlock(state);
+	}
+
 	public Map<Integer, Integer> EnchantabilityLevelMap = Maps.newHashMap();
 
-	public BaseItemShovel setEnchantabilityLevel(Map<Integer, Integer> EnchantabilityLevelMap) {
+	public BaseCompressedSword setEnchantabilityLevel(Map<Integer, Integer> EnchantabilityLevelMap) {
 		this.EnchantabilityLevelMap = EnchantabilityLevelMap;
 		return this;
 	}
@@ -129,7 +157,7 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 
 	public Map<Integer, ItemStack> RepairableMap = Maps.newHashMap();
 
-	public BaseItemShovel setRepairableMap(Map<Integer, ItemStack> RepairableMap) {
+	public BaseCompressedSword setRepairableMap(Map<Integer, ItemStack> RepairableMap) {
 		this.RepairableMap = RepairableMap;
 		return this;
 	}
@@ -145,7 +173,7 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 
 	public Map<Integer, Float> DestroySpeedMap = Maps.newHashMap();
 
-	public BaseItemShovel setDestroySpeed(Map<Integer, Float> DestroySpeedMap) {
+	public BaseCompressedSword setDestroySpeed(Map<Integer, Float> DestroySpeedMap) {
 		this.DestroySpeedMap = DestroySpeedMap;
 		return this;
 	}
@@ -155,13 +183,12 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 		if(!this.DestroySpeedMap.isEmpty() && this.DestroySpeedMap.containsKey(stack.getMetadata())) {
 			return this.DestroySpeedMap.get(stack.getMetadata());
 		}
-		float base = this.baseTool.getDestroySpeed(this.baseToolStack, state);
-		return (float) MCSUtil.item.getMetaValue(base, stack);
+		return this.baseTool.getDestroySpeed(this.baseToolStack, state);
 	}
 
 	public Map<Integer, Integer> MaxDamageMap = Maps.newHashMap();
 
-	public BaseItemShovel setMaxDamage(Map<Integer, Integer> MaxDamageMap) {
+	public BaseCompressedSword setMaxDamage(Map<Integer, Integer> MaxDamageMap) {
 		this.MaxDamageMap = MaxDamageMap;
 		return this;
 	}
@@ -176,12 +203,12 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 
 	Map<Integer, CustomStuffType.ToolModifiersType> AttributeModifierMap = Maps.newHashMap();
 
-	public BaseItemShovel setAttributeModifierMap(Map<Integer, CustomStuffType.ToolModifiersType> attributeModifierMap) {
-		this.AttributeModifierMap = attributeModifierMap;
+	public BaseCompressedSword setAttributeModifierMap(Map<Integer, CustomStuffType.ToolModifiersType> AttributeModifierMap) {
+		this.AttributeModifierMap = AttributeModifierMap;
 		return this;
 	}
 
-	public BaseItemShovel addAttributeModifierMap(int meta, double speed, double damage) {
+	public BaseCompressedSword addAttributeModifierMap(int meta, double speed, double damage) {
 		this.AttributeModifierMap.put(meta, new CustomStuffType.ToolModifiersType(speed, damage));
 		return this;
 	}
@@ -206,42 +233,9 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 		return multimap;
 	}
 
-	public Map<Integer, Integer> HarvestLevelMap = Maps.newHashMap();
-
-	public BaseItemShovel setHarvestLevelMap(Map<Integer, Integer> HarvestLevelMap) {
-		this.HarvestLevelMap = HarvestLevelMap;
-		return this;
-	}
-
-	@Override
-	public int getHarvestLevel(ItemStack stack, String toolClass, EntityPlayer player, IBlockState blockState) {
-		if(!this.HarvestLevelMap.isEmpty() && this.HarvestLevelMap.containsKey(stack.getMetadata())) {
-			return this.HarvestLevelMap.get(stack.getMetadata());
-		}
-		int level = this.baseTool.getHarvestLevel(stack, toolClass, player, blockState);
-		level += (int) ((stack.getMetadata() + 1) * 0.339341);
-		return level;
-	}
-
-	public Map<Integer, List<IBlockState>> CanHarvestBlock = Maps.newHashMap();
-
-	public BaseItemShovel setCanHarvestBlockMap(Map<Integer, List<IBlockState>> CanHarvestBlock) {
-		this.CanHarvestBlock = CanHarvestBlock;
-		return this;
-	}
-
-	@Override
-	public boolean canHarvestBlock(IBlockState state, ItemStack stack) {
-		boolean lag = false;
-		if(this.CanHarvestBlock.containsKey(stack.getMetadata())) {
-			lag = this.CanHarvestBlock.get(stack.getMetadata()).contains(state);
-		}
-		return this.baseTool.canHarvestBlock(state, this.baseToolStack) || lag;
-	}
-
 	Map<Integer, EnumRarity> RarityMap = null;
 
-	public BaseItemShovel setRarityMap(Map<Integer, EnumRarity> map) {
+	public BaseCompressedSword setRarityMap(Map<Integer, EnumRarity> map) {
 		this.RarityMap = map;
 		return this;
 	}
@@ -270,7 +264,7 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 
 	private Map<Integer, Boolean> HasEffectMap = Maps.newHashMap();
 
-	public BaseItemShovel setHasEffectMap(Map<Integer, Boolean> map) {
+	public BaseCompressedSword setHasEffectMap(Map<Integer, Boolean> map) {
 		this.HasEffectMap = map;
 		return this;
 	}
@@ -291,56 +285,56 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 
 	private List<String> shiftInfos = new ArrayList<String>();
 
-	public BaseItemShovel addCustemShiftInformation(String... custemInfo) {
+	public BaseCompressedSword addCustemShiftInformation(String... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
 			shiftInfos.add(custemInfo[i]);
 		}
 		return this;
 	}
 
-	public BaseItemShovel addCustemShiftInformation(List<String> infos) {
+	public BaseCompressedSword addCustemShiftInformation(List<String> infos) {
 		this.shiftInfos = infos;
 		return this;
 	}
 
 	private Map<Integer, List<String>> metaShiftInfos = Maps.newHashMap();
 
-	public BaseItemShovel addCustemShiftInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedSword addCustemShiftInformation(Map<Integer, List<String>> infos) {
 		this.metaShiftInfos = infos;
 		return this;
 	}
 
 	private List<String> infos = new ArrayList<String>();
 
-	public BaseItemShovel addCustemInformation(String... custemInfo) {
+	public BaseCompressedSword addCustemInformation(String... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
 			infos.add(custemInfo[i]);
 		}
 		return this;
 	}
 
-	public BaseItemShovel addCustemInformation(List<String> infos) {
+	public BaseCompressedSword addCustemInformation(List<String> infos) {
 		this.infos = infos;
 		return this;
 	}
 
 	private Map<Integer, List<String>> metaInfos = Maps.newHashMap();
 
-	public BaseItemShovel addCustemInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedSword addCustemInformation(Map<Integer, List<String>> infos) {
 		this.metaInfos = infos;
 		return this;
 	}
 
 	ItemStack infoStack = null;
 
-	public BaseItemShovel setInfoStack(ItemStack stack) {
+	public BaseCompressedSword setInfoStack(ItemStack stack) {
 		this.infoStack = stack;
 		return this;
 	}
 
 	private Map<Integer, ItemStack> infoStacks = Maps.newHashMap();
 
-	public BaseItemShovel setInfoStack(Map<Integer, ItemStack> infoStacks) {
+	public BaseCompressedSword setInfoStack(Map<Integer, ItemStack> infoStacks) {
 		this.infoStacks = infoStacks;
 		return this;
 	}
@@ -349,6 +343,7 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
 		int meta = stack.getMetadata();
+
 		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.baseToolStack, infoStacks);
 		MCSUtil.info.addCompressedInfo(meta, tooltip, this.getUnCompressedItemLocalizedName(), this);
 
@@ -356,8 +351,13 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 			tooltip.add(I18n.format("info.mcs.owner_mod") + " : " + TextFormatting.AQUA.toString() + this.getOwnerMod());
 		}
 
-		if(MCS.test()) {
+		if(MCS.dev()) {
+			Color rgb = new Color(Color.WHITE.getRGB() - (new Color(16, 16, 16).getRGB() * (stack.getMetadata())));
+			tooltip.add("R: " + rgb.getRed());
+			tooltip.add("G: " + rgb.getGreen());
+			tooltip.add("B: " + rgb.getBlue());
 			tooltip.add("最大耐久: " + this.getMaxDamage(stack));
+			tooltip.add("附魔能力: " + this.baseTool.getItemEnchantability(this.baseToolStack) + " -> " + this.getItemEnchantability(stack));
 		}
 
 		MCSUtil.info.addMetaInfo(meta, tooltip, this.infos, this.metaInfos);
@@ -370,12 +370,12 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 	}
 
 	@Override
-	public void getItemModel() {
+	public void getItemModel(RegisterModel util) {
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
-			this.model.registerItemModel(this, meta, this.ownerMod + "/item/tools/shovel/" + this.name, this.name + "." + meta);
+			util.registerItemModel(this, meta, this.ownerMod + "/item/tools/sword/" + this.name, this.name + "." + meta);
 		}
-		this.model.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/tools/shovel/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+		util.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/tools/sword/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
 	}
 	
 	@Override
@@ -406,7 +406,7 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 
 	private boolean makeRecipe = true;
 
-	public BaseItemShovel setMakeDefaultStackRecipe(boolean makeRecipe) {
+	public BaseCompressedSword setMakeDefaultStackRecipe(boolean makeRecipe) {
 		this.makeRecipe = makeRecipe;
 		return this;
 	}
@@ -419,10 +419,35 @@ public class BaseItemShovel extends BaseItemTool.MetaShovel implements ICompress
 	public final String getUnCompressedItemLocalizedName() {
 		return this.baseToolStack.getDisplayName();
 	}
-	
 	private final CompressedLevel type = new CompressedLevel(this);
 	@Override
 	public CompressedLevel getLevel() {
 		return this.type;
+	}
+	@Override
+	public boolean canCreateRecipe(int meta) {
+		return this.craftMaterialStack!=null && this.craftRodStack!=null;
+	}
+	@Override
+	public ItemStack getMaterial(int meta) {
+		if(this.craftMaterialStack.isBlock() && (this.craftMaterialStack.isHas() || this.craftMaterialStack.getAsCompressedBlock().baseRecipeHasItem())) {
+			if(meta <= 0) {
+				return this.craftMaterialStack.getUnCompressedStack();
+			}else {
+				return this.craftMaterialStack.getStack(meta-1);
+			}
+		}
+		return this.craftMaterialStack.getStack(meta);
+	}
+	@Override
+	public ItemStack getRod(int meta) {
+		if(this.craftRodStack.isBlock() && (this.craftRodStack.isHas() || this.craftRodStack.getAsCompressedBlock().baseRecipeHasItem())) {
+			if(meta <= 0) {
+				return this.craftRodStack.getUnCompressedStack();
+			}else {
+				return this.craftRodStack.getStack(meta-1);
+			}
+		}
+		return this.craftRodStack.getStack(meta);
 	}
 }

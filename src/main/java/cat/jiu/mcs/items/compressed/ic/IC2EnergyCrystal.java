@@ -4,11 +4,11 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import cat.jiu.core.api.events.player.IPlayerCraftedItemEvent;
+import cat.jiu.core.api.events.iface.player.IPlayerCraftedItemEvent;
 import cat.jiu.core.util.JiuCoreEvents;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
-import cat.jiu.mcs.util.base.sub.BaseItemSub;
+import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
 
 import ic2.api.item.ICustomDamageItem;
 import ic2.api.item.IElectricItem;
@@ -16,6 +16,7 @@ import ic2.core.IC2;
 import ic2.core.item.BaseElectricItem;
 import ic2.core.item.IPseudoDamageItem;
 import ic2.core.util.LogCategory;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiCrafting;
 import net.minecraft.client.resources.I18n;
@@ -27,11 +28,10 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
-public class IC2EnergyCrystal extends BaseItemSub implements IPlayerCraftedItemEvent, IElectricItem, IPseudoDamageItem, ICustomDamageItem {
+public class IC2EnergyCrystal extends BaseCompressedItem implements IPlayerCraftedItemEvent, IElectricItem, IPseudoDamageItem, ICustomDamageItem {
 	protected final double baseMaxEnergy;
 	protected final int energyLevel;
 	protected final double fransferLimit;
@@ -83,8 +83,8 @@ public class IC2EnergyCrystal extends BaseItemSub implements IPlayerCraftedItemE
 	}
 
 	@Override
-	public void onPlayerCraftedItemInGui(EntityPlayer player, IInventory gui, ItemStack stack, World world, BlockPos pos) {
-		if(!world.isRemote) {
+	public void onPlayerCraftedItemInGui(EntityPlayer player, IInventory gui, ItemStack stack) {
+		if(!player.world.isRemote) {
 			if(stack.getItem() == this) {
 				List<ItemStack> craftIn = Lists.newArrayList();
 

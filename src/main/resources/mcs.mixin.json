@@ -1,0 +1,18 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "cat.jiu.mcs.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"mixins": [
+		"MixinAEStorageCell"
+	],
+	"client": [
+		
+	],
+	"server": [
+		
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

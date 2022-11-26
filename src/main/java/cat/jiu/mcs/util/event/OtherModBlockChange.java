@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-import cat.jiu.core.api.events.player.IPlayerPlaceBlock;
+import cat.jiu.core.api.events.iface.player.IPlayerPlaceBlock;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.tileentity.TileEntityChangeBlock;
@@ -30,14 +30,14 @@ public class OtherModBlockChange implements IPlayerPlaceBlock {
 		}
 		TileEntity tileentity = world.getTileEntity(pos);
 		if(tileentity != null && tileentity instanceof TileEntityChangeBlock) {
-			String log = JiuUtils.day.getDate() + " Player: " + player.getName() + " Place [" + name + "@" + meta + "] at" + " Dim: " + player.dimension + ", DimName: " + world.provider.getDimensionType().getName().toLowerCase() + ", " + pos;
+			String log = JiuUtils.day.getDate() + " Player: " + player.getName() + " Place [" + JiuUtils.item.getStackFromBlockState(placedBlock).getDisplayName() + "] at" + " Dim: " + player.dimension + ", DimName: " + world.provider.getDimensionType().getName().toLowerCase() + ", " + pos;
 			MCS.getLogOS().info(log);
 			
 			this.writeLog("logs/jiu/" + MCS.MODID + "/" + "mcs_server.log", log);
 		}
 	}
 	
-	private void writeLog(String path, String name) {
+	private void writeLog(String path, String arg) {
 		File filepath = new File(path);
 
 		if(!filepath.exists()) {
@@ -45,7 +45,7 @@ public class OtherModBlockChange implements IPlayerPlaceBlock {
 		}
 		try {
 			OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(filepath, true));
-			out.write(name + "\n");
+			out.write(arg + "\n");
 			out.close();
 		}catch(IOException e) {
 			e.printStackTrace();

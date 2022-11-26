@@ -4,11 +4,11 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Queue;
 
-import cat.jiu.core.api.events.item.IItemInPlayerHandTick;
-import cat.jiu.core.api.events.item.IItemInPlayerInventoryTick;
+import cat.jiu.core.api.events.iface.item.IItemInPlayerHandTick;
+import cat.jiu.core.api.events.iface.item.IItemInPlayerInventoryTick;
 import cat.jiu.core.util.JiuCoreEvents;
 import cat.jiu.mcs.util.MCSUtil;
-import cat.jiu.mcs.util.base.sub.BaseItemSub;
+import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
 
 import ic2.api.reactor.IReactor;
 import ic2.api.reactor.IReactorComponent;
@@ -23,15 +23,15 @@ import net.minecraft.item.ItemStack;
 public class IC2ReactorFuelRod extends IC2ReactorAssembly implements IItemInPlayerInventoryTick, IItemInPlayerHandTick {
 	public final int numberOfCells;
 	protected final ItemReactorUranium base;
-	protected final BaseItemSub depletedItem;
+	protected final BaseCompressedItem depletedItem;
 	
-	public IC2ReactorFuelRod(String name, String baseItem, BaseItemSub depletedItem) {
+	public IC2ReactorFuelRod(String name, String baseItem, BaseCompressedItem depletedItem) {
 		this(name, baseItem, 0, depletedItem);
 	}
-	public IC2ReactorFuelRod(String name, String baseItem, int meta, BaseItemSub depletedItem) {
+	public IC2ReactorFuelRod(String name, String baseItem, int meta, BaseCompressedItem depletedItem) {
 		this(name, new ItemStack(Item.getByNameOrId(baseItem), 1, meta), depletedItem);
 	}
-	public IC2ReactorFuelRod(String name, ItemStack baseItem, BaseItemSub depletedItem) {
+	public IC2ReactorFuelRod(String name, ItemStack baseItem, BaseCompressedItem depletedItem) {
 		super(name, baseItem);
 		if(this.baseComponent instanceof ItemReactorUranium) {
 			this.base = (ItemReactorUranium) baseItem.getItem();

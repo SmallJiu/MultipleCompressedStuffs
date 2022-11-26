@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentKeybind;
 
-public class CommandGetOreDict extends BaseCommand.CommandNormal {
+class CommandGetOreDict extends BaseCommand.CommandNormal {
 	public CommandGetOreDict(String name, int level) {
 		super(name, MCS.MODID, level);
 	}

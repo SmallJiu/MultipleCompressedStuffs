@@ -1,5 +1,7 @@
 package cat.jiu.mcs.blocks.net.client.gui;
 
+import java.io.IOException;
+
 import org.lwjgl.input.Mouse;
 
 import cat.jiu.core.util.JiuUtils;
@@ -66,6 +68,19 @@ public class GUICompressedScroolChest extends BaseUI.BaseGui<ContainerCompressed
 				this.selectRows = selectRows;
 				this.container.scrollTo(this.currentScroll);
 			}
+		}
+	}
+	
+	@Override
+	public void handleMouseInput() throws IOException {
+		super.handleMouseInput();
+		if(this.container.canScroll()) {
+			int outRows = (this.container.getSlots() + 9 - 1) / 9 - 6;
+			int dWheel = Mouse.getEventDWheel();
+            if (dWheel > 0)dWheel = 1;
+            if (dWheel < 0)dWheel = -1;
+            this.currentScroll = (float)((double)this.currentScroll - (double)dWheel / (double)outRows);
+            this.container.scrollTo(this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F));
 		}
 	}
 

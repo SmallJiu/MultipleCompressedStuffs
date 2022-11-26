@@ -18,10 +18,10 @@ public class AEFluidStorageCell extends AEStorageCell<IAEFluidStack> {
 	public AEFluidStorageCell(String name, ItemStack stack) {
 		super(name, stack);
 	}
-
+	
 	@Override
-	public int getTotalTypes(ItemStack cellItem) {
-		return 15;
+	protected double getBaseTypes() {
+		return 2.9798;
 	}
 
 	@Override

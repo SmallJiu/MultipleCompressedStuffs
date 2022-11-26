@@ -22,7 +22,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ContainerCompressedScroolChest extends BaseContainer<TileEntityCompressedChest> {
 	protected final int meta;
-	protected final int slots;
+	protected int slots;
 	private final SoundEvent closeSound;
 
 	public ContainerCompressedScroolChest(EntityPlayer player, World world, BlockPos pos) {
@@ -45,6 +45,9 @@ public class ContainerCompressedScroolChest extends BaseContainer<TileEntityComp
 					slotIndex += 1;
 				}
 			}
+//			super.addHandlerSlot(this.te.getSlots(), 8, 18, 9, 6, args -> {
+//				return new UndefinedIndexSlot((IItemHandler)args[0], (int)args[1], (int)args[2], (int)args[3]);
+//			});
 			super.addPlayerInventorySlot(8, 140);
 			this.scrollTo(0.0F);
 		}else {
@@ -118,6 +121,9 @@ public class ContainerCompressedScroolChest extends BaseContainer<TileEntityComp
 
 	public boolean canScroll() {
 		return this.slots > 54;
+	}
+	public int getSlots() {
+		return slots;
 	}
 
 	@SideOnly(Side.CLIENT)

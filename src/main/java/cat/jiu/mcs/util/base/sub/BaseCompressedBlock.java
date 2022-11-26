@@ -1,27 +1,28 @@
 package cat.jiu.mcs.util.base.sub;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import cat.jiu.core.api.ITime;
 import cat.jiu.core.util.JiuUtils;
+import cat.jiu.core.util.RegisterModel;
 import cat.jiu.core.util.Time;
 import cat.jiu.core.util.base.BaseBlock;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.api.recipe.ISmeltingRecipe;
 import cat.jiu.mcs.blocks.tileentity.TileEntityChangeBlock;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.util.CompressedLevel;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
-import cat.jiu.mcs.util.base.BaseBlockItem;
-import cat.jiu.mcs.util.base.sub.BaseBlockSub.HarvestType;
+import cat.jiu.mcs.util.base.BaseCompressedBlockItem;
 import cat.jiu.mcs.util.init.MCSBlocks;
 import cat.jiu.mcs.util.init.MCSResources;
 import cat.jiu.mcs.util.type.CustomStuffType;
@@ -56,21 +57,25 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SuppressWarnings("deprecation")
-public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompressedStuff, ITileEntityProvider {
-
+public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements ICompressedStuff, ITileEntityProvider, ISmeltingRecipe {
 	protected final boolean recipeIsRepeat;
 	protected Block baseBlock;
 	protected IBlockState baseState;
 	protected final String ownerMod;
 	protected ItemStack baseItem;
+	public BaseCompressedBlock(String nameIn, @Nonnull UnFoundItem baseItem, String ownerMod,  Material materialIn, SoundType soundIn, CreativeTabs tabIn, float hardnessIn) {
+		this(nameIn, ItemStack.EMPTY, ownerMod, materialIn, soundIn, tabIn, hardnessIn);
+		this.unFoundItem = baseItem;
+	}
 	
-	public BaseBlockSubT(String nameIn, @Nonnull ItemStack baseItem, String ownerMod,  Material materialIn, SoundType soundIn, CreativeTabs tabIn, float hardnessIn) {
+	public BaseCompressedBlock(String nameIn, @Nonnull ItemStack baseItem, String ownerMod,  Material materialIn, SoundType soundIn, CreativeTabs tabIn, float hardnessIn) {
 		super("mcs", nameIn, materialIn, soundIn, tabIn, hardnessIn);
 		this.baseItem = baseItem;
 		this.recipeIsRepeat = this.checkRecipe(baseItem);
@@ -106,43 +111,43 @@ public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompre
 		}
 	}
 	
-	public BaseBlockSubT(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, Material materialIn, SoundType soundIn, CreativeTabs tabIn) {
+	public BaseCompressedBlock(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, Material materialIn, SoundType soundIn, CreativeTabs tabIn) {
 		this(nameIn, unCompressedItem, ownerMod, materialIn, soundIn, tabIn, 4.0F);
 	}
 
-	public BaseBlockSubT(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, Material materialIn, CreativeTabs tabIn) {
+	public BaseCompressedBlock(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, Material materialIn, CreativeTabs tabIn) {
 		this(nameIn, unCompressedItem, ownerMod, materialIn, SoundType.METAL, tabIn);
 	}
 
-	public BaseBlockSubT(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, SoundType soundIn, CreativeTabs tabIn) {
+	public BaseCompressedBlock(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, SoundType soundIn, CreativeTabs tabIn) {
 		this(nameIn, unCompressedItem, ownerMod, Material.IRON, soundIn, tabIn);
 	}
 
-	public BaseBlockSubT(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, CreativeTabs tabIn, float hardnessIn) {
+	public BaseCompressedBlock(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, CreativeTabs tabIn, float hardnessIn) {
 		this(nameIn, unCompressedItem, ownerMod, Material.IRON, SoundType.METAL, tabIn, hardnessIn);
 	}
 
-	public BaseBlockSubT(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, float hardnessIn) {
+	public BaseCompressedBlock(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, float hardnessIn) {
 		this(nameIn, unCompressedItem, ownerMod, MCS.COMPERESSED_BLOCKS, hardnessIn);
 	}
 
-	public BaseBlockSubT(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, CreativeTabs tabIn) {
+	public BaseCompressedBlock(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, CreativeTabs tabIn) {
 		this(nameIn, unCompressedItem, ownerMod, Material.IRON, tabIn);
 	}
 
-	public BaseBlockSubT(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod) {
+	public BaseCompressedBlock(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod) {
 		this(nameIn, unCompressedItem, ownerMod, MCS.COMPERESSED_BLOCKS);
 	}
 
-	public BaseBlockSubT(@Nonnull ItemStack unCompressedItem, String ownerMod) {
+	public BaseCompressedBlock(@Nonnull ItemStack unCompressedItem, String ownerMod) {
 		this("compressed_" + unCompressedItem.getItem().getRegistryName().getResourcePath(), unCompressedItem, ownerMod);
 	}
 
-	public BaseBlockSubT(String nameIn, @Nonnull ItemStack unCompressedItem) {
+	public BaseCompressedBlock(String nameIn, @Nonnull ItemStack unCompressedItem) {
 		this(nameIn, unCompressedItem, unCompressedItem.getItem().getRegistryName().getResourceDomain());
 	}
 
-	public BaseBlockSubT(@Nonnull ItemStack unCompressedItem) {
+	public BaseCompressedBlock(@Nonnull ItemStack unCompressedItem) {
 		this(unCompressedItem, unCompressedItem.getItem().getRegistryName().getResourceDomain());
 	}
 	
@@ -150,7 +155,7 @@ public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompre
 		return false;
 	}
 	
-	public BaseBlockSubT setUnCompressed(ItemStack stack) {
+	public BaseCompressedBlock setUnCompressed(ItemStack stack) {
 		if(stack == null || stack.isEmpty()) {
 			throw new RuntimeException(this.name + ": unCompressedItem can NOT be EMPTY!");
 		}
@@ -172,124 +177,165 @@ public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompre
 	// Custom start
 	
 	private Map<Integer, Boolean> canUseWrenchBreaks = null;
-	public BaseBlockSubT canUseWrenchBreak(Map<Integer, Boolean> canbe) {
+	public BaseCompressedBlock canUseWrenchBreak(Map<Integer, Boolean> canbe) {
 		if(Loader.isModLoaded("thermalfoundation") || Loader.isModLoaded("buildcraftcore") || Loader.isModLoaded("enderio")) {
 			this.canUseWrenchBreaks = canbe;
 		}
 		return this;
 	}
 	
-	private Map<Integer, CustomStuffType.ChangeBlockType> entrys = Maps.newHashMap();
-	public BaseBlockSubT setChangeBlock(int meta, int tick, int s, int m, boolean canDrops, ItemStack... drops) {
+	private Map<Integer, CustomStuffType.ChangeBlockType> ChangeBlocks;
+	public BaseCompressedBlock setChangeBlock(int meta, int tick, int s, int m, boolean canDrops, ItemStack... drops) {
 		return this.addChangeBlock(meta, new Time(m, s, tick), canDrops, drops);
 	}
 	
-	private Map<Integer, List<String>> metaShiftInfos = Maps.newHashMap();
-	public BaseBlockSubT setCustemShiftInformation(Map<Integer, List<String>> infos) {
+	private Map<Integer, List<String>> metaShiftInfos;
+	public BaseCompressedBlock setCustemShiftInformation(Map<Integer, List<String>> infos) {
 		this.metaShiftInfos = infos;
 		return this;
 	}
 
-	private Map<Integer, List<String>> metaInfos = Maps.newHashMap();
-	public BaseBlockSubT setCustemInformation(Map<Integer, List<String>> infos) {
+	private Map<Integer, List<String>> metaInfos;
+	public BaseCompressedBlock setCustemInformation(Map<Integer, List<String>> infos) {
 		this.metaInfos = infos;
 		return this;
 	}
 	
-	private Map<Integer, Float> HardnessMap = Maps.newHashMap();
-	public BaseBlockSubT setHardnessMap(Map<Integer, Float> map) {
+	private Map<Integer, Float> HardnessMap;
+	public BaseCompressedBlock setHardnessMap(Map<Integer, Float> map) {
 		this.HardnessMap = map;
 		return this;
 	}
-	public BaseBlockSubT addHardnessMap(int meta, float hardness) {
-		this.HardnessMap.put(meta, hardness);
-		return this;
-	}
 	
-	private Map<Integer, HarvestType> HarvestMap = Maps.newHashMap();
-	public BaseBlockSubT setHarvestMap(Map<Integer, HarvestType> map) {
+	private Map<Integer, CustomStuffType.HarvestType> HarvestMap;
+	public BaseCompressedBlock setHarvestMap(Map<Integer, CustomStuffType.HarvestType> map) {
 		this.HarvestMap = map;
 		return this;
 	}
-	public BaseBlockSubT addHarvestMap(int meta, String tool, int level) {
-		this.HarvestMap.put(meta, new HarvestType(tool, level));
-		return this;
-	}
 
-	private Map<Integer, Boolean> BeaconBaseMap = Maps.newHashMap();
-	public BaseBlockSubT setBeaconBaseMap(Map<Integer, Boolean> map) {
+	private Map<Integer, Boolean> BeaconBaseMap;
+	public BaseCompressedBlock setBeaconBaseMap(Map<Integer, Boolean> map) {
 		this.BeaconBaseMap = map;
 		return this;
 	}
 
-	private Map<Integer, Integer> LightValueMap = Maps.newHashMap();
-	public BaseBlockSubT setLightValueMap(Map<Integer, Integer> map) {
+	private Map<Integer, Integer> LightValueMap;
+	public BaseCompressedBlock setLightValueMap(Map<Integer, Integer> map) {
 		this.LightValueMap = map;
 		return this;
 	}
 
-	private Map<Integer, Float> ExplosionResistanceMap = Maps.newHashMap();
-	public BaseBlockSubT setExplosionResistanceMap(Map<Integer, Float> map) {
+	private Map<Integer, Float> ExplosionResistanceMap;
+	public BaseCompressedBlock setExplosionResistanceMap(Map<Integer, Float> map) {
 		this.ExplosionResistanceMap = map;
 		return this;
 	}
+	
+	private Map<Integer, List<ItemStack>> DropsMap;
+	public BaseCompressedBlock setDropsMapMap(Map<Integer, List<ItemStack>> map) {
+		this.DropsMap = map;
+		return this;
+	}
+	
+	private Map<Integer, ItemStack> infoStacks = null;
+	public BaseCompressedBlock setInfoStack(Map<Integer, ItemStack> infoStacks) {
+		this.infoStacks = infoStacks;
+		return this;
+	}
 	// Custom end
+
+	public BaseCompressedBlock addHarvestMap(int meta, String tool, int level) {
+		if(this.HarvestMap == null) this.HarvestMap = Maps.newHashMap();
+		this.HarvestMap.put(meta, new CustomStuffType.HarvestType(tool, level));
+		return this;
+	}
+
+	public BaseCompressedBlock addHardnessMap(int meta, float hardness) {
+		if(this.HardnessMap == null) this.HardnessMap = Maps.newHashMap();
+		this.HardnessMap.put(meta, hardness);
+		return this;
+	}
+	
+	private List<ItemStack> drops = null;
+	public BaseCompressedBlock setDrops(List<ItemStack> drops) {
+		this.drops = drops;
+		return this;
+	}
+	public BaseCompressedBlock addDrops(ItemStack... stacks) {
+		if(this.drops == null) this.drops = Lists.newArrayList();
+		for(ItemStack stack : stacks) {
+			this.drops.add(stack);
+		}
+		return this;
+	}
 	
 	private boolean canThroughBlock = false;
-	public BaseBlockSubT setCanThroughBlock() {
+	public BaseCompressedBlock setCanThroughBlock() {
 		this.canThroughBlock = true;
 		return this;
 	}
 
 	private boolean noToolBreak = false;
-	public BaseBlockSubT setNotNeedToolBreak() {
+	public BaseCompressedBlock setNotNeedToolBreak() {
 		this.noToolBreak = true;
 		return this;
 	}
 	
-	private List<String> shiftInfos = new ArrayList<String>();
-	public BaseBlockSubT addCustemShiftInformation(String... custemInfo) {
-		for(int i = 0; i < custemInfo.length; ++i) {
-			shiftInfos.add(custemInfo[i]);
+	boolean isTransparentCube = false;
+	public BaseCompressedBlock setIsTransparentCube() {
+		this.isTransparentCube = true;
+		return this;
+	}
+	
+	private List<String> shiftInfos;
+	public BaseCompressedBlock addCustemShiftInformation(String... custemInfo) {
+		if(this.shiftInfos == null) this.shiftInfos = Lists.newArrayList();
+		for(String str : custemInfo) {
+			this.shiftInfos.add(str);
 		}
 		return this;
 	}
 
-	public BaseBlockSubT addCustemShiftInformation(List<String> infos) {
-		this.shiftInfos = infos;
+	public BaseCompressedBlock addCustemShiftInformation(List<String> infos) {
+		if(this.shiftInfos == null) this.shiftInfos = Lists.newArrayList();
+		for(String str : infos) {
+			this.shiftInfos.add(str);
+		}
 		return this;
 	}
 
-	private List<String> infos = new ArrayList<String>();
-	public BaseBlockSubT setCustemInformation(List<String> infos) {
+	private List<String> infos;
+	public BaseCompressedBlock setCustemInformation(List<String> infos) {
 		this.infos = infos;
 		return this;
 	}
-	public BaseBlockSubT addCustemInformation(String... custemInfo) {
-		for(int i = 0; i < custemInfo.length; ++i) {
-			infos.add(custemInfo[i]);
+	public BaseCompressedBlock addCustemInformation(String... custemInfo) {
+		if(this.infos == null) this.infos = Lists.newArrayList();
+		for(String str : custemInfo) {
+			this.infos.add(str);
+		}
+		return this;
+	}
+	public BaseCompressedBlock addCustemInformation(List<String> custemInfo) {
+		if(this.infos == null) this.infos = Lists.newArrayList();
+		for(String str : custemInfo) {
+			this.infos.add(str);
 		}
 		return this;
 	}
 
 	ItemStack infoStack = null;
-	public BaseBlockSubT setInfoStack(ItemStack stack) {
+	public BaseCompressedBlock setInfoStack(ItemStack stack) {
 		this.infoStack = stack;
 		return this;
 	}
-
-	private Map<Integer, ItemStack> infoStacks = null;
-	public BaseBlockSubT setInfoStack(Map<Integer, ItemStack> infoStacks) {
-		this.infoStacks = infoStacks;
-		return this;
-	}
 	
-	// Custom imp start
+	// Custom implement start
 
 	@Override
 	public String getHarvestTool(IBlockState state) {
 		if(this.noToolBreak) return null;
-		if(!HarvestMap.isEmpty()) {
+		if(HarvestMap != null && !HarvestMap.isEmpty()) {
 			if(HarvestMap.containsKey(JiuUtils.item.getMetaFromBlockState(state))) {
 				return HarvestMap.get(JiuUtils.item.getMetaFromBlockState(state)).tool;
 			}else if(!this.isHas()) {
@@ -305,7 +351,7 @@ public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompre
 	public int getHarvestLevel(IBlockState state) {
 		if(this.noToolBreak) return 0;
 		
-		if(!HarvestMap.isEmpty()) {
+		if(HarvestMap != null && !HarvestMap.isEmpty()) {
 			if(HarvestMap.containsKey(JiuUtils.item.getMetaFromBlockState(state))) {
 				return HarvestMap.get(JiuUtils.item.getMetaFromBlockState(state)).level;
 			}else if(!this.isHas()) {
@@ -334,7 +380,7 @@ public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompre
 
 	@Override
 	public boolean isBeaconBase(IBlockAccess world, BlockPos pos, BlockPos beacon) {
-		if(!BeaconBaseMap.isEmpty()) {
+		if(BeaconBaseMap != null && !BeaconBaseMap.isEmpty()) {
 			if(BeaconBaseMap.containsKey(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)))) {
 				return BeaconBaseMap.get(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)));
 			}else if(!this.isHas()) {
@@ -349,7 +395,7 @@ public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompre
 
 	@Override
 	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
-		if(!LightValueMap.isEmpty()) {
+		if(LightValueMap != null && !LightValueMap.isEmpty()) {
 			if(LightValueMap.containsKey(JiuUtils.item.getMetaFromBlockState(state))) {
 				return LightValueMap.get(JiuUtils.item.getMetaFromBlockState(state));
 			}else if(!this.isHas()) {
@@ -364,7 +410,7 @@ public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompre
 	
 	@Override
 	public float getExplosionResistance(World world, BlockPos pos, Entity exploder, Explosion explosion) {
-		if(!ExplosionResistanceMap.isEmpty()) {
+		if(ExplosionResistanceMap != null && !ExplosionResistanceMap.isEmpty()) {
 			if(ExplosionResistanceMap.containsKey(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)))) {
 				return ExplosionResistanceMap.get(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)));
 			}else if(!this.isHas()) {
@@ -377,25 +423,37 @@ public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompre
 	}
 	
 	@Override
+	public void onBlockHarvested(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
+		if(this.drops != null && !this.drops.isEmpty()) {
+			JiuUtils.item.spawnAsEntity(world, pos, this.drops);
+		}
+		
+		if(DropsMap != null && !DropsMap.isEmpty()) {
+			int meta = JiuUtils.item.getMetaFromBlockState(state);
+			if(DropsMap.containsKey(meta)) {
+				JiuUtils.item.spawnAsEntity(world, pos, DropsMap.get(meta));
+			}
+		}
+	}
+	
+	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
 		int meta = stack.getMetadata();
 		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.baseItem, infoStacks);
 		MCSUtil.info.addCompressedInfo(meta, tooltip, this.getUnCompressedItemLocalizedName(), Item.getItemFromBlock(this));
 
-		if(MCS.test()) {
+		if(MCS.dev()) {
 			tooltip.add("Is Has Block: " + this.isHas());
-			NBTTagCompound nbt = stack.getTagCompound();
 			tooltip.add("unCompressedItem: " + this.baseItem.getItem().getRegistryName() + "." + this.baseItem.getItemDamage());
 
+			NBTTagCompound nbt = stack.getTagCompound();
 			if(nbt != null) {
 				tooltip.add("ChangeTime: " + nbt.getInteger("ChangeM") + "/" + nbt.getInteger("ChangeS") + "/" + nbt.getInteger("ChangeTick"));
 				tooltip.add(nbt.toString());
 			}
 
-			String[] names = JiuUtils.other.custemSplitString(this.name, "_");
-			tooltip.add(names.length + "");
-			tooltip.add(this.getUnCompressedName());
+			tooltip.add(JiuUtils.other.custemSplitString(this.name, "_").length + " | " + this.getUnCompressedName());
 			tooltip.add("BaseBurnTime: " + this.getUnCompressedBurnTime());
 		}
 
@@ -422,10 +480,10 @@ public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompre
 		MCSUtil.info.addMetaInfo(meta, tooltip, this.infos, this.metaInfos);
 		MCSUtil.info.addShiftInfo(meta, tooltip, this.shiftInfos, this.metaShiftInfos);
 	}
-	// Custom imp end
+	// Custom implement end
 	
 	boolean canUseWrenchBreak = false;
-	public BaseBlockSubT canUseWrenchBreak(boolean canbe) {
+	public BaseCompressedBlock canUseWrenchBreak(boolean canbe) {
 		if(Loader.isModLoaded("thermalfoundation") || Loader.isModLoaded("buildcraftcore") || Loader.isModLoaded("enderio")) {
 			this.canUseWrenchBreak = canbe;
 		}
@@ -435,36 +493,40 @@ public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompre
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		boolean lag = false;
-		if(this.canUseWrenchBreak) {
-			return this.useWrenchBreak(world, pos, state, player, hand, false);
-		}else if(this.canUseWrenchBreaks != null && this.canUseWrenchBreaks.containsKey(JiuUtils.item.getMetaFromBlockState(state))) {
-			return this.useWrenchBreak(world, pos, state, player, hand, true);
+		if(player.isSneaking()) {
+			if(this.canUseWrenchBreak) {
+				lag = this.useWrenchBreak(world, pos, state, player, hand, false);
+			}else if(this.canUseWrenchBreaks != null && this.canUseWrenchBreaks.containsKey(JiuUtils.item.getMetaFromBlockState(state))) {
+				lag = this.useWrenchBreak(world, pos, state, player, hand, true);
+			}
 		}
 		return lag;
 	}
 
-	private boolean useWrenchBreak(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, boolean useMap) {
+	protected boolean useWrenchBreak(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, boolean useMap) {
 		ItemStack handitem = player.getHeldItem(hand);
 
-		if(player.isSneaking()) {
-			if(Loader.isModLoaded("thermalfoundation") || Loader.isModLoaded("buildcraftcore") || Loader.isModLoaded("enderio")) {
-				if(Loader.isModLoaded("thermalfoundation")) {
-					if(handitem.getItem() instanceof IToolHammer) {
-						if(!useMap) {
-							JiuUtils.item.spawnAsEntity(world, pos, JiuUtils.item.getStackFromBlockState(state));
-							world.setBlockState(pos, Blocks.AIR.getDefaultState());
-							return true;
-						}else {
-							int meta = JiuUtils.item.getMetaFromBlockState(state);
-							if(this.canUseWrenchBreaks.containsKey(meta)) {
-								if(this.canUseWrenchBreaks.get(meta)) {
-									JiuUtils.item.spawnAsEntity(world, pos, JiuUtils.item.getStackFromBlockState(state));
-									world.setBlockState(pos, Blocks.AIR.getDefaultState());
-									return true;
-								}
-							}
-						}
-					}
+		if(Loader.isModLoaded("thermalfoundation")) {
+			if(handitem.getItem() instanceof IToolHammer) {
+				return this.wrenchBreak(world, pos, state, useMap);
+			}
+		}
+		
+		return false;
+	}
+	
+	protected boolean wrenchBreak(World world, BlockPos pos, IBlockState state, boolean useMap) {
+		if(!useMap) {
+			JiuUtils.item.spawnAsEntity(world, pos, JiuUtils.item.getStackFromBlockState(state));
+			world.setBlockToAir(pos);
+			return true;
+		}else {
+			int meta = JiuUtils.item.getMetaFromBlockState(state);
+			if(this.canUseWrenchBreaks.containsKey(meta)) {
+				if(this.canUseWrenchBreaks.get(meta)) {
+					JiuUtils.item.spawnAsEntity(world, pos, JiuUtils.item.getStackFromBlockState(state));
+					world.setBlockToAir(pos);
+					return true;
 				}
 			}
 		}
@@ -491,15 +553,16 @@ public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompre
 		return false;
 	}
 	
-	public BaseBlockSubT addChangeBlock(int meta, ITime time, boolean canDrops, ItemStack... drops) {
-		this.entrys.put(meta, new CustomStuffType.ChangeBlockType(drops, time, canDrops));
+	public BaseCompressedBlock addChangeBlock(int meta, ITime time, boolean canDrops, ItemStack... drops) {
+		if(this.ChangeBlocks == null) this.ChangeBlocks = Maps.newHashMap();
+		this.ChangeBlocks.put(meta, new CustomStuffType.ChangeBlockType(drops, time, canDrops));
 		return this;
 	}
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		if(!this.entrys.isEmpty()) {
-			if(this.entrys.containsKey(meta)) {
-				return new TileEntityChangeBlock(entrys.get(meta));
+		if(this.ChangeBlocks != null && !this.ChangeBlocks.isEmpty()) {
+			if(this.ChangeBlocks.containsKey(meta)) {
+				return new TileEntityChangeBlock(ChangeBlocks.get(meta));
 			}
 		}else {
 			if(MCSBlocks.CHANGE_MCS_BLOCK_MAP.containsKey(this.name)) {
@@ -520,21 +583,21 @@ public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompre
 		}
 	}
 
-	// implements ICompressedStuff start
+	// implement ICompressedStuff start
 	
-	private final List<String> otherOredict = ICompressedStuff.super.addOtherOreDictionary();
-	public BaseBlockSubT addOtherOreDict(String oredict) {
+	private final List<String> otherOredict = ICompressedStuff.super.getOtherOreDictionary();
+	public BaseCompressedBlock addOtherOreDict(String oredict) {
 		this.otherOredict.add(oredict);
 		return this;
 	}
 
 	@Override
-	public List<String> addOtherOreDictionary() {
+	public List<String> getOtherOreDictionary() {
 		return this.otherOredict;
 	}
 	
 	boolean createOredict = true;
-	public BaseBlockSubT createOreDictionary(boolean flag) {
+	public BaseCompressedBlock createOreDictionary(boolean flag) {
 		this.createOredict = flag;
 		return this;
 	}
@@ -554,7 +617,7 @@ public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompre
 	}
 
 	private boolean makeRecipe = true;
-	public BaseBlockSubT setMakeDefaultStackRecipe(boolean makeRecipe) {
+	public BaseCompressedBlock setMakeDefaultStackRecipe(boolean makeRecipe) {
 		this.makeRecipe = makeRecipe;
 		return this;
 	}
@@ -588,23 +651,25 @@ public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompre
 	}
 	@Override
 	public ItemBlock getRegisterItemBlock() {
-		return new BaseBlockItem(this);
+		return new BaseCompressedBlockItem(this);
 	}
 	String state = null;
-	public BaseBlockSubT setModelState(String state) {
+	public BaseCompressedBlock setModelState(String state) {
 		this.state = state;
 		return this;
 	}
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void getItemModel() {
+	public void getItemModel(RegisterModel util) {
 		String has = this.baseItem.getItem() instanceof ItemBlock ? "normal" : "has";
 		if(this.state != null) has = this.state;
 
-		model.setBlockStateMapper(this, false, this.ownerMod + "/" + has + "/" + this.name);
+		util.setBlockStateMapper(this, false, this.ownerMod + "/" + has + "/" + this.name);
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
-			model.registerItemModel(this, meta, this.ownerMod + "/block/" + has + "/" + this.name, this.name + "." + meta);
+			String dir = this.ownerMod + "/block/" + has + "/" + this.name;
+			String file = this.name + "." + meta;
+			util.registerItemModel(this, meta, dir, file);
 		}
 	}
 	
@@ -658,4 +723,99 @@ public class BaseBlockSubT extends BaseBlock.Sub<ModSubtypes> implements ICompre
 	public Block getBaseBlock() {
 		return JiuUtils.item.getBlockFromItemStack(this.baseItem);
 	}
+	
+	private boolean baseRecipeIsItem = false;
+	public BaseCompressedBlock setBaseRecipeIsItem() {
+		this.baseRecipeIsItem = true;
+		return this;
+	}
+	public boolean baseRecipeHasItem() {
+		return baseRecipeIsItem;
+	}
+	
+	private UnFoundItem unFoundItem;
+	public BaseCompressedBlock setUnFoundItem(String name, int meta) {
+		if(this.unFoundItem==null) {
+			this.unFoundItem = new UnFoundItem(name, meta);
+		}
+		return this;
+	}
+	public ItemStack getUnFoundItem() {
+		return unFoundItem.toStack();
+	}
+	public boolean hasUnFoundItem() {
+		return (this.baseItem==null || this.baseItem.isEmpty()) && this.unFoundItem!=null;
+	}
+	
+	public static class UnFoundItem {
+		private final String name;
+		private final int meta;
+		public UnFoundItem(String name, int meta) {
+			this.name = name;
+			this.meta = meta;
+		}
+		private ItemStack toStack() {return new ItemStack(Item.getByNameOrId(name), 1, meta);}
+	}
+	
+	private ICompressedStuff smeltingOutput;
+	public BaseCompressedBlock setSmeltingOutput(ICompressedStuff stuff) {
+		this.smeltingOutput = stuff;
+		return this;
+	}
+	private int smeltingMetaDisparity = 0;
+	public BaseCompressedBlock setSmeltingMetaDisparity(int smeltingMetaDisparity) {
+		this.smeltingMetaDisparity = smeltingMetaDisparity;
+		return this;
+	}
+	@Override
+	public boolean canCreateRecipe(int meta) {
+		return this.smeltingOutput!=null;
+	}
+	@Override
+	public ItemStack getSmeltingOutput(int meta) {
+		int outmeta = meta-smeltingMetaDisparity;
+		return outmeta < 0 ? null : smeltingOutput.getStack(outmeta);
+	}
+	// static
+	
+	public static BaseCompressedBlock register(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerModID, Material materialIn, SoundType soundIn, CreativeTabs tabIn, float hardnessIn) {
+		if(Loader.isModLoaded(ownerModID) || ownerModID.equals("custom")) {
+			return new BaseCompressedBlock(nameIn, unCompressedItem, ownerModID, materialIn, soundIn, tabIn, hardnessIn);
+		}else {
+			return null;
+		}
+	}
+
+	public static BaseCompressedBlock register(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, Material materialIn, SoundType soundIn, CreativeTabs tabIn) {
+		return register(nameIn, unCompressedItem, ownerMod, materialIn, soundIn, tabIn, 4.0F);
+	}
+
+	public static BaseCompressedBlock register(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, Material materialIn, CreativeTabs tabIn) {
+		return register(nameIn, unCompressedItem, ownerMod, materialIn, SoundType.METAL, tabIn);
+	}
+
+	public static BaseCompressedBlock register(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, SoundType soundIn, CreativeTabs tabIn) {
+		return register(nameIn, unCompressedItem, ownerMod, Material.IRON, soundIn, tabIn);
+	}
+
+	public static BaseCompressedBlock register(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, CreativeTabs tabIn) {
+		return register(nameIn, unCompressedItem, ownerMod, Material.IRON, SoundType.METAL, tabIn);
+	}
+
+	public static BaseCompressedBlock register(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod) {
+		return register(nameIn, unCompressedItem, ownerMod, MCS.COMPERESSED_BLOCKS);
+	}
+
+	public static BaseCompressedBlock register(String nameIn, @Nonnull ItemStack unCompressedItem) {
+		return register(nameIn, unCompressedItem, unCompressedItem.getItem().getRegistryName().getResourceDomain());
+	}
+
+	public static BaseCompressedBlock register(@Nonnull ItemStack unCompressedItem, String ownerMod) {
+		return register("compressed_" + unCompressedItem.getItem().getRegistryName().getResourcePath(), unCompressedItem, ownerMod);
+	}
+
+	public static BaseCompressedBlock register(@Nonnull ItemStack unCompressedItem) {
+		return register("compressed_" + unCompressedItem.getItem().getRegistryName().getResourcePath(), unCompressedItem);
+	}
+	
 }

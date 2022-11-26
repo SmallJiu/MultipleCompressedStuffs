@@ -1,6 +1,6 @@
 package cat.jiu.mcs.api;
 
-import cat.jiu.core.api.IBuilder;
+import cat.jiu.core.api.handler.IBuilder;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

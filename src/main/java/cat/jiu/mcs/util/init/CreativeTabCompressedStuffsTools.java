@@ -1,12 +1,14 @@
 package cat.jiu.mcs.util.init;
 
-import java.util.Random;
-
+import cat.jiu.core.api.ITimer;
 import cat.jiu.core.util.base.BaseItemTool;
+import cat.jiu.core.util.timer.Timer;
 import cat.jiu.mcs.MCS;
+import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.config.Configs;
+
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Items;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -14,7 +16,6 @@ import net.minecraft.util.ResourceLocation;
 public class CreativeTabCompressedStuffsTools extends CreativeTabs {
 	public CreativeTabCompressedStuffsTools() {
 		super("compressed_stuffs_tools");
-
 	}
 
 	@Override
@@ -25,18 +26,35 @@ public class CreativeTabCompressedStuffsTools extends CreativeTabs {
 			return super.getBackgroundImage();
 		}
 	}
-
+	private ITimer time = new Timer(0,15,0);
+	private ItemStack stack;
+	
+	@Override
+	public ItemStack getIconItemStack() {
+		return getTabIconItem();
+	}
 	@Override
 	public ItemStack getTabIconItem() {
-		Random rand = new Random();
-
 		if(!MCSResources.ITEMS.isEmpty()) {
-			int block = rand.nextInt(MCSResources.ITEMS.size());
-			Item item = MCSResources.ITEMS.get(block);
-			if(item instanceof BaseItemTool.MetaTool) return new ItemStack(item, 1, rand.nextInt(15));
-			return getTabIconItem();
+			time.update();
+			if(time.isDone()) {
+				time.setTicks(Timer.parseTick(15, 0));
+				this.stack = getStack();
+			}
+			if(this.stack==null || this.stack.isEmpty()) 
+				this.stack = getStack();
 		}else {
-			return new ItemStack(Items.DIAMOND_PICKAXE);
+			if(this.stack==null || this.stack.isEmpty()) 
+				this.stack = new ItemStack(Blocks.BEDROCK);
+		}
+		return this.stack;
+	}
+	private ItemStack getStack() {
+		while(true) {
+			Item b = MCSResources.ITEMS.get(CreativeTabCompressedStuffsBlocks.rand.nextInt(MCSResources.ITEMS.size()));
+			if(b instanceof BaseItemTool.MetaTool && b instanceof ICompressedStuff) {
+				return ((ICompressedStuff) b).getStack(CreativeTabCompressedStuffsBlocks.rand.nextInt(15));
+			}
 		}
 	}
 }

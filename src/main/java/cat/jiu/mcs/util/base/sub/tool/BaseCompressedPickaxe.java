@@ -11,14 +11,17 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 import cat.jiu.core.util.JiuUtils;
+import cat.jiu.core.util.RegisterModel;
 import cat.jiu.core.util.base.BaseItemTool;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.api.recipe.IToolRecipe;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.exception.NonToolException;
 import cat.jiu.mcs.util.CompressedLevel;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
+import cat.jiu.mcs.util.init.MCSItems;
 import cat.jiu.mcs.util.init.MCSResources;
 import cat.jiu.mcs.util.type.CustomStuffType;
 
@@ -33,7 +36,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemAxe;
+import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
@@ -44,39 +47,49 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuff {
-	public static BaseItemAxe register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
+public class BaseCompressedPickaxe extends BaseItemTool.MetaPickaxe implements ICompressedStuff, IToolRecipe {
+	public static BaseCompressedPickaxe register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab, ICompressedStuff craftMaterialStack, ICompressedStuff craftRodStack) {
 		if(baseItem == null || baseItem.isEmpty()) return null;
 		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
-			return new BaseItemAxe(name, baseItem, ownerMod, tab);
+			return new BaseCompressedPickaxe(name, baseItem, ownerMod, tab, craftMaterialStack, craftRodStack);
 		}else {
 			return null;
 		}
 	}
+	
+	public static BaseCompressedPickaxe register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
+		return register(name, baseItem, ownerMod, tab, null, null);
+	}
 
-	public static BaseItemAxe register(String name, ItemStack baseItem, String ownerMod) {
+	public static BaseCompressedPickaxe register(String name, ItemStack baseItem, String ownerMod) {
 		return register(name, baseItem, ownerMod, MCS.COMPERESSED_TOOLS);
 	}
 
-	protected final ItemStack baseToolStack;
-	protected final ItemAxe baseTool;
-	protected final float baseAttackDamage;
-	protected final float baseAttackSpeed;
-	protected final String ownerMod;
-
-	public BaseItemAxe(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab) {
+	private final ItemStack baseToolStack;
+	private final ItemPickaxe baseTool;
+	private final float baseAttackDamage;
+	private final String ownerMod;
+	protected final ICompressedStuff craftMaterialStack;
+	protected final ICompressedStuff craftRodStack;
+	public BaseCompressedPickaxe(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab) {
+		this(name, baseTool, ownerMod, tab, null, null);
+	}
+	public BaseCompressedPickaxe(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab, ICompressedStuff craftMaterialStack) {
+		this(name, baseTool, ownerMod, tab, craftMaterialStack, MCSItems.minecraft.normal.C_STICK_I);
+	}
+	public BaseCompressedPickaxe(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab, ICompressedStuff craftMaterialStack, ICompressedStuff craftRodStack) {
 		super(MCS.MODID, name, tab, true, getToolMaterial(baseTool), ModSubtypes.values());
 		this.baseToolStack = baseTool;
-		if(baseTool.getItem() instanceof ItemAxe) {
-			this.baseTool = (ItemAxe) baseTool.getItem();
+		if(baseTool.getItem() instanceof ItemPickaxe) {
+			this.baseTool = (ItemPickaxe) baseTool.getItem();
 		}else {
-			this.baseTool = null;
-			throw new NonToolException(baseTool, "Axe");
+			throw new NonToolException(baseTool, "Pickaxe");
 		}
 		this.ownerMod = ownerMod;
-		this.baseAttackDamage = 3.0F + this.baseTool.attackDamage;
-		this.baseAttackSpeed = this.baseTool.attackSpeed;
+		this.baseAttackDamage = this.baseTool.attackDamage;
 		this.setMaxMetadata(16);
+		this.craftMaterialStack = craftMaterialStack;
+		this.craftRodStack = craftRodStack;
 
 		if(!ownerMod.equals("custom")) {
 			MCSResources.ITEMS.add(this);
@@ -89,21 +102,37 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 			throw new RuntimeException("name must not be owner mod. Name: " + name + ", OwnerMod: " + baseTool.getItem().getRegistryName().getResourceDomain());
 		}
 	}
-
-	public BaseItemAxe(String name, ItemStack baseTool) {
+	public BaseCompressedPickaxe(String name, ItemStack baseTool, ICompressedStuff craftMaterialStack, ICompressedStuff craftRodStack) {
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS, craftMaterialStack, craftRodStack);
+	}
+	public BaseCompressedPickaxe(String name, ItemStack baseTool, ICompressedStuff craftMaterialStack) {
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS, craftMaterialStack);
+	}
+	public BaseCompressedPickaxe(String name, ItemStack baseTool) {
 		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS);
 	}
 
 	private static ToolMaterial getToolMaterial(ItemStack baseItem) {
-		if(baseItem.getItem() instanceof ItemAxe) {
-			return ((ItemAxe) baseItem.getItem()).toolMaterial;
+		if(baseItem.getItem() instanceof ItemPickaxe) {
+			return ((ItemPickaxe) baseItem.getItem()).toolMaterial;
 		}
 		return ToolMaterial.WOOD;
 	}
 
-	protected Map<Integer, Integer> EnchantabilityLevelMap = Maps.newHashMap();
+	public String getUnCompressedName() {
+		String[] unNames = JiuUtils.other.custemSplitString(this.name, "_");
+		StringBuffer i = new StringBuffer();
+		for(String s : unNames) {
+			if(!"compressed".equals(s)) {
+				i.append(JiuUtils.other.upperFirst(s));
+			}
+		}
+		return i.toString();
+	}
 
-	public BaseItemAxe setEnchantabilityLevel(Map<Integer, Integer> EnchantabilityLevelMap) {
+	public Map<Integer, Integer> EnchantabilityLevelMap = Maps.newHashMap();
+
+	public BaseCompressedPickaxe setEnchantabilityLevelMap(Map<Integer, Integer> EnchantabilityLevelMap) {
 		this.EnchantabilityLevelMap = EnchantabilityLevelMap;
 		return this;
 	}
@@ -117,9 +146,9 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 		return (int) MCSUtil.item.getMetaValue(enchantability, stack);
 	}
 
-	protected Map<Integer, ItemStack> RepairableMap = Maps.newHashMap();
+	public Map<Integer, ItemStack> RepairableMap = Maps.newHashMap();
 
-	public BaseItemAxe setRepairableMap(Map<Integer, ItemStack> RepairableMap) {
+	public BaseCompressedPickaxe setRepairableMap(Map<Integer, ItemStack> RepairableMap) {
 		this.RepairableMap = RepairableMap;
 		return this;
 	}
@@ -133,9 +162,9 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 		return this.baseTool.getIsRepairable(this.baseToolStack, repair) || lag;
 	}
 
-	protected Map<Integer, Float> DestroySpeedMap = Maps.newHashMap();
+	public Map<Integer, Float> DestroySpeedMap = Maps.newHashMap();
 
-	public BaseItemAxe setDestroySpeed(Map<Integer, Float> DestroySpeedMap) {
+	public BaseCompressedPickaxe setDestroySpeedMap(Map<Integer, Float> DestroySpeedMap) {
 		this.DestroySpeedMap = DestroySpeedMap;
 		return this;
 	}
@@ -149,15 +178,16 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 		return (float) MCSUtil.item.getMetaValue(base, stack);
 	}
 
-	protected Map<Integer, Integer> MaxDamageMap = Maps.newHashMap();
-	public BaseItemAxe setMaxDamage(Map<Integer, Integer> MaxDamageMap) {
+	public Map<Integer, Integer> MaxDamageMap = Maps.newHashMap();
+
+	public BaseCompressedPickaxe setMaxDamage(Map<Integer, Integer> MaxDamageMap) {
 		this.MaxDamageMap = MaxDamageMap;
 		return this;
 	}
 
 	@Override
 	public int getMaxDamage(ItemStack stack) {
-		if(stack.getMetadata() >= 32766) return 10104;
+		if(stack.getMetadata() >= 32766) return 998;
 		if(!this.MaxDamageMap.isEmpty() && this.MaxDamageMap.containsKey(stack.getMetadata())) {
 			return this.MaxDamageMap.get(stack.getMetadata());
 		}
@@ -166,12 +196,12 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 
 	Map<Integer, CustomStuffType.ToolModifiersType> AttributeModifierMap = Maps.newHashMap();
 
-	public BaseItemAxe setAttributeModifierMap(Map<Integer, CustomStuffType.ToolModifiersType> attributeModifierMap) {
+	public BaseCompressedPickaxe setAttributeModifierMap(Map<Integer, CustomStuffType.ToolModifiersType> attributeModifierMap) {
 		this.AttributeModifierMap = attributeModifierMap;
 		return this;
 	}
 
-	public BaseItemAxe addAttributeModifierMap(int meta, double speed, double damage) {
+	public BaseCompressedPickaxe addAttributeModifierMap(int meta, double speed, double damage) {
 		this.AttributeModifierMap.put(meta, new CustomStuffType.ToolModifiersType(speed, damage));
 		return this;
 	}
@@ -196,8 +226,9 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 		return multimap;
 	}
 
-	protected Map<Integer, Integer> HarvestLevelMap = Maps.newHashMap();
-	public BaseItemAxe setHarvestLevelMap(Map<Integer, Integer> HarvestLevelMap) {
+	public Map<Integer, Integer> HarvestLevelMap = Maps.newHashMap();
+
+	public BaseCompressedPickaxe setHarvestLevelMap(Map<Integer, Integer> HarvestLevelMap) {
 		this.HarvestLevelMap = HarvestLevelMap;
 		return this;
 	}
@@ -212,8 +243,9 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 		return level;
 	}
 
-	protected Map<Integer, List<IBlockState>> CanHarvestBlock = Maps.newHashMap();
-	public BaseItemAxe setCanHarvestBlockMap(Map<Integer, List<IBlockState>> CanHarvestBlock) {
+	public Map<Integer, List<IBlockState>> CanHarvestBlock = Maps.newHashMap();
+
+	public BaseCompressedPickaxe setCanHarvestBlockMap(Map<Integer, List<IBlockState>> CanHarvestBlock) {
 		this.CanHarvestBlock = CanHarvestBlock;
 		return this;
 	}
@@ -229,7 +261,7 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 
 	Map<Integer, EnumRarity> RarityMap = null;
 
-	public BaseItemAxe setRarityMap(Map<Integer, EnumRarity> map) {
+	public BaseCompressedPickaxe setRarityMap(Map<Integer, EnumRarity> map) {
 		this.RarityMap = map;
 		return this;
 	}
@@ -258,7 +290,7 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 
 	private Map<Integer, Boolean> HasEffectMap = Maps.newHashMap();
 
-	public BaseItemAxe setHasEffectMap(Map<Integer, Boolean> map) {
+	public BaseCompressedPickaxe setHasEffectMap(Map<Integer, Boolean> map) {
 		this.HasEffectMap = map;
 		return this;
 	}
@@ -279,54 +311,56 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 
 	private List<String> shiftInfos = new ArrayList<String>();
 
-	public BaseItemAxe addCustemShiftInformation(String... custemInfo) {
+	public BaseCompressedPickaxe addCustemShiftInformation(String... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
 			shiftInfos.add(custemInfo[i]);
 		}
 		return this;
 	}
 
-	public BaseItemAxe addCustemShiftInformation(List<String> infos) {
+	public BaseCompressedPickaxe addCustemShiftInformation(List<String> infos) {
 		this.shiftInfos = infos;
 		return this;
 	}
 
 	private Map<Integer, List<String>> metaShiftInfos = Maps.newHashMap();
 
-	public BaseItemAxe addCustemShiftInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedPickaxe addCustemShiftInformation(Map<Integer, List<String>> infos) {
 		this.metaShiftInfos = infos;
 		return this;
 	}
 
 	private List<String> infos = new ArrayList<String>();
 
-	public BaseItemAxe addCustemInformation(String... custemInfo) {
+	public BaseCompressedPickaxe addCustemInformation(String... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
 			infos.add(custemInfo[i]);
 		}
 		return this;
 	}
 
-	public BaseItemAxe addCustemInformation(List<String> infos) {
+	public BaseCompressedPickaxe addCustemInformation(List<String> infos) {
 		this.infos = infos;
 		return this;
 	}
 
 	private Map<Integer, List<String>> metaInfos = Maps.newHashMap();
 
-	public BaseItemAxe addCustemInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedPickaxe addCustemInformation(Map<Integer, List<String>> infos) {
 		this.metaInfos = infos;
 		return this;
 	}
 
 	ItemStack infoStack = null;
-	public BaseItemAxe setInfoStack(ItemStack stack) {
+
+	public BaseCompressedPickaxe setInfoStack(ItemStack stack) {
 		this.infoStack = stack;
 		return this;
 	}
 
 	private Map<Integer, ItemStack> infoStacks = Maps.newHashMap();
-	public BaseItemAxe setInfoStack(Map<Integer, ItemStack> infoStacks) {
+
+	public BaseCompressedPickaxe setInfoStack(Map<Integer, ItemStack> infoStacks) {
 		this.infoStacks = infoStacks;
 		return this;
 	}
@@ -335,14 +369,15 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
 		int meta = stack.getMetadata();
-		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.baseToolStack, infoStacks);
+
+		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.baseToolStack, this.infoStacks);
 		MCSUtil.info.addCompressedInfo(meta, tooltip, this.getUnCompressedItemLocalizedName(), this);
 
 		if(Configs.Tooltip_Information.show_owner_mod) {
 			tooltip.add(I18n.format("info.mcs.owner_mod") + " : " + TextFormatting.AQUA.toString() + this.getOwnerMod());
 		}
 
-		if(MCS.test()) {
+		if(MCS.dev()) {
 			tooltip.add("最大耐久: " + this.getMaxDamage(stack));
 		}
 
@@ -355,14 +390,13 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 		MCSUtil.item.getSubItems(this, tab, items);
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public void getItemModel() {
+	public void getItemModel(RegisterModel util) {
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
-			this.model.registerItemModel(this, meta, this.ownerMod + "/item/tools/axe/" + this.name, this.name + "." + meta);
+			util.registerItemModel(this, meta, this.ownerMod + "/item/tools/pickaxe/" + this.name, this.name + "." + meta);
 		}
-		this.model.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/tools/axe/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+		util.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/tools/pickaxe/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
 	}
 	
 	@Override
@@ -393,7 +427,7 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 
 	private boolean makeRecipe = true;
 
-	public BaseItemAxe setMakeDefaultStackRecipe(boolean makeRecipe) {
+	public BaseCompressedPickaxe setMakeDefaultStackRecipe(boolean makeRecipe) {
 		this.makeRecipe = makeRecipe;
 		return this;
 	}
@@ -406,21 +440,34 @@ public class BaseItemAxe extends BaseItemTool.MetaAxe implements ICompressedStuf
 	public final String getUnCompressedItemLocalizedName() {
 		return this.baseToolStack.getDisplayName();
 	}
-
-	@Override
-	public String getUnCompressedName() {
-		String[] unNames = JiuUtils.other.custemSplitString(this.name, "_");
-		StringBuffer i = new StringBuffer();
-		for(String s : unNames) {
-			if(!"compressed".equals(s)) {
-				i.append(JiuUtils.other.upperFirst(s));
-			}
-		}
-		return i.toString();
-	}
 	private final CompressedLevel type = new CompressedLevel(this);
 	@Override
 	public CompressedLevel getLevel() {
 		return this.type;
+	}@Override
+	public boolean canCreateRecipe(int meta) {
+		return this.craftMaterialStack!=null && this.craftRodStack!=null;
+	}
+	@Override
+	public ItemStack getMaterial(int meta) {
+		if(this.craftMaterialStack.isBlock() && (this.craftMaterialStack.isHas() || this.craftMaterialStack.getAsCompressedBlock().baseRecipeHasItem())) {
+			if(meta <= 0) {
+				return this.craftMaterialStack.getUnCompressedStack();
+			}else {
+				return this.craftMaterialStack.getStack(meta-1);
+			}
+		}
+		return this.craftMaterialStack.getStack(meta);
+	}
+	@Override
+	public ItemStack getRod(int meta) {
+		if(this.craftRodStack.isBlock() && (this.craftRodStack.isHas() || this.craftRodStack.getAsCompressedBlock().baseRecipeHasItem())) {
+			if(meta <= 0) {
+				return this.craftRodStack.getUnCompressedStack();
+			}else {
+				return this.craftRodStack.getStack(meta-1);
+			}
+		}
+		return this.craftRodStack.getStack(meta);
 	}
 }

@@ -1,10 +1,10 @@
 package cat.jiu.mcs.blocks.compressed;
 
-import cat.jiu.mcs.util.base.sub.BaseBlockSub;
+import cat.jiu.mcs.util.base.sub.BaseCompressedBlock;
 
 import net.minecraft.item.ItemStack;
 
-public class CompressedTNT extends BaseBlockSub {
+public class CompressedTNT extends BaseCompressedBlock {
 	public CompressedTNT(String nameIn, ItemStack unCompressedItem) {
 		super(nameIn, unCompressedItem);
 		// BlockTNT

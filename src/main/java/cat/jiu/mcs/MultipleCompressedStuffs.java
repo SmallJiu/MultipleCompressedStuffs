@@ -1,23 +1,30 @@
 package cat.jiu.mcs;
 
 import java.io.File;
+import java.util.Map;
+
+import javax.annotation.Nonnull;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.gson.JsonObject;
+import com.google.common.collect.Maps;
 
 import cat.jiu.core.JiuCore.LogOS;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.core.util.helpers.DayUtils;
 import cat.jiu.mcs.command.MCSCommand;
 import cat.jiu.mcs.proxy.ServerProxy;
+import cat.jiu.mcs.util.client.model.texture.ModTextures;
 import cat.jiu.mcs.util.init.*;
 
 import moze_intel.projecte.emc.EMCMapper;
 import moze_intel.projecte.emc.SimpleStack;
+
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import net.minecraftforge.fml.common.Loader;
@@ -35,7 +42,8 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 	useMetadata = true,
 	guiFactory = "cat.jiu.mcs.config.ConfigGuiFactory",
 	dependencies =
-	  "required-after:jiucore@[" + MCS.JIUCORE_VERSION + "," + MCS.JIUCORE_MAIN_VERSION + "-20221230125959" + "];"
+	  "required-after:jiucore@[1.1.5-a0,];"
+	+ "required-after:mixinbooter;"
 	+ "after:thermalfoundation;"
 	+ "after:projecte;"
 	+ "after:botania;"
@@ -54,36 +62,50 @@ public class MultipleCompressedStuffs {
 	public static final String MODID = "mcs";
 	public static final String NAME = "MultipleCompressedStuffs";
 	public static final String OWNER = "small_jiu";
-	protected static final String JIUCORE_MAIN_VERSION = "1.1.0";
-	public static final String JIUCORE_VERSION = JIUCORE_MAIN_VERSION + "-20220604025014";
-	public static final String VERSION = "3.0.3-20220610234154";
+	protected static final String JIUCORE_VERSION = "1.1.5-a0";
+	public static final String VERSION = "3.0.4-a0";
 	public static final CreativeTabs COMPERESSED_BLOCKS = new CreativeTabCompressedStuffsBlocks();
 	public static final CreativeTabs COMPERESSED_ITEMS = new CreativeTabCompressedStuffsItems();
 	public static final CreativeTabs COMPERESSED_TOOLS = new CreativeTabCompressedStuffsTools();
-	private static JsonObject Textures = null;
-	public static JsonObject getTextures() {return Textures;}
-	public static boolean setTextures(JsonObject texture) {
-		if(Textures == null) {
-			Textures = texture;
+	
+	private static final Map<String, ModTextures> mod_texture = Maps.newHashMap();
+	public static boolean hasModTextures(String modid) {return mod_texture.containsKey(modid);}
+	public static ModTextures getTextures(String modid) {return mod_texture.get(modid);}
+	public static boolean addModTextures(String modid, @Nonnull ModTextures textures) {
+		if(mod_texture!=null && !mod_texture.containsKey(modid)) {
+			mod_texture.put(modid, textures);
 			return true;
-		}else {
-			LogManager.getLogger(MCS.MODID).error("Textures has setup, no need set");
-			return false;
 		}
+		return false;
 	}
 	
-	private static Boolean isTest = null; // if is IDE, you can set to 'true' to enable some test stuff
-	public static final boolean test() {
-		if(isTest == null) {
-			isTest = new File("./config/jiu/mcs_debug.jiu").exists();
+	private static Boolean isDev = null; // if is IDE, you can set to 'true' to enable some test stuff
+	public static final boolean dev() {
+		if(isDev == null) {
+			isDev = new File("./config/jiu/mcs_debug.jiu").exists();
 		}
-		return isTest;
+		return isDev;
+	}
+	private static boolean DevelopmentEnvironment;
+	public static final boolean isDevelopmentEnvironment() {
+		return DevelopmentEnvironment;
 	}
 	
 	@Mod.Instance(
 		value = MCS.MODID,
 		owner = MCS.OWNER)
 	public static MultipleCompressedStuffs instance;
+	public MultipleCompressedStuffs() {
+		try {
+			Block.class.getDeclaredField("lightValue");
+			Item.class.getDeclaredField("maxDamage");
+			DevelopmentEnvironment = true;
+			getLogOS().info("Is Dev.");
+		}catch(Throwable e) {
+			DevelopmentEnvironment = false;
+			getLogOS().info("Is not Dev.");
+		}
+	}
 
 	@SidedProxy(
 		clientSide = "cat.jiu.mcs.proxy.ClientProxy",
@@ -107,7 +129,7 @@ public class MultipleCompressedStuffs {
 	@Mod.EventHandler
 	public void onLoadComplete(FMLLoadCompleteEvent event) {
 		getLogOS().info("");
-
+		
 		getLogOS().info("Register Blocks (took " + (proxy.startblock - proxy.startcustom) + " ms)");
 		getLogOS().info("Register Custom Entry (took " + proxy.startcustom + " ms)");
 		getLogOS().info("Register Items (took " + proxy.startitem + " ms)");
@@ -122,12 +144,12 @@ public class MultipleCompressedStuffs {
 		getLogOS().info("#                                         #");
 		getLogOS().info("# MultipleCompressedStuffs Load Complete. #");
 		getLogOS().info("#                                         #");
-		getLogOS().info("#             " + this.getDayOfVersion() + "              #");
+		getLogOS().info("#             " + getDayOfVersion() + "              #");
 		getLogOS().info("#                                         #");
 		getLogOS().info("###########################################");
 	}
 
-	private String getDayOfVersion() {
+	private static String getDayOfVersion() {
 		DayUtils day = JiuUtils.day;
 		return day.getYear() + ""
 			+ (day.getMonth() < 10 ? "0" + day.getMonth() : day.getMonth() + "")
@@ -142,7 +164,7 @@ public class MultipleCompressedStuffs {
 		event.registerServerCommand(new MCSCommand());
 
 		if(Loader.isModLoaded("projecte")) {
-			if(test()) {
+			if(dev()) {
 				EMCMapper.emc.put(new SimpleStack(new ItemStack(MCSItems.normal.CAT_HAIR)), Long.MAX_VALUE);
 			}else {
 				EMCMapper.emc.put(new SimpleStack(new ItemStack(MCSItems.normal.CAT_HAIR)), 1024L);

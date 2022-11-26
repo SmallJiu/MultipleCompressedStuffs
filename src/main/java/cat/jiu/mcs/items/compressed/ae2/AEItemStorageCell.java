@@ -20,6 +20,11 @@ public class AEItemStorageCell extends AEStorageCell<IAEItemStack> {
 	public IStorageChannel<IAEItemStack> getChannel() {
 		return AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class);
 	}
+	
+	@Override
+	protected double getBaseTypes() {
+		return 1.5259;
+	}
 
 	@Override
 	public boolean createOreDictionary() {

@@ -6,7 +6,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cat.jiu.mcs.util.client.model.BaseModel;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class OverlayBlockModel extends BaseModel {
 	protected final int meta;
 	protected final boolean isHas;

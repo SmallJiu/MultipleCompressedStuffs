@@ -1,13 +1,10 @@
 package cat.jiu.mcs;
 
 import java.awt.Container;
-import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import cat.jiu.mcs.tools.JsonWriter;
-import cat.jiu.mcs.tools.ModelWriter;
 import cat.jiu.mcs.tools.ToCase;
 
 public class MCSToolsMain {
@@ -26,27 +23,6 @@ public class MCSToolsMain {
 			f.dispose();
 			ToCase.main(args);
 		});
-
-		JButton model = new JButton("Model Write");
-		model.setBounds(10, 50, 150, 30);
-		model.addActionListener(event -> {
-			f.dispose();
-			try {
-				ModelWriter.main(args);
-			}catch(IOException e) {
-				e.printStackTrace();
-			}
-		});
-
-		JButton json = new JButton("Json Util");
-		json.setBounds(10, 90, 150, 30);
-		json.addActionListener(event -> {
-			f.dispose();
-			JsonWriter.main(args);
-
-		});
-		c.add(json);
-		c.add(model);
 		c.add(strCase);
 		f.setVisible(true);
 	}

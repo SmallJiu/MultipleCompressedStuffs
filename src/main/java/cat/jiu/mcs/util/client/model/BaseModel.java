@@ -10,7 +10,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cat.jiu.mcs.MCS;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public abstract class BaseModel {
 	private final JsonObject stateJson;
 	protected final JsonElement originalTexture;

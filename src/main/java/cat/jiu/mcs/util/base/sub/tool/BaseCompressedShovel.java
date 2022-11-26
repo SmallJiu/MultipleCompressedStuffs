@@ -11,14 +11,17 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 import cat.jiu.core.util.JiuUtils;
+import cat.jiu.core.util.RegisterModel;
 import cat.jiu.core.util.base.BaseItemTool;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.api.recipe.IToolRecipe;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.exception.NonToolException;
 import cat.jiu.mcs.util.CompressedLevel;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
+import cat.jiu.mcs.util.init.MCSItems;
 import cat.jiu.mcs.util.init.MCSResources;
 import cat.jiu.mcs.util.type.CustomStuffType;
 
@@ -31,49 +34,64 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemHoe;
+import net.minecraft.item.ItemPickaxe;
+import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-
 import net.minecraftforge.common.IRarity;
+
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuff {
-	public static BaseItemHoe register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
+public class BaseCompressedShovel extends BaseItemTool.MetaShovel implements ICompressedStuff, IToolRecipe {
+	public static BaseCompressedShovel register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab, ICompressedStuff craftMaterialStack, ICompressedStuff craftRodStack) {
 		if(baseItem == null || baseItem.isEmpty()) return null;
 		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
-			return new BaseItemHoe(name, baseItem, ownerMod, tab);
+			return new BaseCompressedShovel(name, baseItem, ownerMod, tab, craftMaterialStack, craftRodStack);
 		}else {
 			return null;
 		}
 	}
+	
+	public static BaseCompressedShovel register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
+		return register(name, baseItem, ownerMod, tab, null, null);
+	}
 
-	public static BaseItemHoe register(String name, ItemStack baseItem, String ownerMod) {
-		return register(name, baseItem, ownerMod, MCS.COMPERESSED_TOOLS);
+	public static BaseCompressedShovel register(String name, ItemStack baseItem, String ownerMod) {
+		return register(name, baseItem, ownerMod, MCS.COMPERESSED_ITEMS);
 	}
 
 	protected final ItemStack baseToolStack;
-	protected final ItemHoe baseTool;
-	protected final float baseAttackSpeed;
+	protected final ItemSpade baseTool;
+	protected final float baseAttackDamage;
 	protected final String ownerMod;
-
-	public BaseItemHoe(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab) {
+	protected final ICompressedStuff craftMaterialStack;
+	protected final ICompressedStuff craftRodStack;
+	public BaseCompressedShovel(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab) {
+		this(name, baseTool, ownerMod, tab, null, null);
+	}
+	public BaseCompressedShovel(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab, ICompressedStuff craftMaterialStack) {
+		this(name, baseTool, ownerMod, tab, craftMaterialStack, MCSItems.minecraft.normal.C_STICK_I);
+	}
+	public BaseCompressedShovel(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab, ICompressedStuff craftMaterialStack, ICompressedStuff craftRodStack) {
 		super(MCS.MODID, name, tab, true, getToolMaterial(baseTool), ModSubtypes.values());
 		this.baseToolStack = baseTool;
-		if(baseTool.getItem() instanceof ItemHoe) {
-			this.baseTool = (ItemHoe) baseTool.getItem();
+		if(baseTool.getItem() instanceof ItemSpade) {
+			this.baseTool = (ItemSpade) baseTool.getItem();
 		}else {
 			this.baseTool = null;
-			throw new NonToolException(baseTool, "Hoe");
+			throw new NonToolException(baseTool, "Shovel");
 		}
 		this.ownerMod = ownerMod;
-		this.baseAttackSpeed = this.baseTool.speed - 4.0F;
+		this.baseAttackDamage = 3.0F + this.baseTool.attackDamage;
 		this.setMaxMetadata(16);
+		this.craftMaterialStack = craftMaterialStack;
+		this.craftRodStack = craftRodStack;
 
 		if(!ownerMod.equals("custom")) {
 			MCSResources.ITEMS.add(this);
@@ -86,14 +104,19 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 			throw new RuntimeException("name must not be owner mod. Name: " + name + ", OwnerMod: " + baseTool.getItem().getRegistryName().getResourceDomain());
 		}
 	}
-
-	public BaseItemHoe(String name, ItemStack baseTool) {
+	public BaseCompressedShovel(String name, ItemStack baseTool, ICompressedStuff craftMaterialStack, ICompressedStuff craftRodStack) {
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS, craftMaterialStack, craftRodStack);
+	}
+	public BaseCompressedShovel(String name, ItemStack baseTool, ICompressedStuff craftMaterialStack) {
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS, craftMaterialStack);
+	}
+	public BaseCompressedShovel(String name, ItemStack baseTool) {
 		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS);
 	}
 
 	private static ToolMaterial getToolMaterial(ItemStack baseItem) {
-		if(baseItem.getItem() instanceof ItemHoe) {
-			return ((ItemHoe) baseItem.getItem()).toolMaterial;
+		if(baseItem.getItem() instanceof ItemPickaxe) {
+			return ((ItemPickaxe) baseItem.getItem()).toolMaterial;
 		}
 		return ToolMaterial.WOOD;
 	}
@@ -111,7 +134,7 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 
 	public Map<Integer, Integer> EnchantabilityLevelMap = Maps.newHashMap();
 
-	public BaseItemHoe setEnchantabilityLevel(Map<Integer, Integer> EnchantabilityLevelMap) {
+	public BaseCompressedShovel setEnchantabilityLevel(Map<Integer, Integer> EnchantabilityLevelMap) {
 		this.EnchantabilityLevelMap = EnchantabilityLevelMap;
 		return this;
 	}
@@ -127,7 +150,7 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 
 	public Map<Integer, ItemStack> RepairableMap = Maps.newHashMap();
 
-	public BaseItemHoe setRepairableMap(Map<Integer, ItemStack> RepairableMap) {
+	public BaseCompressedShovel setRepairableMap(Map<Integer, ItemStack> RepairableMap) {
 		this.RepairableMap = RepairableMap;
 		return this;
 	}
@@ -143,7 +166,7 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 
 	public Map<Integer, Float> DestroySpeedMap = Maps.newHashMap();
 
-	public BaseItemHoe setDestroySpeed(Map<Integer, Float> DestroySpeedMap) {
+	public BaseCompressedShovel setDestroySpeed(Map<Integer, Float> DestroySpeedMap) {
 		this.DestroySpeedMap = DestroySpeedMap;
 		return this;
 	}
@@ -153,12 +176,13 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 		if(!this.DestroySpeedMap.isEmpty() && this.DestroySpeedMap.containsKey(stack.getMetadata())) {
 			return this.DestroySpeedMap.get(stack.getMetadata());
 		}
-		return this.baseTool.getDestroySpeed(this.baseToolStack, state);
+		float base = this.baseTool.getDestroySpeed(this.baseToolStack, state);
+		return (float) MCSUtil.item.getMetaValue(base, stack);
 	}
 
 	public Map<Integer, Integer> MaxDamageMap = Maps.newHashMap();
 
-	public BaseItemHoe setMaxDamage(Map<Integer, Integer> MaxDamageMap) {
+	public BaseCompressedShovel setMaxDamage(Map<Integer, Integer> MaxDamageMap) {
 		this.MaxDamageMap = MaxDamageMap;
 		return this;
 	}
@@ -172,12 +196,13 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 	}
 
 	Map<Integer, CustomStuffType.ToolModifiersType> AttributeModifierMap = Maps.newHashMap();
-	public BaseItemHoe setAttributeModifierMap(Map<Integer, CustomStuffType.ToolModifiersType> attributeModifierMap) {
+
+	public BaseCompressedShovel setAttributeModifierMap(Map<Integer, CustomStuffType.ToolModifiersType> attributeModifierMap) {
 		this.AttributeModifierMap = attributeModifierMap;
 		return this;
 	}
 
-	public BaseItemHoe addAttributeModifierMap(int meta, double speed, double damage) {
+	public BaseCompressedShovel addAttributeModifierMap(int meta, double speed, double damage) {
 		this.AttributeModifierMap.put(meta, new CustomStuffType.ToolModifiersType(speed, damage));
 		return this;
 	}
@@ -187,30 +212,75 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 		Multimap<String, AttributeModifier> multimap = HashMultimap.create();
 
 		if(slot == EntityEquipmentSlot.MAINHAND) {
+			boolean lag = false;
 			if(!this.AttributeModifierMap.isEmpty() && this.AttributeModifierMap.containsKey(stack.getMetadata())) {
 				CustomStuffType.ToolModifiersType type = this.AttributeModifierMap.get(stack.getMetadata());
+				lag = true;
 				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", type.damage, 0));
 				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", type.speed, 0));
-			}else {
-				return this.baseTool.getAttributeModifiers(slot, this.baseToolStack);
+			}
+			if(!lag) {
+				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", MCSUtil.item.getMetaValue(this.baseAttackDamage, stack.getMetadata()), 0));
+				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", (double) ((stack.getMetadata() + 1) * 0.0973) - 2.43D, 0));
 			}
 		}
 		return multimap;
 	}
-	
+
+	public Map<Integer, Integer> HarvestLevelMap = Maps.newHashMap();
+
+	public BaseCompressedShovel setHarvestLevelMap(Map<Integer, Integer> HarvestLevelMap) {
+		this.HarvestLevelMap = HarvestLevelMap;
+		return this;
+	}
+
 	@Override
 	public int getHarvestLevel(ItemStack stack, String toolClass, EntityPlayer player, IBlockState blockState) {
-		return this.baseTool.getHarvestLevel(this.baseToolStack, toolClass, player, blockState);
+		if(!this.HarvestLevelMap.isEmpty() && this.HarvestLevelMap.containsKey(stack.getMetadata())) {
+			return this.HarvestLevelMap.get(stack.getMetadata());
+		}
+		int level = this.baseTool.getHarvestLevel(stack, toolClass, player, blockState);
+		level += (int) ((stack.getMetadata() + 1) * 0.339341);
+		return level;
+	}
+
+	public Map<Integer, List<IBlockState>> CanHarvestBlock = Maps.newHashMap();
+
+	public BaseCompressedShovel setCanHarvestBlockMap(Map<Integer, List<IBlockState>> CanHarvestBlock) {
+		this.CanHarvestBlock = CanHarvestBlock;
+		return this;
 	}
 
 	@Override
 	public boolean canHarvestBlock(IBlockState state, ItemStack stack) {
-		return this.baseTool.canHarvestBlock(state, this.baseToolStack);
+		boolean lag = false;
+		if(this.CanHarvestBlock.containsKey(stack.getMetadata())) {
+			lag = this.CanHarvestBlock.get(stack.getMetadata()).contains(state);
+		}
+		return this.baseTool.canHarvestBlock(state, this.baseToolStack) || lag;
 	}
+
+	Map<Integer, EnumRarity> RarityMap = null;
+
+	public BaseCompressedShovel setRarityMap(Map<Integer, EnumRarity> map) {
+		this.RarityMap = map;
+		return this;
+	}
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public IRarity getForgeRarity(ItemStack stack) {
-		return this.baseToolStack.getItem().getForgeRarity(this.baseToolStack);
+		if(this.RarityMap != null) {
+			if(!this.RarityMap.isEmpty()) {
+				if(this.RarityMap.containsKey(stack.getMetadata())) {
+					return this.RarityMap.get(stack.getMetadata());
+				}
+			}
+		}
+		if(!this.baseToolStack.isEmpty()) {
+			return this.baseToolStack.getItem().getForgeRarity(this.baseToolStack);
+		}
+		return super.getForgeRarity(stack);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -221,7 +291,7 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 
 	private Map<Integer, Boolean> HasEffectMap = Maps.newHashMap();
 
-	public BaseItemHoe setHasEffectMap(Map<Integer, Boolean> map) {
+	public BaseCompressedShovel setHasEffectMap(Map<Integer, Boolean> map) {
 		this.HasEffectMap = map;
 		return this;
 	}
@@ -242,56 +312,56 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 
 	private List<String> shiftInfos = new ArrayList<String>();
 
-	public BaseItemHoe addCustemShiftInformation(String... custemInfo) {
+	public BaseCompressedShovel addCustemShiftInformation(String... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
 			shiftInfos.add(custemInfo[i]);
 		}
 		return this;
 	}
 
-	public BaseItemHoe addCustemShiftInformation(List<String> infos) {
+	public BaseCompressedShovel addCustemShiftInformation(List<String> infos) {
 		this.shiftInfos = infos;
 		return this;
 	}
 
 	private Map<Integer, List<String>> metaShiftInfos = Maps.newHashMap();
 
-	public BaseItemHoe addCustemShiftInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedShovel addCustemShiftInformation(Map<Integer, List<String>> infos) {
 		this.metaShiftInfos = infos;
 		return this;
 	}
 
 	private List<String> infos = new ArrayList<String>();
 
-	public BaseItemHoe addCustemInformation(String... custemInfo) {
+	public BaseCompressedShovel addCustemInformation(String... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
 			infos.add(custemInfo[i]);
 		}
 		return this;
 	}
 
-	public BaseItemHoe addCustemInformation(List<String> infos) {
+	public BaseCompressedShovel addCustemInformation(List<String> infos) {
 		this.infos = infos;
 		return this;
 	}
 
 	private Map<Integer, List<String>> metaInfos = Maps.newHashMap();
 
-	public BaseItemHoe addCustemInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedShovel addCustemInformation(Map<Integer, List<String>> infos) {
 		this.metaInfos = infos;
 		return this;
 	}
 
 	ItemStack infoStack = null;
 
-	public BaseItemHoe setInfoStack(ItemStack stack) {
+	public BaseCompressedShovel setInfoStack(ItemStack stack) {
 		this.infoStack = stack;
 		return this;
 	}
 
 	private Map<Integer, ItemStack> infoStacks = Maps.newHashMap();
 
-	public BaseItemHoe setInfoStack(Map<Integer, ItemStack> infoStacks) {
+	public BaseCompressedShovel setInfoStack(Map<Integer, ItemStack> infoStacks) {
 		this.infoStacks = infoStacks;
 		return this;
 	}
@@ -307,7 +377,7 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 			tooltip.add(I18n.format("info.mcs.owner_mod") + " : " + TextFormatting.AQUA.toString() + this.getOwnerMod());
 		}
 
-		if(MCS.test()) {
+		if(MCS.dev()) {
 			tooltip.add("最大耐久: " + this.getMaxDamage(stack));
 		}
 
@@ -321,12 +391,12 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 	}
 
 	@Override
-	public void getItemModel() {
+	public void getItemModel(RegisterModel util) {
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
-			this.model.registerItemModel(this, meta, this.ownerMod + "/item/tools/hoe/" + this.name, this.name + "." + meta);
+			util.registerItemModel(this, meta, this.ownerMod + "/item/tools/shovel/" + this.name, this.name + "." + meta);
 		}
-		this.model.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/tools/hoe/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+		util.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/tools/shovel/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
 	}
 	
 	@Override
@@ -357,7 +427,7 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 
 	private boolean makeRecipe = true;
 
-	public BaseItemHoe setMakeDefaultStackRecipe(boolean makeRecipe) {
+	public BaseCompressedShovel setMakeDefaultStackRecipe(boolean makeRecipe) {
 		this.makeRecipe = makeRecipe;
 		return this;
 	}
@@ -375,5 +445,30 @@ public class BaseItemHoe extends BaseItemTool.MetaHoe implements ICompressedStuf
 	@Override
 	public CompressedLevel getLevel() {
 		return this.type;
+	}@Override
+	public boolean canCreateRecipe(int meta) {
+		return this.craftMaterialStack!=null && this.craftRodStack!=null;
+	}
+	@Override
+	public ItemStack getMaterial(int meta) {
+		if(this.craftMaterialStack.isBlock() && (this.craftMaterialStack.isHas() || this.craftMaterialStack.getAsCompressedBlock().baseRecipeHasItem())) {
+			if(meta <= 0) {
+				return this.craftMaterialStack.getUnCompressedStack();
+			}else {
+				return this.craftMaterialStack.getStack(meta-1);
+			}
+		}
+		return this.craftMaterialStack.getStack(meta);
+	}
+	@Override
+	public ItemStack getRod(int meta) {
+		if(this.craftRodStack.isBlock() && (this.craftRodStack.isHas() || this.craftRodStack.getAsCompressedBlock().baseRecipeHasItem())) {
+			if(meta <= 0) {
+				return this.craftRodStack.getUnCompressedStack();
+			}else {
+				return this.craftRodStack.getStack(meta-1);
+			}
+		}
+		return this.craftRodStack.getStack(meta);
 	}
 }

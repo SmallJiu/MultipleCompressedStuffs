@@ -4,7 +4,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cat.jiu.mcs.util.client.model.BaseModel;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class BlockHasModel extends BaseModel {
 	protected final int meta;
 	public BlockHasModel(JsonElement originalTexture, String owner, String name, int meta, long i) {

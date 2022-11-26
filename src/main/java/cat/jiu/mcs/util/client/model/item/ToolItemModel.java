@@ -2,6 +2,10 @@ package cat.jiu.mcs.util.client.model.item;
 
 import com.google.gson.JsonElement;
 
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+@SideOnly(Side.CLIENT)
 public class ToolItemModel extends NormalItemModel {
 	public ToolItemModel(JsonElement originalTexture, String owner, String name, int meta, long i) {
 		super(originalTexture, "item/handheld", owner, name, meta, i);

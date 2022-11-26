@@ -38,9 +38,6 @@ public class ToCase {
 				if(e.getKeyChar() == KeyEvent.VK_ENTER) {
 					start.doClick();
 				}
-				if(e.getKeyChar() == KeyEvent.VK_BACK_SPACE) {
-					tf.setText("");
-				}
 			}
 		});
 		c.add(strCase, BorderLayout.NORTH);

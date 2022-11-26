@@ -1,10 +1,10 @@
 package cat.jiu.mcs.items.compressed.ic;
 
-import cat.jiu.core.api.events.item.IItemInPlayerHandTick;
-import cat.jiu.core.api.events.item.IItemInPlayerInventoryTick;
+import cat.jiu.core.api.events.iface.item.IItemInPlayerHandTick;
+import cat.jiu.core.api.events.iface.item.IItemInPlayerInventoryTick;
 import cat.jiu.core.util.JiuCoreEvents;
 import cat.jiu.mcs.util.MCSUtil;
-import cat.jiu.mcs.util.base.sub.BaseItemSub;
+import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
 
 import ic2.core.IC2Potion;
 import ic2.core.item.armor.ItemArmorHazmat;
@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.Loader;
  * @author small_jiu
  *
  */
-public class IC2RadiationItem extends BaseItemSub implements IItemInPlayerInventoryTick, IItemInPlayerHandTick {
+public class IC2RadiationItem extends BaseCompressedItem implements IItemInPlayerInventoryTick, IItemInPlayerHandTick {
 	public static IC2RadiationItem register(String name, ItemStack baseItem, String langModId) {
 		if(baseItem == null || baseItem.isEmpty()) {
 			return null;

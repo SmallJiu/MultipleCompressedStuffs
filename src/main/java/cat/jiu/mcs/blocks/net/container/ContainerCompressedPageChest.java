@@ -18,6 +18,8 @@ import net.minecraft.world.World;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 public class ContainerCompressedPageChest extends BaseUI.BaseContainer<TileEntityCompressedChest> {
 	protected final int meta;
@@ -33,7 +35,7 @@ public class ContainerCompressedPageChest extends BaseUI.BaseContainer<TileEntit
 			this.closeSound = this.te.getCloseSound();
 			this.slots = this.te.getSlotSize();
 			this.maxPage = this.slots / 54;
-			super.addHandlerSlot(this.te.getSlots(), 8, 18, 9, 6);
+			super.addHandlerSlot(this.te.getSlots(), 8, 18, 9, 6, args->new SlotItemHandler((IItemHandler)args[0], (int)args[1], (int)args[2], (int)args[3]));
 			super.addPlayerInventorySlot(8, 140);
 			this.toPage(0);
 		}else {

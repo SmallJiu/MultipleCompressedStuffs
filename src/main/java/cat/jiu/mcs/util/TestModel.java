@@ -1,9 +1,10 @@
 package cat.jiu.mcs.util;
 
-import cat.jiu.core.api.events.entity.IEntityJoinWorldEvent;
-import cat.jiu.core.api.events.entity.IEntityTickEvent;
+import cat.jiu.core.api.events.iface.entity.IEntityJoinWorldEvent;
+import cat.jiu.core.api.events.iface.entity.IEntityTickEvent;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
@@ -21,7 +22,7 @@ public class TestModel implements IEntityJoinWorldEvent, IEntityTickEvent {
 	}
 
 	@Override
-	public void onEntityTick(Entity entity, World world, BlockPos pos) {
+	public void onEntityTick(Entity entity) {
 		isTest(entity);
 		toVoid(entity);
 	}
@@ -30,13 +31,13 @@ public class TestModel implements IEntityJoinWorldEvent, IEntityTickEvent {
 		if(!test) {
 			return;
 		}
-		if(MCS.test()) {
-			test = MCS.test();
+		if(MCS.dev()) {
+			test = MCS.dev();
 			return;
 		}
 		if(entity instanceof EntityPlayer) {
 			if(entity.getName().indexOf("Player") == 0) {
-				test = MCS.test();
+				test = MCS.dev();
 				if(entity.world.isRemote) {
 					JiuUtils.entity.sendMessage(entity, "TestMode Is: " + test);
 				}

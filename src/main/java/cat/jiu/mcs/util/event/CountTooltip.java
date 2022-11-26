@@ -32,8 +32,8 @@ public class CountTooltip {
 		if(stack.getItem() instanceof BaseItemTool.MetaTool && stack.getMetadata() >= 32766) {
 			tooltip.add(tooltip.size()-1, TextFormatting.BLUE + I18n.format("item.unbreakable"));
 		}
-		if(MCS.test() && !stack.isEmpty()) {
-			tooltip.add(JiuUtils.nbt.getItemNBT(stack).toString());
+		if(MCS.dev() && !stack.isEmpty()) {
+//			tooltip.add(JiuUtils.nbt.getItemNBT(stack).toString());
 			List<String> ores = JiuUtils.item.getOreDict(stack);
 			if(!ores.isEmpty()) {
 				tooltip.add("OreDictionary:");

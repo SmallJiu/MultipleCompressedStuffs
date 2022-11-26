@@ -2,6 +2,8 @@ itemGroup.compressed_stuffs_blocks=MultipleCompressed-Blocks
 itemGroup.compressed_stuffs_items=MultipleCompressed-Items
 itemGroup.compressed_stuffs_tools=MultipleCompressed-Tools
 
+cmd.mcs.dev.gen=/mcs gen <max> <x> <y> <z> -- spawn random items to pos
+
 info.mcs.energy=Energy
 
 info.mcs.logging.air.name=Eat the air you!

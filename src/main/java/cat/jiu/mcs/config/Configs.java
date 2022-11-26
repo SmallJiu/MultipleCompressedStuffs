@@ -28,12 +28,12 @@ public class Configs {
 	@Config.Comment("Use 3x3 Recipes, if is 'false', will use 2x2 recipes")
 	@Config.RequiresMcRestart
 	public static boolean use_3x3_recipes = true;
-	
+
 	@Config.LangKey("config.mcs.recipe.infinite")
 	@Config.Comment("enable infinite compressed state recipe")
 	@Config.RequiresMcRestart
 	public static boolean enable_infinite_recipe = false;
-	
+
 	@Config.LangKey("config.mcs.use_scrool_gui")
 	@Config.Comment("Use scrool compressed chest gui, false will use page gui")
 	public static boolean use_scrool_gui = true;
@@ -48,10 +48,9 @@ public class Configs {
 			"clathrateOil", "machineBlockCasing", "machineBlockAdvanced", "machineBlockAdvancedCasing", "sandstone",
 			"dyeBrown", "dyeGreen", "dyeBlack", "chest", "sandstone",
 			"dirt", "chestWood"
-		};
+	};
 
 	public static final CustomCompressedBlock Custom = new CustomCompressedBlock();
-
 	public static final TooltipInformation Tooltip_Information = new TooltipInformation();
 
 	public static class TooltipInformation {
@@ -93,7 +92,7 @@ public class Configs {
 		@Config.LangKey("config.mcs.can_custom_specific_number")
 		@Config.Comment("Can Custom Specific Number of unCompressedItem in Tooltip Information")
 		public boolean can_custom_specific_number = false;
-		
+
 		@Config.LangKey("config.mcs.waila.remaining_time")
 		@Config.Comment("static to show the change block remaining time")
 		public boolean Static_Show_Change_Block_Remaining_Time = true;

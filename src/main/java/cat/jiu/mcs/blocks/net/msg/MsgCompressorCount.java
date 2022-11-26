@@ -16,9 +16,7 @@ public class MsgCompressorCount implements IMessage {
 	private BlockPos pos;
 	private int count;
 
-	public MsgCompressorCount() {
-	}
-
+	public MsgCompressorCount() {}
 	public MsgCompressorCount(BlockPos pos, int energy) {
 		this.pos = pos;
 		this.count = energy;

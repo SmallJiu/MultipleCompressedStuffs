@@ -1,13 +1,13 @@
 package cat.jiu.mcs.blocks.compressed;
 
-import cat.jiu.core.api.events.player.IPlayerCraftedItemEvent;
+import cat.jiu.core.api.events.iface.player.IPlayerCraftedItemEvent;
 import cat.jiu.core.util.JiuCoreEvents;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.net.GuiHandler;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCompressedChest;
 import cat.jiu.mcs.config.Configs;
-import cat.jiu.mcs.util.base.sub.BaseBlockSub;
+import cat.jiu.mcs.util.base.sub.BaseCompressedBlock;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockShulkerBox;
@@ -19,6 +19,7 @@ import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -29,7 +30,7 @@ import net.minecraft.world.World;
 
 import net.minecraftforge.items.ItemStackHandler;
 
-public class CompressedChest extends BaseBlockSub implements IPlayerCraftedItemEvent {
+public class CompressedChest extends BaseCompressedBlock implements IPlayerCraftedItemEvent {
 	protected final int baseSlot;
 	protected final SoundEvent openSound;
 	protected final SoundEvent closeSound;
@@ -71,25 +72,37 @@ public class CompressedChest extends BaseBlockSub implements IPlayerCraftedItemE
 		JiuCoreEvents.addEvent(this);
 	}
 
-	static int page = GuiHandler.CHEST_PAGE_GUI;
-	static int scrool = GuiHandler.CHEST_SCROOL_GUI;
-
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		player.openGui(MCS.MODID, Configs.use_scrool_gui ? scrool : page, world, pos.getX(), pos.getY(), pos.getZ());
+		if(player.isSneaking()) {
+			if(this.useWrenchBreak(world, pos, state, player, hand, false)) return true;
+		}
+		player.openGui(MCS.MODID, Configs.use_scrool_gui ? GuiHandler.CHEST_SCROOL_GUI : GuiHandler.CHEST_PAGE_GUI, world, pos.getX(), pos.getY(), pos.getZ());
 		if(this.openSound != null) {
 			world.playSound(null, pos, this.openSound, SoundCategory.BLOCKS, 1, 1);
 		}
 		return true;
 	}
+	
+	@Override
+	protected boolean wrenchBreak(World world, BlockPos pos, IBlockState state, boolean useMap) {
+		if(world.getTileEntity(pos) != null) {
+			ItemStack stack = new ItemStack(this, 1, JiuUtils.item.getMetaFromBlockState(state));
+			NBTTagCompound nbt = new NBTTagCompound();
+			nbt.setTag("BlockEntityTag", world.getTileEntity(pos).writeToNBT(new NBTTagCompound()));
+			world.setBlockToAir(pos);
+			JiuUtils.item.spawnAsEntity(world, pos, JiuUtils.nbt.setNBT(stack, nbt));
+			return true;
+		}
+		return false;
+	}
 
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
-		TileEntity te = world.getTileEntity(pos);
-		if(te instanceof TileEntityCompressedChest) {
-			JiuUtils.item.spawnAsEntity(world, pos, ((TileEntityCompressedChest) te).getSlots());
+	public void onBlockHarvested(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
+		if(world.isRemote) return;
+		if(world.getTileEntity(pos) instanceof TileEntityCompressedChest) {
+			JiuUtils.item.spawnAsEntity(world, pos, ((TileEntityCompressedChest) world.getTileEntity(pos)).getSlots());
 		}
-		super.breakBlock(world, pos, state);
 	}
 
 	@Override
@@ -98,7 +111,7 @@ public class CompressedChest extends BaseBlockSub implements IPlayerCraftedItemE
 	}
 
 	@Override
-	public void onPlayerCraftedItemInGui(EntityPlayer player, IInventory gui, ItemStack stack, World world, BlockPos pos) {
+	public void onPlayerCraftedItemInGui(EntityPlayer player, IInventory gui, ItemStack stack) {
 		ItemStack in = null;
 		for(int i = 0; i < gui.getSizeInventory(); i++) {
 			ItemStack s = gui.getStackInSlot(i);
@@ -108,10 +121,10 @@ public class CompressedChest extends BaseBlockSub implements IPlayerCraftedItemE
 			}
 		}
 		if(in != null && in.getItem() == Item.getItemFromBlock(this)) {
-			if(in != null && JiuUtils.nbt.getItemNBT(in).getSize() > 0) {
-				ItemStackHandler stacks = new ItemStackHandler(((TileEntityCompressedChest) this.createNewTileEntity(world, in.getMetadata())).getSlotSize());
+			if(JiuUtils.nbt.getItemNBT(in).getSize() > 0) {
+				ItemStackHandler stacks = new ItemStackHandler(((TileEntityCompressedChest) this.createNewTileEntity(player.world, in.getMetadata())).getSlotSize());
 				stacks.deserializeNBT(JiuUtils.nbt.getItemNBT(in).getCompoundTag("SlotItems"));
-				JiuUtils.item.spawnAsEntity(world, pos, stacks);
+				JiuUtils.item.spawnAsEntity(player.world, player.getPosition(), stacks);
 			}
 		}
 	}

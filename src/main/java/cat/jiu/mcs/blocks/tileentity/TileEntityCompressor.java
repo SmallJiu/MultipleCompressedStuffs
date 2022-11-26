@@ -17,8 +17,9 @@ import cat.jiu.mcs.util.init.MCSBlocks;
 import cat.jiu.mcs.util.init.MCSResources;
 
 import ic2.api.item.IElectricItem;
-
+import net.minecraft.block.Block;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -119,7 +120,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 			ItemStack stack = block.getStack(amount, 0);
 			
 			if(JiuUtils.item.addItemToSlot(compressedSlot, stack, true)) {
-				if(this.debug || MCS.test()) {this.storage.extractEnergyWithLong(1, false);}else {
+				if(this.debug || MCS.dev()) {this.storage.extractEnergyWithLong(1, false);}else {
 					unBlock.shrink(amount * shirkC);
 					this.storage.extractEnergyWithLong(5 * amount, false);
 				}
@@ -140,7 +141,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 							ItemStack stack = new ItemStack(slotStack.getItem(), amount, slotStack.getMetadata() + 1);
 							if(this.compressedSlot.insertItem(i + 1, stack, true).isEmpty()) {
 								slotStack.shrink(amount * shirkC);
-								if(this.debug || MCS.test()) {this.storage.extractEnergyWithLong(1, false);}else {
+								if(this.debug || MCS.dev()) {this.storage.extractEnergyWithLong(1, false);}else {
 									this.storage.extractEnergyWithLong(5 * amount, false);
 								}
 								this.compressedSlot.insertItem(i + 1, stack, false);
@@ -160,11 +161,23 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 	public void setDebug() {
 		this.debug = !this.debug;
 	}
+	
+	protected int getEnergy(ItemStack stack) {
+		int energy = TileEntityFurnace.getItemBurnTime(stack);
+		if(energy <= 0) {
+			Item item = stack.getItem();
+			if(item == Items.REDSTONE) {
+				energy = 1000;
+			}
+		}
+		
+		return energy;
+	}
 
 	private void addEnergy() {
 		ItemStack stack = this.energySlot.getStackInSlot(0);
 		if(!stack.isEmpty() && stack != null) {
-			int itemEnergy = TileEntityFurnace.getItemBurnTime(stack) / 10;
+			int itemEnergy = this.getEnergy(stack) / 10;
 			if(itemEnergy > 0) {
 				long i = this.storage.getEnergyStoredWithLong() + itemEnergy;
 
@@ -195,16 +208,15 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 						return;
 					}
 				}
-			}else if(Loader.isModLoaded("ic2")) {
-				if(stack.getItem() instanceof IElectricItem) {
-					// JiuUtils.nbt.setItemNBT(stack, "charge", (JiuUtils.nbt.getItemNBTDouble(stack, "charge")-1));
-					// this.storage.receiveEnergy(4, false);
-				}
+			}else if(Loader.isModLoaded("ic2") && stack.getItem() instanceof IElectricItem) {
+				// JiuUtils.nbt.setItemNBT(stack, "charge", (JiuUtils.nbt.getItemNBTDouble(stack, "charge")-1));
+				// this.storage.receiveEnergy(4, false);
 			}else if(JiuUtils.item.isBlock(stack)) {
-				if(JiuUtils.item.getBlockFromItemStack(stack) == MCSBlocks.creative_energy) {
+				Block block = JiuUtils.item.getBlockFromItemStack(stack);
+				if(block == MCSBlocks.creative_energy) {
 					this.storage.receiveEnergyWithLong(Integer.MAX_VALUE, false);
 					return;
-				}else if(JiuUtils.item.getBlockFromItemStack(stack) == MCSBlocks.C_creative_energy_B) {
+				}else if(block == MCSBlocks.C_creative_energy_B) {
 					this.storage.receiveEnergyWithLong(Integer.MAX_VALUE, false);
 					return;
 				}

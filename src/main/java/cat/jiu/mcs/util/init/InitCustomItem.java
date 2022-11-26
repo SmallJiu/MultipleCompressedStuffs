@@ -11,8 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cat.jiu.core.util.JiuUtils;
-import cat.jiu.core.util.Time;
-import cat.jiu.mcs.util.base.sub.BaseBlockSub.HarvestType;
+import cat.jiu.core.util.timer.Timer;
 import cat.jiu.mcs.util.type.CustomStuffType;
 import cat.jiu.mcs.util.type.CustomStuffType.ToolModifiersType;
 
@@ -76,7 +75,7 @@ public class InitCustomItem {
 						int m = Integer.parseInt(effectElement[2]);
 						int s = Integer.parseInt(effectElement[3]);
 						int tick = Integer.parseInt(effectElement[4]);
-						type.add(new CustomStuffType.PotionEffectType(potion, new Time(m, s, tick), level));
+						type.add(new CustomStuffType.PotionEffectType(potion, new Timer(m, s, tick), level));
 					}
 
 					if(meta == -1) {
@@ -100,7 +99,7 @@ public class InitCustomItem {
 					int m = Integer.parseInt(effectElement[2]);
 					int s = Integer.parseInt(effectElement[3]);
 					int tick = Integer.parseInt(effectElement[4]);
-					type.add(new CustomStuffType.PotionEffectType(potion, new Time(m, s, tick), level));
+					type.add(new CustomStuffType.PotionEffectType(potion, new Timer(m, s, tick), level));
 				}
 				for(int meta = 0; meta < 16; meta++) {
 					put(PotionEffectMap, meta, type);
@@ -112,7 +111,7 @@ public class InitCustomItem {
 				int m = Integer.parseInt(effectElement[2]);
 				int s = Integer.parseInt(effectElement[3]);
 				int tick = Integer.parseInt(effectElement[4]);
-				List<CustomStuffType.PotionEffectType> type = Lists.newArrayList(new CustomStuffType.PotionEffectType(potion, new Time(m, s, tick), level));
+				List<CustomStuffType.PotionEffectType> type = Lists.newArrayList(new CustomStuffType.PotionEffectType(potion, new Timer(m, s, tick), level));
 
 				for(int meta = 0; meta < 16; meta++) {
 					put(PotionEffectMap, meta, type);
@@ -445,9 +444,9 @@ public class InitCustomItem {
 		return null;
 	}
 
-	public static Map<Integer, HarvestType> initHarvest(JsonObject obj) {
+	public static Map<Integer, CustomStuffType.HarvestType> initHarvest(JsonObject obj) {
 		if(obj.has("harvest")) {
-			Map<Integer, HarvestType> HarvestMap = Maps.newHashMap();
+			Map<Integer, CustomStuffType.HarvestType> HarvestMap = Maps.newHashMap();
 			JsonElement e = obj.get("harvest");
 			if(e.isJsonObject()) {
 				JsonObject harvestObject = obj.get("harvest").getAsJsonObject();
@@ -460,7 +459,7 @@ public class InitCustomItem {
 						if(isInt(toolObject)) {// if is int
 							int level = toolObject.getAsInt();
 							for(int meta = 0; meta < 16; meta++) {
-								put(HarvestMap, meta, new HarvestType(toolOrMeta, level));
+								put(HarvestMap, meta, new CustomStuffType.HarvestType(toolOrMeta, level));
 							}
 						}else {
 							// get meta list
@@ -470,23 +469,23 @@ public class InitCustomItem {
 								int level = toolElement.getValue().getAsInt();
 								if(meta == -1) {
 									for(int i = 0; i < 16; i++) {
-										put(HarvestMap, i, new HarvestType(toolOrMeta, level));
+										put(HarvestMap, i, new CustomStuffType.HarvestType(toolOrMeta, level));
 									}
 								}else {
-									put(HarvestMap, meta, new HarvestType(toolOrMeta, level));
+									put(HarvestMap, meta, new CustomStuffType.HarvestType(toolOrMeta, level));
 								}
 							}
 						}
 					}else {
 						int meta = Integer.parseInt(toolOrMeta);
 						int level = harvest.getValue().getAsInt();
-						put(HarvestMap, meta, new HarvestType("pickaxe", level));
+						put(HarvestMap, meta, new CustomStuffType.HarvestType("pickaxe", level));
 					}
 				}
 			}else if(e.isJsonPrimitive()) {
 				int level = e.getAsJsonPrimitive().getAsInt();
 				for(int i = 0; i < 16; i++) {
-					put(HarvestMap, i, new HarvestType("pickaxe", level));
+					put(HarvestMap, i, new CustomStuffType.HarvestType("pickaxe", level));
 				}
 			}
 			return HarvestMap;

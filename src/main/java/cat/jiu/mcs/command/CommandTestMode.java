@@ -11,7 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.CommandBlockBaseLogic;
 import net.minecraft.util.text.TextComponentKeybind;
 
-public class CommandTestMode extends BaseCommand.CommandNormal {
+class CommandTestMode extends BaseCommand.CommandNormal {
 	public CommandTestMode(String name, int level) {
 		super(name, MCS.MODID, level);
 	}

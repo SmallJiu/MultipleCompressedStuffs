@@ -7,7 +7,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cat.jiu.mcs.util.client.model.BaseModel;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class NormalItemModel extends BaseModel {
 	protected final int meta;
 	public NormalItemModel(JsonElement originalTexture, String owner, String name, int meta, long i) {
@@ -30,10 +33,8 @@ public class NormalItemModel extends BaseModel {
 				textures.addProperty("layer"+i, textureArray.get(i).getAsString());
 			}
 		}else if(this.originalTexture.isJsonObject()) {
-			int i = 0;
 			for (Entry<String, JsonElement> texture : this.originalTexture.getAsJsonObject().entrySet()) {
-				textures.addProperty("layer"+i, texture.getValue().getAsString());
-				i += 1;
+				textures.addProperty(texture.getKey(), texture.getValue().getAsString());
 			}
 		}
 		

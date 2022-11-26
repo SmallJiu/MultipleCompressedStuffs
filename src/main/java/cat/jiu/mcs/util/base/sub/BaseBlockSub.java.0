@@ -386,7 +386,7 @@ public class BaseBlockSub extends BaseBlock implements IHasModel, IMetaName, ITi
 		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.unCompressedItem, infoStacks);
 		MCSUtil.info.addCompressedInfo(meta, tooltip, this.getUnCompressedItemLocalizedName(), Item.getItemFromBlock(this));
 
-		if(MCS.test()) {
+		if(MCS.dev()) {
 			tooltip.add("Is Has Block: " + this.isHas());
 			NBTTagCompound nbt = stack.getTagCompound();
 			tooltip.add("unCompressedItem: " + this.unCompressedItem.getItem().getRegistryName() + "." + this.unCompressedItem.getItemDamage());

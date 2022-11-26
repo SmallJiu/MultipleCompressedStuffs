@@ -5,7 +5,7 @@ import java.util.List;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.util.MCSUtil;
-import cat.jiu.mcs.util.base.sub.BaseItemSub;
+import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
 
 import ic2.api.item.ICustomDamageItem;
 import ic2.api.reactor.IReactor;
@@ -24,7 +24,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
-public class IC2ReactorAssembly extends BaseItemSub implements IReactorComponent, ICustomDamageItem {
+public class IC2ReactorAssembly extends BaseCompressedItem implements IReactorComponent, ICustomDamageItem {
 	protected final IReactorComponent baseComponent;
 	protected final ICustomDamageItem baseDamageItem;
 

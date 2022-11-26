@@ -8,7 +8,6 @@ import cat.jiu.core.util.base.BaseBlock;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.net.GuiHandler;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCompressor;
-import cat.jiu.mcs.util.MCSUtil;
 
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
@@ -24,6 +23,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -34,6 +34,7 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.items.ItemStackHandler;
 
 public class BlockCompressor extends BaseBlock.Normal implements ITileEntityProvider {
 	public BlockCompressor() {
@@ -54,8 +55,7 @@ public class BlockCompressor extends BaseBlock.Normal implements ITileEntityProv
 	public float getExplosionResistance(World world, BlockPos pos, Entity exploder, Explosion explosion) {
 		TileEntity tile = world.getTileEntity(pos);
 		if(tile instanceof TileEntityCompressor) {
-			TileEntityCompressor te = (TileEntityCompressor) tile;
-			if(!te.canBreak()) {
+			if(!((TileEntityCompressor) tile).canBreak()) {
 				return Float.MAX_VALUE;
 			}
 		}
@@ -67,8 +67,7 @@ public class BlockCompressor extends BaseBlock.Normal implements ITileEntityProv
 	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
 		TileEntity tile = world.getTileEntity(pos);
 		if(tile instanceof TileEntityCompressor) {
-			TileEntityCompressor te = (TileEntityCompressor) tile;
-			if(!te.canBreak()) {
+			if(!((TileEntityCompressor) tile).canBreak()) {
 				return Float.MAX_VALUE;
 			}
 		}
@@ -86,132 +85,70 @@ public class BlockCompressor extends BaseBlock.Normal implements ITileEntityProv
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if(playerIn.isSneaking()) {
-			if(!world.isRemote) {
-				if(MCS.test()) {
-					TileEntity te0 = world.getTileEntity(pos);
-					if(te0 instanceof TileEntityCompressor) {
-						TileEntityCompressor te = (TileEntityCompressor) te0;
-						NonNullList<ItemStack> inv = playerIn.inventoryContainer.getInventory();
-
-						for(int i = 0; i < inv.size(); i++) {
-							ItemStack stack = inv.get(i);
-							Item item = stack.getItem();
-							ItemStack baseItem = MCSUtil.item.getUnCompressed(item);
-
-							if(!baseItem.isEmpty()) {
-								if(JiuUtils.item.equalsStack(te.compressedSlot.getStackInSlot(0), stack)) {
-									te.compressedSlot.getStackInSlot(0).grow(stack.getCount());
-									stack.setCount(0);
-								}else if(JiuUtils.item.equalsStack(te.compressedSlot.getStackInSlot(0), baseItem)) {
-									if(JiuUtils.item.addItemToSlot(te.compressedSlot, stack, true)) {
-										JiuUtils.item.addItemToSlot(te.compressedSlot, stack, false);
-										stack.setCount(0);
-									}
-								}
-							}else if(JiuUtils.item.equalsStack(stack, te.compressedSlot.getStackInSlot(0))) {
-								te.compressedSlot.getStackInSlot(0).grow(stack.getCount());
-								stack.setCount(0);
-							}else if(te.compressedSlot.getStackInSlot(0).isEmpty()) {
-								boolean lag = false;
-								for(int j = 0; j < te.compressedSlot.getSlots(); j++) {
-									ItemStack compressed = te.compressedSlot.getStackInSlot(j);
-									if(!compressed.isEmpty()) {
-										ItemStack compressedUn = MCSUtil.item.getUnCompressed(compressed.getItem());
-										if(!compressedUn.isEmpty()) {
-											if(JiuUtils.item.equalsStack(compressedUn, stack)) {
-												if(!te.compressedSlot.getStackInSlot(0).isEmpty()) {
-													te.compressedSlot.getStackInSlot(0).grow(stack.getCount());
-												}else {
-													te.compressedSlot.setStackInSlot(0, stack);
-												}
-												stack.setCount(0);
-												lag = true;
-												break;
-											}else if(JiuUtils.item.equalsStack(stack, compressed)) {
-												if(JiuUtils.item.addItemToSlot(te.compressedSlot, stack, true)) {
-													JiuUtils.item.addItemToSlot(te.compressedSlot, stack, false);
-													stack.setCount(0);
-													lag = true;
-													break;
-												}
-											}
-										}else if(JiuUtils.item.equalsStack(stack, te.compressedSlot.getStackInSlot(0))) {
-											te.compressedSlot.getStackInSlot(0).grow(stack.getCount());
-											stack.setCount(0);
-											lag = true;
-											break;
-										}
-									}
-								}
-								if(!lag) {
-									if(!stack.isEmpty()) {
-										if(te.compressedSlot.getStackInSlot(0).isEmpty()) {
-											te.compressedSlot.setStackInSlot(0, stack);
-											stack.setCount(0);
-										}else {
-											te.compressedSlot.getStackInSlot(0).grow(stack.getCount());
-											stack.setCount(0);
-										}
-									}
-								}
-							}
-						}
-					}
-				}else {
-					return true;
-				}
-
-			}
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if(player.isSneaking()) {
+			if(this.useWrenchBreak(world, pos, state, player, hand, facing, hitX, hitY, hitZ)) return true;
+			return true;
 		}else {
 			int x = pos.getX(), y = pos.getY(), z = pos.getZ();
-			playerIn.openGui(MCS.MODID, GuiHandler.COMPRESSOR, world, x, y, z);
+			player.openGui(MCS.MODID, GuiHandler.COMPRESSOR, world, x, y, z);
+			return true;
+		}
+	}
+	
+	private boolean useWrenchBreak(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		Item item = player.getHeldItem(hand).getItem();
+		if(Loader.isModLoaded("thermalfoundation")) {
+			if(item instanceof cofh.api.item.IToolHammer) {
+				return this.wrenchBreak(world, pos, state);
+			}
+		}
+		return false;
+	}
+	
+	private boolean wrenchBreak(World world, BlockPos pos, IBlockState state) {
+		TileEntity tile = world.getTileEntity(pos);
+		if(tile != null) {
+			ItemStack stack = JiuUtils.item.getStackFromBlockState(state);
+			NBTTagCompound nbt = new NBTTagCompound();
+			nbt.setTag("BlockEntityTag", tile.writeToNBT(new NBTTagCompound()));
+			world.setBlockToAir(pos);
+			JiuUtils.item.spawnAsEntity(world, pos, JiuUtils.nbt.setNBT(stack, nbt));
 			return true;
 		}
 		return false;
 	}
-
+	
 	@Override
-	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+	public void onBlockHarvested(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
+		if(world.isRemote) return;
 		TileEntity posTe = world.getTileEntity(pos);
-
 		if(posTe instanceof TileEntityCompressor) {
+			NonNullList<ItemStack> drops = NonNullList.create();
 			TileEntityCompressor te = (TileEntityCompressor) posTe;
-			super.breakBlock(world, pos, state);
-			// ItemStack dropBlock = JiuUtils.item.getStackFormBlockState(state);
-			// NBTTagCompound nbt = new NBTTagCompound();
-			// NBTTagCompound postNBT = te.writeToNBT(new NBTTagCompound());
-			//
-			// postNBT.removeTag("x");
-			// postNBT.removeTag("y");
-			// postNBT.removeTag("z");
-			// postNBT.removeTag("id");
-			// nbt.setTag("BlockEntityTag", postNBT);
-			// dropBlock.setTagCompound(nbt);
-			// JiuUtils.item.spawnAsEntity(world, pos, dropBlock);
-			// world.setBlockState(pos, Blocks.AIR.getDefaultState());
-
-			JiuUtils.item.spawnAsEntity(world, pos, te.getEnergySlotItems());
-			JiuUtils.item.spawnAsEntity(world, pos, te.getCompressedSlotItems());
-
-			if(!Loader.isModLoaded("redstoneflux")) {
-				long i = te.storage.getEnergyStoredWithLong();
-
-				if(i >= 9000) {
-					while(i >= 9000) {
-						i -= 9000;
-						JiuUtils.item.spawnAsEntity(world, pos, new ItemStack(Blocks.REDSTONE_BLOCK));
-					}
-				}
-
-				if(i >= 1000) {
-					while(i >= 1000) {
-						i -= 1000;
-						JiuUtils.item.spawnAsEntity(world, pos, new ItemStack(Items.REDSTONE));
-					}
-				}
+			
+			drops.add(te.getEnergySlotItems().getStackInSlot(0));
+			
+			ItemStackHandler compressedSlot = te.getCompressedSlotItems();
+			for(int i = 0; i < compressedSlot.getSlots(); i++) {
+				drops.add(compressedSlot.getStackInSlot(i));
 			}
+			
+			if(!Loader.isModLoaded("redstoneflux")) {
+				this.addEnergyDrops(te.storage.getEnergyStoredWithLong(), drops);
+			}
+			JiuUtils.item.spawnAsEntity(world, pos, drops);
+		}
+	}
+	
+	private void addEnergyDrops(long energy, NonNullList<ItemStack> drops) {
+		while(energy >= 9000) {
+			energy -= 9000;
+			drops.add(new ItemStack(Blocks.REDSTONE_BLOCK));
+		}
+		while(energy >= 1000) {
+			energy -= 1000;
+			drops.add(new ItemStack(Items.REDSTONE));
 		}
 	}
 

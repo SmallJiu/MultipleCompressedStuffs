@@ -11,14 +11,17 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 import cat.jiu.core.util.JiuUtils;
+import cat.jiu.core.util.RegisterModel;
 import cat.jiu.core.util.base.BaseItemTool;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.api.recipe.IToolRecipe;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.exception.NonToolException;
 import cat.jiu.mcs.util.CompressedLevel;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
+import cat.jiu.mcs.util.init.MCSItems;
 import cat.jiu.mcs.util.init.MCSResources;
 import cat.jiu.mcs.util.type.CustomStuffType;
 
@@ -31,9 +34,8 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemPickaxe;
+import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
@@ -44,36 +46,50 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompressedStuff {
-	public static BaseItemPickaxe register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
+public class BaseCompressedHoe extends BaseItemTool.MetaHoe implements ICompressedStuff, IToolRecipe {
+	public static BaseCompressedHoe register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab, ICompressedStuff craftMaterialStack, ICompressedStuff craftRodStack) {
 		if(baseItem == null || baseItem.isEmpty()) return null;
 		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
-			return new BaseItemPickaxe(name, baseItem, ownerMod, tab);
+			return new BaseCompressedHoe(name, baseItem, ownerMod, tab, craftMaterialStack, craftRodStack);
 		}else {
 			return null;
 		}
 	}
+	
+	public static BaseCompressedHoe register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
+		return register(name, baseItem, ownerMod, tab, null, null);
+	}
 
-	public static BaseItemPickaxe register(String name, ItemStack baseItem, String ownerMod) {
+	public static BaseCompressedHoe register(String name, ItemStack baseItem, String ownerMod) {
 		return register(name, baseItem, ownerMod, MCS.COMPERESSED_TOOLS);
 	}
 
-	private final ItemStack baseToolStack;
-	private final ItemPickaxe baseTool;
-	private final float baseAttackDamage;
-	private final String ownerMod;
-
-	public BaseItemPickaxe(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab) {
+	protected final ItemStack baseToolStack;
+	protected final ItemHoe baseTool;
+	protected final float baseAttackSpeed;
+	protected final String ownerMod;
+	protected final ICompressedStuff craftMaterialStack;
+	protected final ICompressedStuff craftRodStack;
+	public BaseCompressedHoe(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab) {
+		this(name, baseTool, ownerMod, tab, null, null);
+	}
+	public BaseCompressedHoe(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab, ICompressedStuff craftMaterialStack) {
+		this(name, baseTool, ownerMod, tab, craftMaterialStack, MCSItems.minecraft.normal.C_STICK_I);
+	}
+	public BaseCompressedHoe(String name, ItemStack baseTool, String ownerMod, CreativeTabs tab, ICompressedStuff craftMaterialStack, ICompressedStuff craftRodStack) {
 		super(MCS.MODID, name, tab, true, getToolMaterial(baseTool), ModSubtypes.values());
 		this.baseToolStack = baseTool;
-		if(baseTool.getItem() instanceof ItemPickaxe) {
-			this.baseTool = (ItemPickaxe) baseTool.getItem();
+		if(baseTool.getItem() instanceof ItemHoe) {
+			this.baseTool = (ItemHoe) baseTool.getItem();
 		}else {
-			throw new NonToolException(baseTool, "Pickaxe");
+			this.baseTool = null;
+			throw new NonToolException(baseTool, "Hoe");
 		}
 		this.ownerMod = ownerMod;
-		this.baseAttackDamage = this.baseTool.attackDamage;
+		this.baseAttackSpeed = this.baseTool.speed - 4.0F;
 		this.setMaxMetadata(16);
+		this.craftMaterialStack = craftMaterialStack;
+		this.craftRodStack = craftRodStack;
 
 		if(!ownerMod.equals("custom")) {
 			MCSResources.ITEMS.add(this);
@@ -86,14 +102,19 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 			throw new RuntimeException("name must not be owner mod. Name: " + name + ", OwnerMod: " + baseTool.getItem().getRegistryName().getResourceDomain());
 		}
 	}
-
-	public BaseItemPickaxe(String name, ItemStack baseTool) {
+	public BaseCompressedHoe(String name, ItemStack baseTool, ICompressedStuff craftMaterialStack, ICompressedStuff craftRodStack) {
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS, craftMaterialStack, craftRodStack);
+	}
+	public BaseCompressedHoe(String name, ItemStack baseTool, ICompressedStuff craftMaterialStack) {
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS, craftMaterialStack);
+	}
+	public BaseCompressedHoe(String name, ItemStack baseTool) {
 		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS);
 	}
 
 	private static ToolMaterial getToolMaterial(ItemStack baseItem) {
-		if(baseItem.getItem() instanceof ItemPickaxe) {
-			return ((ItemPickaxe) baseItem.getItem()).toolMaterial;
+		if(baseItem.getItem() instanceof ItemHoe) {
+			return ((ItemHoe) baseItem.getItem()).toolMaterial;
 		}
 		return ToolMaterial.WOOD;
 	}
@@ -111,7 +132,7 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 
 	public Map<Integer, Integer> EnchantabilityLevelMap = Maps.newHashMap();
 
-	public BaseItemPickaxe setEnchantabilityLevelMap(Map<Integer, Integer> EnchantabilityLevelMap) {
+	public BaseCompressedHoe setEnchantabilityLevel(Map<Integer, Integer> EnchantabilityLevelMap) {
 		this.EnchantabilityLevelMap = EnchantabilityLevelMap;
 		return this;
 	}
@@ -122,12 +143,12 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 			return this.EnchantabilityLevelMap.get(stack.getMetadata());
 		}
 		int enchantability = this.baseTool.getItemEnchantability(this.baseToolStack);
-		return (int) MCSUtil.item.getMetaValue(enchantability, stack);
+		return (int) (enchantability + (enchantability * ((stack.getMetadata() + 1) * 0.29394)));
 	}
 
 	public Map<Integer, ItemStack> RepairableMap = Maps.newHashMap();
 
-	public BaseItemPickaxe setRepairableMap(Map<Integer, ItemStack> RepairableMap) {
+	public BaseCompressedHoe setRepairableMap(Map<Integer, ItemStack> RepairableMap) {
 		this.RepairableMap = RepairableMap;
 		return this;
 	}
@@ -143,7 +164,7 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 
 	public Map<Integer, Float> DestroySpeedMap = Maps.newHashMap();
 
-	public BaseItemPickaxe setDestroySpeedMap(Map<Integer, Float> DestroySpeedMap) {
+	public BaseCompressedHoe setDestroySpeed(Map<Integer, Float> DestroySpeedMap) {
 		this.DestroySpeedMap = DestroySpeedMap;
 		return this;
 	}
@@ -153,20 +174,18 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 		if(!this.DestroySpeedMap.isEmpty() && this.DestroySpeedMap.containsKey(stack.getMetadata())) {
 			return this.DestroySpeedMap.get(stack.getMetadata());
 		}
-		float base = this.baseTool.getDestroySpeed(this.baseToolStack, state);
-		return (float) MCSUtil.item.getMetaValue(base, stack);
+		return this.baseTool.getDestroySpeed(this.baseToolStack, state);
 	}
 
 	public Map<Integer, Integer> MaxDamageMap = Maps.newHashMap();
 
-	public BaseItemPickaxe setMaxDamage(Map<Integer, Integer> MaxDamageMap) {
+	public BaseCompressedHoe setMaxDamage(Map<Integer, Integer> MaxDamageMap) {
 		this.MaxDamageMap = MaxDamageMap;
 		return this;
 	}
 
 	@Override
 	public int getMaxDamage(ItemStack stack) {
-		if(stack.getMetadata() >= 32766) return 998;
 		if(!this.MaxDamageMap.isEmpty() && this.MaxDamageMap.containsKey(stack.getMetadata())) {
 			return this.MaxDamageMap.get(stack.getMetadata());
 		}
@@ -174,13 +193,12 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 	}
 
 	Map<Integer, CustomStuffType.ToolModifiersType> AttributeModifierMap = Maps.newHashMap();
-
-	public BaseItemPickaxe setAttributeModifierMap(Map<Integer, CustomStuffType.ToolModifiersType> attributeModifierMap) {
+	public BaseCompressedHoe setAttributeModifierMap(Map<Integer, CustomStuffType.ToolModifiersType> attributeModifierMap) {
 		this.AttributeModifierMap = attributeModifierMap;
 		return this;
 	}
 
-	public BaseItemPickaxe addAttributeModifierMap(int meta, double speed, double damage) {
+	public BaseCompressedHoe addAttributeModifierMap(int meta, double speed, double damage) {
 		this.AttributeModifierMap.put(meta, new CustomStuffType.ToolModifiersType(speed, damage));
 		return this;
 	}
@@ -190,75 +208,30 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 		Multimap<String, AttributeModifier> multimap = HashMultimap.create();
 
 		if(slot == EntityEquipmentSlot.MAINHAND) {
-			boolean lag = false;
 			if(!this.AttributeModifierMap.isEmpty() && this.AttributeModifierMap.containsKey(stack.getMetadata())) {
 				CustomStuffType.ToolModifiersType type = this.AttributeModifierMap.get(stack.getMetadata());
-				lag = true;
 				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", type.damage, 0));
 				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", type.speed, 0));
-			}
-			if(!lag) {
-				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", MCSUtil.item.getMetaValue(this.baseAttackDamage, stack.getMetadata()), 0));
-				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", (double) ((stack.getMetadata() + 1) * 0.0973) - 2.43D, 0));
+			}else {
+				return this.baseTool.getAttributeModifiers(slot, this.baseToolStack);
 			}
 		}
 		return multimap;
 	}
-
-	public Map<Integer, Integer> HarvestLevelMap = Maps.newHashMap();
-
-	public BaseItemPickaxe setHarvestLevelMap(Map<Integer, Integer> HarvestLevelMap) {
-		this.HarvestLevelMap = HarvestLevelMap;
-		return this;
-	}
-
+	
 	@Override
 	public int getHarvestLevel(ItemStack stack, String toolClass, EntityPlayer player, IBlockState blockState) {
-		if(!this.HarvestLevelMap.isEmpty() && this.HarvestLevelMap.containsKey(stack.getMetadata())) {
-			return this.HarvestLevelMap.get(stack.getMetadata());
-		}
-		int level = this.baseTool.getHarvestLevel(stack, toolClass, player, blockState);
-		level += (int) ((stack.getMetadata() + 1) * 0.339341);
-		return level;
-	}
-
-	public Map<Integer, List<IBlockState>> CanHarvestBlock = Maps.newHashMap();
-
-	public BaseItemPickaxe setCanHarvestBlockMap(Map<Integer, List<IBlockState>> CanHarvestBlock) {
-		this.CanHarvestBlock = CanHarvestBlock;
-		return this;
+		return this.baseTool.getHarvestLevel(this.baseToolStack, toolClass, player, blockState);
 	}
 
 	@Override
 	public boolean canHarvestBlock(IBlockState state, ItemStack stack) {
-		boolean lag = false;
-		if(this.CanHarvestBlock.containsKey(stack.getMetadata())) {
-			lag = this.CanHarvestBlock.get(stack.getMetadata()).contains(state);
-		}
-		return this.baseTool.canHarvestBlock(state, this.baseToolStack) || lag;
+		return this.baseTool.canHarvestBlock(state, this.baseToolStack);
 	}
-
-	Map<Integer, EnumRarity> RarityMap = null;
-
-	public BaseItemPickaxe setRarityMap(Map<Integer, EnumRarity> map) {
-		this.RarityMap = map;
-		return this;
-	}
-
 	@SideOnly(Side.CLIENT)
 	@Override
 	public IRarity getForgeRarity(ItemStack stack) {
-		if(this.RarityMap != null) {
-			if(!this.RarityMap.isEmpty()) {
-				if(this.RarityMap.containsKey(stack.getMetadata())) {
-					return this.RarityMap.get(stack.getMetadata());
-				}
-			}
-		}
-		if(!this.baseToolStack.isEmpty()) {
-			return this.baseToolStack.getItem().getForgeRarity(this.baseToolStack);
-		}
-		return super.getForgeRarity(stack);
+		return this.baseToolStack.getItem().getForgeRarity(this.baseToolStack);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -269,7 +242,7 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 
 	private Map<Integer, Boolean> HasEffectMap = Maps.newHashMap();
 
-	public BaseItemPickaxe setHasEffectMap(Map<Integer, Boolean> map) {
+	public BaseCompressedHoe setHasEffectMap(Map<Integer, Boolean> map) {
 		this.HasEffectMap = map;
 		return this;
 	}
@@ -290,56 +263,56 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 
 	private List<String> shiftInfos = new ArrayList<String>();
 
-	public BaseItemPickaxe addCustemShiftInformation(String... custemInfo) {
+	public BaseCompressedHoe addCustemShiftInformation(String... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
 			shiftInfos.add(custemInfo[i]);
 		}
 		return this;
 	}
 
-	public BaseItemPickaxe addCustemShiftInformation(List<String> infos) {
+	public BaseCompressedHoe addCustemShiftInformation(List<String> infos) {
 		this.shiftInfos = infos;
 		return this;
 	}
 
 	private Map<Integer, List<String>> metaShiftInfos = Maps.newHashMap();
 
-	public BaseItemPickaxe addCustemShiftInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedHoe addCustemShiftInformation(Map<Integer, List<String>> infos) {
 		this.metaShiftInfos = infos;
 		return this;
 	}
 
 	private List<String> infos = new ArrayList<String>();
 
-	public BaseItemPickaxe addCustemInformation(String... custemInfo) {
+	public BaseCompressedHoe addCustemInformation(String... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
 			infos.add(custemInfo[i]);
 		}
 		return this;
 	}
 
-	public BaseItemPickaxe addCustemInformation(List<String> infos) {
+	public BaseCompressedHoe addCustemInformation(List<String> infos) {
 		this.infos = infos;
 		return this;
 	}
 
 	private Map<Integer, List<String>> metaInfos = Maps.newHashMap();
 
-	public BaseItemPickaxe addCustemInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedHoe addCustemInformation(Map<Integer, List<String>> infos) {
 		this.metaInfos = infos;
 		return this;
 	}
 
 	ItemStack infoStack = null;
 
-	public BaseItemPickaxe setInfoStack(ItemStack stack) {
+	public BaseCompressedHoe setInfoStack(ItemStack stack) {
 		this.infoStack = stack;
 		return this;
 	}
 
 	private Map<Integer, ItemStack> infoStacks = Maps.newHashMap();
 
-	public BaseItemPickaxe setInfoStack(Map<Integer, ItemStack> infoStacks) {
+	public BaseCompressedHoe setInfoStack(Map<Integer, ItemStack> infoStacks) {
 		this.infoStacks = infoStacks;
 		return this;
 	}
@@ -348,15 +321,14 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
 		int meta = stack.getMetadata();
-
-		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.baseToolStack, this.infoStacks);
+		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.baseToolStack, infoStacks);
 		MCSUtil.info.addCompressedInfo(meta, tooltip, this.getUnCompressedItemLocalizedName(), this);
 
 		if(Configs.Tooltip_Information.show_owner_mod) {
 			tooltip.add(I18n.format("info.mcs.owner_mod") + " : " + TextFormatting.AQUA.toString() + this.getOwnerMod());
 		}
 
-		if(MCS.test()) {
+		if(MCS.dev()) {
 			tooltip.add("最大耐久: " + this.getMaxDamage(stack));
 		}
 
@@ -370,12 +342,12 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 	}
 
 	@Override
-	public void getItemModel() {
+	public void getItemModel(RegisterModel util) {
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
-			this.model.registerItemModel(this, meta, this.ownerMod + "/item/tools/pickaxe/" + this.name, this.name + "." + meta);
+			util.registerItemModel(this, meta, this.ownerMod + "/item/tools/hoe/" + this.name, this.name + "." + meta);
 		}
-		this.model.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/tools/pickaxe/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+		util.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/tools/hoe/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
 	}
 	
 	@Override
@@ -406,7 +378,7 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 
 	private boolean makeRecipe = true;
 
-	public BaseItemPickaxe setMakeDefaultStackRecipe(boolean makeRecipe) {
+	public BaseCompressedHoe setMakeDefaultStackRecipe(boolean makeRecipe) {
 		this.makeRecipe = makeRecipe;
 		return this;
 	}
@@ -419,9 +391,36 @@ public class BaseItemPickaxe extends BaseItemTool.MetaPickaxe implements ICompre
 	public final String getUnCompressedItemLocalizedName() {
 		return this.baseToolStack.getDisplayName();
 	}
+	
 	private final CompressedLevel type = new CompressedLevel(this);
 	@Override
 	public CompressedLevel getLevel() {
 		return this.type;
+	}
+	@Override
+	public boolean canCreateRecipe(int meta) {
+		return this.craftMaterialStack!=null && this.craftRodStack!=null;
+	}
+	@Override
+	public ItemStack getMaterial(int meta) {
+		if(this.craftMaterialStack.isBlock() && (this.craftMaterialStack.isHas() || this.craftMaterialStack.getAsCompressedBlock().baseRecipeHasItem())) {
+			if(meta <= 0) {
+				return this.craftMaterialStack.getUnCompressedStack();
+			}else {
+				return this.craftMaterialStack.getStack(meta-1);
+			}
+		}
+		return this.craftMaterialStack.getStack(meta);
+	}
+	@Override
+	public ItemStack getRod(int meta) {
+		if(this.craftRodStack.isBlock() && (this.craftRodStack.isHas() || this.craftRodStack.getAsCompressedBlock().baseRecipeHasItem())) {
+			if(meta <= 0) {
+				return this.craftRodStack.getUnCompressedStack();
+			}else {
+				return this.craftRodStack.getStack(meta-1);
+			}
+		}
+		return this.craftRodStack.getStack(meta);
 	}
 }

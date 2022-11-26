@@ -8,7 +8,7 @@ import com.sci.torcherino.TorcherinoRegistry;
 
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCompressedTorcherino;
-import cat.jiu.mcs.util.base.sub.BaseBlockSub;
+import cat.jiu.mcs.util.base.sub.BaseCompressedBlock;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -23,7 +23,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class CompressedTorcherino extends BaseBlockSub {
+public class CompressedTorcherino extends BaseCompressedBlock {
 	public CompressedTorcherino(String nameIn, ItemStack unCompressedItem) {
 		super(nameIn, unCompressedItem, "torcherino", MCS.COMPERESSED_BLOCKS);
 		this.setInfoStack(new ItemStack(Items.AIR));
@@ -35,24 +35,24 @@ public class CompressedTorcherino extends BaseBlockSub {
 	
 	@Override
 	public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
-		Block b = super.getUnCompressedBlock();
+		Block b = super.getBaseBlock();
 		if(b != null) {
-			b.onBlockAdded(world, pos, super.getUnCompressedState());
+			b.onBlockAdded(world, pos, super.getBaseState());
 		}
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
 	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
-		Block b = super.getUnCompressedBlock();
+		Block b = super.getBaseBlock();
 		if(b != null) {
-			b.neighborChanged(super.getUnCompressedState(), worldIn, pos, blockIn, fromPos);
+			b.neighborChanged(super.getBaseState(), worldIn, pos, blockIn, fromPos);
 		}
 	}
 	
 	@Override
 	public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
-		Block b = super.getUnCompressedBlock();
+		Block b = super.getBaseBlock();
 		if(b != null) {
 			return b.canPlaceBlockAt(worldIn, pos);
 		}
@@ -62,9 +62,9 @@ public class CompressedTorcherino extends BaseBlockSub {
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
-		Block b = super.getUnCompressedBlock();
+		Block b = super.getBaseBlock();
 		if(b != null) {
-			b.randomDisplayTick(super.getUnCompressedState(), worldIn, pos, rand);
+			b.randomDisplayTick(super.getBaseState(), worldIn, pos, rand);
 		}
 	}
 	

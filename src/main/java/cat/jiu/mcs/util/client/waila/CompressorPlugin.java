@@ -21,16 +21,21 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Optional.*;
 
 @InterfaceList({
-	@Interface(iface = "mcp.mobius.waila.api.IWailaDataProvider", modid = "waila"),
-	@Interface(iface = "mcp.mobius.waila.api.IWailaDataAccessor", modid = "waila"),
-	@Interface(iface = "mcp.mobius.waila.api.IWailaConfigHandler", modid = "waila")
+	@Interface(iface = "mcp.mobius.waila.api.IWailaDataProvider", modid = "waila", striprefs = true),
+	@Interface(iface = "mcp.mobius.waila.api.IWailaDataAccessor", modid = "waila", striprefs = true),
+	@Interface(iface = "mcp.mobius.waila.api.IWailaConfigHandler", modid = "waila", striprefs = true)
 })
 public class CompressorPlugin implements IWailaDataProvider {
+	@Method(modid = "waila")
 	public List<String> getWailaBody(ItemStack itemStack, List<String> tooltip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
 		TileEntity tile = accessor.getTileEntity();
 		if(tile != null && accessor.getNBTData() != null && tile instanceof TileEntityCompressor) {
 			JiuEnergyStorage energy = JiuEnergyStorage.empty();
 			energy.readFromNBT(accessor.getNBTData().getCompoundTag("energy"), true);
+			
+			if(accessor.getNBTData().hasKey("debug")) {
+				tooltip.add("Debug: on");
+			}
 			
 			StringBuilder s = new StringBuilder();
 			s.append(I18n.format("info.mcs.energy"));
@@ -39,10 +44,6 @@ public class CompressorPlugin implements IWailaDataProvider {
 			s.append(" JE / ");
 			s.append(JiuUtils.big_integer.format(energy.getMaxEnergyStoredWithBigInteger(), 3));
 			s.append(" JE");
-			
-			if(accessor.getNBTData().hasKey("debug")) {
-				tooltip.add("Debug: on");
-			}
 			
 			tooltip.add(s.toString());
 		}

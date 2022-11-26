@@ -13,15 +13,15 @@ import appeng.items.contents.CellUpgrades;
 import appeng.util.Platform;
 
 import cat.jiu.mcs.util.MCSUtil;
-import cat.jiu.mcs.util.base.sub.BaseItemSub;
+import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 
-@SuppressWarnings({"rawtypes"})
-public abstract class AEStorageCell<T extends IAEStack<T>> extends BaseItemSub implements IStorageCell<T> {
+@SuppressWarnings({"all"})
+public abstract class AEStorageCell<T extends IAEStack<T>> extends BaseCompressedItem implements IStorageCell<T> {
 	protected final IStorageCell baseCell;
 
 	public AEStorageCell(String name, ItemStack baseItem) {
@@ -101,27 +101,16 @@ public abstract class AEStorageCell<T extends IAEStack<T>> extends BaseItemSub i
 	}
 
 	@Override
-	public int getTotalTypes(ItemStack p0) {
-		if(this.baseCell != null) {
-			return this.baseCell.getTotalTypes(this.unCompressedItem);
-		}
-		return 63;
+	public final int getTotalTypes(ItemStack p0) {
+		int baseValue = this.baseCell.getTotalTypes(this.unCompressedItem);
+		return baseValue + (int) MCSUtil.item.getMetaValue(this.getBaseTypes(), p0);
 	}
+	
+	protected abstract double getBaseTypes();
 
-	@Override
-	public boolean isBlackListed(ItemStack p0, T p1) {
-		return false;
-	}
-
-	@Override
-	public boolean storableInStorageCell() {
-		return false;
-	}
-
-	@Override
-	public boolean isStorageCell(ItemStack p0) {
-		return true;
-	}
+	public boolean isBlackListed(ItemStack p0, T p1) {return false;}
+	public boolean storableInStorageCell() {return false;}
+	public boolean isStorageCell(ItemStack p0) {return true;}
 
 	@Override
 	public double getIdleDrain() {
@@ -132,5 +121,10 @@ public abstract class AEStorageCell<T extends IAEStack<T>> extends BaseItemSub i
 	}
 
 	@Override
-	public abstract IStorageChannel<T> getChannel();
+	public IStorageChannel<T> getChannel(){
+		if(this.baseCell != null) {
+			return this.baseCell.getChannel();
+		}
+		return null;
+	}
 }

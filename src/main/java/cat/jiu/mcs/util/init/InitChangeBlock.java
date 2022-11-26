@@ -9,8 +9,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import cat.jiu.core.util.JiuUtils;
-import cat.jiu.core.util.Time;
+import cat.jiu.core.util.timer.Timer;
 import cat.jiu.mcs.util.type.CustomStuffType;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -23,15 +24,15 @@ public class InitChangeBlock {
 				List<ItemStack> drop = new ArrayList<>();
 				int meta = Integer.parseInt(dropobj.getKey());
 				boolean canDrop = true;
-				Time time = new Time();
+				Timer time = new Timer();
 				loadMeta.add(meta);
 
 				if(dropE instanceof JsonObject) {
 					JsonObject dropo = (JsonObject) dropE;
 					if(dropo.has("time")) {
-						time = Time.getTime(obj.get("time"));
+						time = Timer.getTime(obj.get("time"));
 					}else {
-						time = Time.getTime(obj.get("time"));
+						time = Timer.getTime(obj.get("time"));
 					}
 					if(dropo.has("item")) {
 						JsonArray dropa = dropo.getAsJsonArray("item");
@@ -49,7 +50,7 @@ public class InitChangeBlock {
 					}
 				}else if(dropE instanceof JsonArray) {
 					JsonArray dropa = (JsonArray) dropE;
-					time = Time.getTime(dropa.get(0));
+					time = Timer.getTime(dropa.get(0));
 
 					if(dropa.size() == 1) {
 						if(MCSResources.BLOCKS_NAME.contains(name)) {
@@ -71,7 +72,7 @@ public class InitChangeBlock {
 				typeMap.put(meta, new CustomStuffType.ChangeBlockType(drop, time, canDrop));
 			}
 
-			Time time = Time.getTime(obj.get("time"));
+			Timer time = Timer.getTime(obj.get("time"));
 			boolean canDrop = true;
 			if(obj.has("canDrop")) {
 				canDrop = obj.get("canDrop").getAsBoolean();
@@ -88,7 +89,7 @@ public class InitChangeBlock {
 				}
 			}
 		}else {
-			Time time = Time.getTime(obj.get("time"));
+			Timer time = Timer.getTime(obj.get("time"));
 			boolean canDrop = true;
 			if(obj.has("canDrop")) {
 				canDrop = obj.get("canDrop").getAsBoolean();

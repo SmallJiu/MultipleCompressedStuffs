@@ -6,13 +6,12 @@ import appeng.api.AEApi;
 import appeng.api.definitions.IItemDefinition;
 import appeng.core.localization.ButtonToolTips;
 import appeng.tile.misc.TileQuartzGrowthAccelerator;
-
-import cat.jiu.core.api.events.entity.IEntityJoinWorldEvent;
-import cat.jiu.core.api.events.item.IItemInFluidTickEvent;
+import cat.jiu.core.api.events.iface.entity.IEntityJoinWorldEvent;
+import cat.jiu.core.api.events.iface.item.IItemInFluidTickEvent;
 import cat.jiu.core.util.JiuCoreEvents;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.api.ICompressedStuff;
-import cat.jiu.mcs.util.base.sub.BaseItemSub;
+import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -26,7 +25,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class AECrystalSeed extends BaseItemSub implements IItemInFluidTickEvent, IEntityJoinWorldEvent {
+public class AECrystalSeed extends BaseCompressedItem implements IItemInFluidTickEvent, IEntityJoinWorldEvent {
 	protected final ICompressedStuff result;
 
 	public AECrystalSeed(String name, IItemDefinition baseItem, int meta, ICompressedStuff result) {
@@ -57,8 +56,10 @@ public class AECrystalSeed extends BaseItemSub implements IItemInFluidTickEvent,
 	}
 
 	@Override
-	public void onItemInFluidTick(EntityItem item, World world, BlockPos pos, IBlockState state) {
+	public void onItemInFluidTick(EntityItem item, IBlockState state) {
 		if(item.getItem().getItem() instanceof AECrystalSeed) {
+			World world = item.world;
+			BlockPos pos = item.getPosition();
 			ItemStack stack = item.getItem();
 			AECrystalSeed seed = (AECrystalSeed) stack.getItem();
 

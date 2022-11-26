@@ -24,16 +24,17 @@ import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.exception.JsonElementNotFoundException;
 import cat.jiu.mcs.exception.JsonException;
 import cat.jiu.mcs.exception.UnknownTypeException;
-import cat.jiu.mcs.util.base.sub.BaseBlockSub;
-import cat.jiu.mcs.util.base.sub.BaseItemFood;
-import cat.jiu.mcs.util.base.sub.BaseItemSub;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemAxe;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemHoe;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemPickaxe;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemShovel;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemSword;
+import cat.jiu.mcs.util.base.sub.BaseCompressedBlock;
+import cat.jiu.mcs.util.base.sub.BaseCompressedFood;
+import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
+import cat.jiu.mcs.util.base.sub.tool.BaseCompressedAxe;
+import cat.jiu.mcs.util.base.sub.tool.BaseCompressedHoe;
+import cat.jiu.mcs.util.base.sub.tool.BaseCompressedPickaxe;
+import cat.jiu.mcs.util.base.sub.tool.BaseCompressedShovel;
+import cat.jiu.mcs.util.base.sub.tool.BaseCompressedSword;
 import cat.jiu.mcs.util.client.CompressedStuffResourcePack;
-import cat.jiu.mcs.util.base.sub.BaseBlockSub.HarvestType;
+import cat.jiu.mcs.util.client.model.texture.object.BlockTexture;
+import cat.jiu.mcs.util.client.model.texture.object.ItemTexture;
 import cat.jiu.mcs.util.type.CustomStuffType;
 import cat.jiu.mcs.util.type.CustomType;
 
@@ -44,7 +45,7 @@ import net.minecraft.item.ItemStack;
 public class InitCustom {
 	private static final Logger log = LogManager.getLogger();
 	public static final HashMap<String, JsonElement> unRegisterCustom = Maps.newHashMap();
-	public static final HashMap<String, BaseBlockSub> unSetUnItem = Maps.newHashMap();
+	public static final HashMap<String, BaseCompressedBlock> unSetUnItem = Maps.newHashMap();
 
 	public static void registerCustom() {
 		File config = new File("./config/jiu/mcs/custom.json");
@@ -122,14 +123,14 @@ public class InitCustom {
 			InitCustom.unRegisterCustom.put(name, unItemE);
 			unItem = ItemStack.EMPTY;
 		}
-		BaseBlockSub block = BaseBlockSub.register(name, unItem, "custom", tab);
+		BaseCompressedBlock block = BaseCompressedBlock.register(name, unItem, "custom", tab);
 		if(lag) {
 			unSetUnItem.put(name, block);
 		}
 		block.setCreativeTab(tab);
 		
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
+			CompressedStuffResourcePack.customTextures.put(name, new BlockTexture(json.get("texture")));
 		}
 
 		if(json.has("enableDefaultRecipe")) {
@@ -143,15 +144,15 @@ public class InitCustom {
 
 		Map<Integer, List<String>> infos = InitCustomItem.initInfos(json);
 		if(infos != null) {
-			block.addCustemInformation(infos);
+			block.setCustemInformation(infos);
 		}
 
 		Map<Integer, List<String>> shiftInfos = InitCustomItem.initShiftInfos(json);
 		if(shiftInfos != null) {
-			block.addCustemShiftInformation(shiftInfos);
+			block.setCustemShiftInformation(shiftInfos);
 		}
 
-		Map<Integer, HarvestType> HarvestMap = InitCustomItem.initHarvest(json);
+		Map<Integer, CustomStuffType.HarvestType> HarvestMap = InitCustomItem.initHarvest(json);
 		if(HarvestMap != null) {
 			block.setHarvestMap(HarvestMap);
 		}
@@ -186,12 +187,12 @@ public class InitCustom {
 	}
 
 	public static void initNormalItem(JsonObject json, String name, ItemStack unItem, CreativeTabs tab) {
-		BaseItemSub item = BaseItemSub.register(name, unItem, "custom", tab);
+		BaseCompressedItem item = BaseCompressedItem.register(name, unItem, "custom", tab);
 		if(item == null)
 			return;
 		item.setCreativeTab(tab);
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
+			CompressedStuffResourcePack.customTextures.put(name, new ItemTexture(json.get("texture")));
 		}
 
 		if(json.has("enableDefaultRecipe")) {
@@ -223,17 +224,17 @@ public class InitCustom {
 	}
 
 	public static void initFood(JsonObject json, String name, ItemStack unItem, CreativeTabs tab, Entry<String, JsonElement> fileObject, int i) {
-		BaseItemFood item = BaseItemFood.register(name, unItem, "custom", tab);
+		BaseCompressedFood item = BaseCompressedFood.register(name, unItem, "custom", tab);
 		item.setCreativeTab(tab);
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
+			CompressedStuffResourcePack.customTextures.put(name, new ItemTexture(json.get("texture")));
 		}
 		
 		if(json.has("enableDefaultRecipe")) {
 			item.setMakeDefaultStackRecipe(json.get("enableDefaultRecipe").getAsBoolean());
 		}
 
-		if(!BaseItemFood.isFood(unItem)) {
+		if(!BaseCompressedFood.isFood(unItem)) {
 			if(!json.has("healAmount")) {
 				String crashMsg = "\n\ncustom.json -> element not found:\n -> " + fileObject.getKey() + ":\n  -> (" + i + "): \n   -> \"healAmount\": <Number>\n";
 				throw new JsonElementNotFoundException(crashMsg);
@@ -293,12 +294,12 @@ public class InitCustom {
 	}
 
 	public static void initSword(JsonObject json, String name, ItemStack unItem, CreativeTabs tab) {
-		BaseItemSword item = BaseItemSword.register(name, unItem, "custom", tab);
+		BaseCompressedSword item = BaseCompressedSword.register(name, unItem, "custom", tab);
 		if(item == null)
 			return;
 		item.setCreativeTab(tab);
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
+			CompressedStuffResourcePack.customTextures.put(name, new ItemTexture(json.get("texture")));
 		}
 
 		if(json.has("enableDefaultRecipe")) {
@@ -345,12 +346,12 @@ public class InitCustom {
 	}
 
 	public static void initPickaxe(JsonObject json, String name, ItemStack unItem, CreativeTabs tab) {
-		BaseItemPickaxe item = BaseItemPickaxe.register(name, unItem, "custom", tab);
+		BaseCompressedPickaxe item = BaseCompressedPickaxe.register(name, unItem, "custom", tab);
 		if(item == null)
 			return;
 		item.setCreativeTab(tab);
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
+			CompressedStuffResourcePack.customTextures.put(name, new ItemTexture(json.get("texture")));
 		}
 
 		if(json.has("enableDefaultRecipe")) {
@@ -417,12 +418,12 @@ public class InitCustom {
 	}
 
 	public static void initShovel(JsonObject json, String name, ItemStack unItem, CreativeTabs tab) {
-		BaseItemShovel item = BaseItemShovel.register(name, unItem, "custom", tab);
+		BaseCompressedShovel item = BaseCompressedShovel.register(name, unItem, "custom", tab);
 		if(item == null)
 			return;
 		item.setCreativeTab(tab);
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
+			CompressedStuffResourcePack.customTextures.put(name, new ItemTexture(json.get("texture")));
 		}
 
 		if(json.has("enableDefaultRecipe")) {
@@ -479,12 +480,12 @@ public class InitCustom {
 	}
 
 	public static void initAxe(JsonObject json, String name, ItemStack unItem, CreativeTabs tab) {
-		BaseItemAxe item = BaseItemAxe.register(name, unItem, "custom", tab);
+		BaseCompressedAxe item = BaseCompressedAxe.register(name, unItem, "custom", tab);
 		if(item == null)
 			return;
 		item.setCreativeTab(tab);
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
+			CompressedStuffResourcePack.customTextures.put(name, new ItemTexture(json.get("texture")));
 		}
 
 		if(json.has("enableDefaultRecipe")) {
@@ -541,12 +542,12 @@ public class InitCustom {
 	}
 
 	public static void initHoe(JsonObject json, String name, ItemStack unItem, CreativeTabs tab) {
-		BaseItemHoe item = BaseItemHoe.register(name, unItem, "custom", tab);
+		BaseCompressedHoe item = BaseCompressedHoe.register(name, unItem, "custom", tab);
 		if(item == null)
 			return;
 		item.setCreativeTab(tab);
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
+			CompressedStuffResourcePack.customTextures.put(name, new ItemTexture(json.get("texture")));
 		}
 
 		if(json.has("enableDefaultRecipe")) {

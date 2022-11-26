@@ -11,6 +11,7 @@ import com.google.common.collect.Maps;
 import cat.jiu.core.util.RegisterModel;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.api.recipe.ISmeltingRecipe;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.core.api.IHasModel;
 import cat.jiu.core.util.JiuUtils;
@@ -34,7 +35,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
+public class BaseCompressedItem extends Item implements IHasModel, ICompressedStuff, ISmeltingRecipe {
 	protected final String name;
 	protected final CreativeTabs tab;
 	protected final ItemStack unCompressedItem;
@@ -43,29 +44,29 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 	protected final RegisterModel model = new RegisterModel(MCS.MODID);
 	private String model_material = null;
 
-	public BaseItemSub setModelMaterial(String model_material) {
+	public BaseCompressedItem setModelMaterial(String model_material) {
 		this.model_material = model_material;
 		return this;
 	}
 
-	public static BaseItemSub register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab, boolean hasSubtypes) {
+	public static BaseCompressedItem register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab, boolean hasSubtypes) {
 		if(baseItem == null || baseItem.isEmpty()) return null;
 		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
-			return new BaseItemSub(name, baseItem, ownerMod, tab, hasSubtypes);
+			return new BaseCompressedItem(name, baseItem, ownerMod, tab, hasSubtypes);
 		}else {
 			return null;
 		}
 	}
 
-	public static BaseItemSub register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
+	public static BaseCompressedItem register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
 		return register(name, baseItem, ownerMod, tab, true);
 	}
 
-	public static BaseItemSub register(String name, ItemStack baseItem, String ownerMod) {
+	public static BaseCompressedItem register(String name, ItemStack baseItem, String ownerMod) {
 		return register(name, baseItem, ownerMod, MCS.COMPERESSED_ITEMS);
 	}
 
-	public BaseItemSub(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab, boolean hasSubtypes) {
+	public BaseCompressedItem(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab, boolean hasSubtypes) {
 		this.name = name;
 		this.tab = tab;
 		this.unCompressedItem = baseItem;
@@ -86,18 +87,18 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 		}else if(name.equalsIgnoreCase(unCompressedItem.getItem().getRegistryName().getResourceDomain())) {
 			throw new RuntimeException("name must not be owner mod. Name: " + name + ", OwnerMod: " + unCompressedItem.getItem().getRegistryName().getResourceDomain());
 		}
-		RegisterModel.NeedToRegistryModel.add(this);
+		RegisterModel.addNeedRegistryModel(MCS.MODID, this);
 	}
 	
-	public BaseItemSub(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
+	public BaseCompressedItem(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
 		this(name, baseItem, ownerMod, tab, true);
 	}
 
-	public BaseItemSub(String name, ItemStack baseItem, CreativeTabs tab) {
+	public BaseCompressedItem(String name, ItemStack baseItem, CreativeTabs tab) {
 		this(name, baseItem, baseItem.getItem().getRegistryName().getResourceDomain(), tab);
 	}
 
-	public BaseItemSub(String name, ItemStack baseItem) {
+	public BaseCompressedItem(String name, ItemStack baseItem) {
 		this(name, baseItem, MCS.COMPERESSED_ITEMS);
 	}
 
@@ -105,21 +106,21 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 		return this.ownerMod;
 	}
 
-	private final List<String> otherOredict = ICompressedStuff.super.addOtherOreDictionary();
+	private final List<String> otherOredict = ICompressedStuff.super.getOtherOreDictionary();
 
-	public BaseItemSub addOtherOreDict(String oredict) {
+	public BaseCompressedItem addOtherOreDict(String oredict) {
 		this.otherOredict.add(oredict);
 		return this;
 	}
 
 	@Override
-	public List<String> addOtherOreDictionary() {
+	public List<String> getOtherOreDictionary() {
 		return this.otherOredict;
 	}
 
 	private boolean makeRecipe = true;
 
-	public BaseItemSub setMakeDefaultStackRecipe(boolean makeRecipe) {
+	public BaseCompressedItem setMakeDefaultStackRecipe(boolean makeRecipe) {
 		this.makeRecipe = makeRecipe;
 		return this;
 	}
@@ -130,7 +131,7 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 
 	boolean createOredict = true;
 
-	public BaseItemSub createOreDictionary(boolean flag) {
+	public BaseCompressedItem createOreDictionary(boolean flag) {
 		this.createOredict = flag;
 		return this;
 	}
@@ -153,7 +154,7 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 
 	private Map<Integer, Boolean> HasEffectMap = Maps.newHashMap();
 
-	public BaseItemSub setHasEffectMap(Map<Integer, Boolean> map) {
+	public BaseCompressedItem setHasEffectMap(Map<Integer, Boolean> map) {
 		this.HasEffectMap = map;
 		return this;
 	}
@@ -174,7 +175,7 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 
 	Map<Integer, IRarity> RarityMap = null;
 
-	public BaseItemSub setRarityMap(Map<Integer, IRarity> map) {
+	public BaseCompressedItem setRarityMap(Map<Integer, IRarity> map) {
 		this.RarityMap = map;
 		return this;
 	}
@@ -208,56 +209,56 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 
 	private List<String> shiftInfos = new ArrayList<String>();
 
-	public BaseItemSub addCustemShiftInformation(String... custemInfo) {
+	public BaseCompressedItem addCustemShiftInformation(String... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
 			shiftInfos.add(custemInfo[i]);
 		}
 		return this;
 	}
 
-	public BaseItemSub setCustemShiftInformation(List<String> infos) {
+	public BaseCompressedItem setCustemShiftInformation(List<String> infos) {
 		this.shiftInfos = infos;
 		return this;
 	}
 
 	private Map<Integer, List<String>> metaShiftInfos = Maps.newHashMap();
 
-	public BaseItemSub setCustemShiftInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedItem setCustemShiftInformation(Map<Integer, List<String>> infos) {
 		this.metaShiftInfos = infos;
 		return this;
 	}
 
 	private List<String> infos = new ArrayList<String>();
 
-	public BaseItemSub addCustemInformation(String... custemInfo) {
+	public BaseCompressedItem addCustemInformation(String... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
 			infos.add(custemInfo[i]);
 		}
 		return this;
 	}
 
-	public BaseItemSub setCustemInformation(List<String> infos) {
+	public BaseCompressedItem setCustemInformation(List<String> infos) {
 		this.infos = infos;
 		return this;
 	}
 
 	private Map<Integer, List<String>> metaInfos = Maps.newHashMap();
 
-	public BaseItemSub setCustemInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedItem setCustemInformation(Map<Integer, List<String>> infos) {
 		this.metaInfos = infos;
 		return this;
 	}
 
 	ItemStack infoStack = null;
 
-	public BaseItemSub setInfoStack(ItemStack stack) {
+	public BaseCompressedItem setInfoStack(ItemStack stack) {
 		this.infoStack = stack;
 		return this;
 	}
 
 	private Map<Integer, ItemStack> infoStacks = Maps.newHashMap();
 
-	public BaseItemSub setInfoStack(Map<Integer, ItemStack> infoStacks) {
+	public BaseCompressedItem setInfoStack(Map<Integer, ItemStack> infoStacks) {
 		this.infoStacks = infoStacks;
 		return this;
 	}
@@ -269,10 +270,8 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.unCompressedItem, infoStacks);
 		MCSUtil.info.addCompressedInfo(meta, tooltip, this.getUnCompressedItemLocalizedName(), this);
 
-		if(MCS.test()) {
-			String[] names = JiuUtils.other.custemSplitString(this.name, "_");
-			tooltip.add(names.length + "");
-			tooltip.add(this.getUnCompressedName());
+		if(MCS.dev()) {
+			tooltip.add(JiuUtils.other.custemSplitString(this.name, "_").length + " | " + this.getUnCompressedName());
 		}
 
 		if(Configs.Tooltip_Information.show_owner_mod) {
@@ -337,5 +336,25 @@ public class BaseItemSub extends Item implements IHasModel, ICompressedStuff {
 	@Override
 	public CompressedLevel getLevel() {
 		return this.type;
+	}
+	
+	private ICompressedStuff smeltingOutput;
+	public BaseCompressedItem setSmeltingOutput(ICompressedStuff stuff) {
+		this.smeltingOutput = stuff;
+		return this;
+	}
+	private int smeltingMetaDisparity = 0;
+	public BaseCompressedItem setSmeltingMetaDisparity(int smeltingMetaDisparity) {
+		this.smeltingMetaDisparity = smeltingMetaDisparity;
+		return this;
+	}
+	@Override
+	public boolean canCreateRecipe(int meta) {
+		return this.smeltingOutput!=null;
+	}
+	@Override
+	public ItemStack getSmeltingOutput(int meta) {
+		int outmeta = meta-smeltingMetaDisparity;
+		return outmeta < 0 ? null : smeltingOutput.getStack(outmeta);
 	}
 }

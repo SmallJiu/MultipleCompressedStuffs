@@ -26,8 +26,8 @@ import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.exception.ItemNotFoundException;
 import cat.jiu.mcs.recipes.MCSRecipe;
 import cat.jiu.mcs.util.TestModel;
-import cat.jiu.mcs.util.base.sub.BaseBlockSub;
-import cat.jiu.mcs.util.client.waila.WailaRegister;
+import cat.jiu.mcs.util.base.sub.BaseCompressedBlock;
+import cat.jiu.mcs.util.client.waila.WailaPluginRegistry;
 import cat.jiu.mcs.util.event.CatEvent;
 import cat.jiu.mcs.util.event.OtherModBlockChange;
 import cat.jiu.mcs.util.init.InitCustom;
@@ -63,17 +63,17 @@ public class ServerProxy {
 		PreInit.preInit();
 		GuiHandler.register();
 
-		this.startblock = System.currentTimeMillis();
+		long i = System.currentTimeMillis();
 		new MCSBlocks();
-		this.startblock = System.currentTimeMillis() - this.startblock;
+		this.startblock = System.currentTimeMillis() - i;
 		
-		this.startcustom = System.currentTimeMillis();
+		i = System.currentTimeMillis();
 		InitCustom.registerCustom();
-		this.startcustom = System.currentTimeMillis() - this.startcustom;
+		this.startcustom = System.currentTimeMillis() - i;
 		
-		this.startitem = System.currentTimeMillis();
+		i = System.currentTimeMillis();
 		new MCSItems();
-		this.startitem = System.currentTimeMillis() - this.startitem;
+		this.startitem = System.currentTimeMillis() - i;
 
 		JiuCoreEvents.addEvent(new CatEvent());
 		JiuCoreEvents.addEvent(new TestModel());
@@ -99,7 +99,7 @@ public class ServerProxy {
 				HashMap<String, JsonElement> entrys = (HashMap<String, JsonElement>) InitCustom.unRegisterCustom.clone();
 				for(Entry<String, JsonElement> res : entrys.entrySet()) {
 					ItemStack unItem = JiuUtils.item.toStack(res.getValue());
-					BaseBlockSub b = InitCustom.unSetUnItem.get(res.getKey());
+					BaseCompressedBlock b = InitCustom.unSetUnItem.get(res.getKey());
 					if(unItem != null && !unItem.isEmpty()) {
 						b.setUnCompressed(unItem);
 					}
@@ -118,8 +118,9 @@ public class ServerProxy {
 				}
 			}
 		}
+		
 		if(Loader.isModLoaded("waila")) {
-			WailaRegister.register();
+			WailaPluginRegistry.register();
 		}
 
 		startore = System.currentTimeMillis();
@@ -132,9 +133,13 @@ public class ServerProxy {
 		try {
 			MCSBlocks.initChangeBlock();
 		}catch(Throwable e) {
-			this.makeCrashReport(e.getMessage(), e);
+			throw new RuntimeException(e);
 		}
 	}
+//	private void registerWailaPlugin() {
+//		WailaPluginRegister.addWailaPlugin(Layout.BODY, new ChangeBlockPlugin(), TileEntityChangeBlock.class, true);
+//		WailaPluginRegister.addWailaPlugin(Layout.BODY, new CompressorPlugin(), TileEntityCompressor.class, true);
+//	}
 
 	private void setUnStack() {
 		if(Configs.Custom.Mod_Stuff.AppliedEnergistics2) {
@@ -209,10 +214,6 @@ public class ServerProxy {
 		}
 	}
 
-	public void makeCrashReport(String msg, Throwable causeThrowable) {
-		throw new RuntimeException(msg, causeThrowable);
-	}
-
 	public World getClientWorld() {
 		return null;
 	}
@@ -220,6 +221,8 @@ public class ServerProxy {
 	public Side getSide() {
 		return FMLCommonHandler.instance().getEffectiveSide();
 	}
+	
+	public boolean isClient() {return !(this instanceof ServerProxy);}
 	
 	public ModContainer getContaniner() {
 		return Loader.instance().getIndexedModList().get("mcs");

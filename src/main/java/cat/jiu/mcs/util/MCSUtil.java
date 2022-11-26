@@ -1,18 +1,24 @@
 package cat.jiu.mcs.util;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.google.gson.JsonElement;
+
+import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.config.Configs;
-import cat.jiu.mcs.util.base.BaseBlockItem;
-import cat.jiu.mcs.util.base.sub.BaseItemFood;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemAxe;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemHoe;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemPickaxe;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemShovel;
-import cat.jiu.mcs.util.base.sub.tool.BaseItemSword;
+import cat.jiu.mcs.util.base.BaseCompressedBlockItem;
+import cat.jiu.mcs.util.base.sub.BaseCompressedFood;
+import cat.jiu.mcs.util.base.sub.tool.BaseCompressedAxe;
+import cat.jiu.mcs.util.base.sub.tool.BaseCompressedHoe;
+import cat.jiu.mcs.util.base.sub.tool.BaseCompressedPickaxe;
+import cat.jiu.mcs.util.base.sub.tool.BaseCompressedShovel;
+import cat.jiu.mcs.util.base.sub.tool.BaseCompressedSword;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -33,16 +39,21 @@ public class MCSUtil {
 	public static final ItemUtil item = new ItemUtil();
 
 	public static class ItemUtil {
+		public List<String> getOreDict(ItemStack stack){
+			return JiuUtils.item.getOreDict(stack).stream().filter(o -> !JiuUtils.other.containKey(Configs.cancel_oredict_for_recipe, o)).collect(Collectors.toList());
+		}
+		
 		public double getMetaValue(double baseValue, ItemStack stack) {
 			return this.getMetaValue(baseValue, stack.getMetadata());
 		}
 
 		public double getMetaValue(double baseValue, int meta) {
-			return baseValue + (baseValue * ((meta + 1) * 1.527));
+			double value = baseValue + (baseValue * ((meta + 1) * 1.527));
+			return value > Integer.MAX_VALUE ? Integer.MAX_VALUE : value;
 		}
 
 		public void getSubItems(ICompressedStuff compitem, CreativeTabs tab, NonNullList<ItemStack> items) {
-			Item item = compitem.getItem();
+			Item item = compitem.getAsItem();
 			if(item == null || item == Items.AIR) return;
 			if(this.isInCreativeTab(item, tab)) {
 				if(item.getHasSubtypes()) {
@@ -94,6 +105,20 @@ public class MCSUtil {
 				return false;
 			}
 			return item instanceof ICompressedStuff;
+		}
+		
+		public ICompressedStuff getCompressed(ItemStack stack) {
+			if(stack == null) {
+				return null;
+			}
+			return this.getCompressed(stack.getItem());
+		}
+
+		public ICompressedStuff getCompressed(Item item) {
+			if(item == null || item == Items.AIR) {
+				return null;
+			}
+			return this.isCompressedItem(item) ? (ICompressedStuff)item : null;
 		}
 
 		public int getUnCompressedBurnTime(ItemStack stack) {
@@ -313,24 +338,38 @@ public class MCSUtil {
 
 			if(Configs.Tooltip_Information.show_owner_type) {
 				String entry = "item";
-				if(item instanceof BaseBlockItem) {
+				if(item instanceof BaseCompressedBlockItem) {
 					entry = "block";
-				}else if(item instanceof BaseItemFood) {
+				}else if(item instanceof BaseCompressedFood) {
 					entry = "food";
-				}else if(item instanceof BaseItemSword) {
+				}else if(item instanceof BaseCompressedSword) {
 					entry = "sword";
-				}else if(item instanceof BaseItemPickaxe) {
+				}else if(item instanceof BaseCompressedPickaxe) {
 					entry = "pickaxe";
-				}else if(item instanceof BaseItemShovel) {
+				}else if(item instanceof BaseCompressedShovel) {
 					entry = "shovel";
-				}else if(item instanceof BaseItemAxe) {
+				}else if(item instanceof BaseCompressedAxe) {
 					entry = "axe";
-				}else if(item instanceof BaseItemHoe) {
+				}else if(item instanceof BaseCompressedHoe) {
 					entry = "hoe";
 				}
 
 				tooltip.add(I18n.format("info.mcs.owner_entry") + ": " + TextFormatting.AQUA.toString() + I18n.format("info.mcs.entry." + entry + ".name"));
 			}
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T extends JsonElement> T copy(T json) {
+		if(json==null) return null;
+		
+		try {
+			Method method = json.getClass().getDeclaredMethod("deepCopy");
+			method.setAccessible(true);
+			return (T) method.invoke(json);
+		}catch(NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e0) {
+			e0.printStackTrace();
+			throw new RuntimeException(e0);
 		}
 	}
 }

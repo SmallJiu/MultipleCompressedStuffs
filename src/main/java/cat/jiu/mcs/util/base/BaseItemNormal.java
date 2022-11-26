@@ -30,7 +30,7 @@ public class BaseItemNormal extends Item implements IHasModel {
 		this.setUnlocalizedName("mcs." + this.name);
 		this.setCreativeTab(this.tab);
 		this.setRegistryName(this.name);
-		RegisterModel.NeedToRegistryModel.add(this);
+		RegisterModel.addNeedRegistryModel(MCS.MODID, this);
 		MCSResources.ITEMS.add(this);
 		MCSResources.ITEMS_NAME.add(this.name);
 	}

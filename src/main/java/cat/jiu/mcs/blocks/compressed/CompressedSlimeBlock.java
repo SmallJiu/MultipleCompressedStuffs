@@ -1,7 +1,7 @@
 package cat.jiu.mcs.blocks.compressed;
 
 import cat.jiu.core.util.JiuUtils;
-import cat.jiu.mcs.util.base.sub.BaseBlockSub;
+import cat.jiu.mcs.util.base.sub.BaseCompressedBlock;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class CompressedSlimeBlock extends BaseBlockSub {
+public class CompressedSlimeBlock extends BaseCompressedBlock {
 	public CompressedSlimeBlock(String nameIn, ItemStack unCompressedItem) {
 		super(nameIn, unCompressedItem);
 	}

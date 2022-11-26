@@ -5,9 +5,9 @@ import java.util.Map;
 
 import com.google.common.collect.Lists;
 
-import cat.jiu.core.api.ITime;
+import cat.jiu.core.api.ITimer;
 import cat.jiu.core.util.JiuUtils;
-import cat.jiu.core.util.Time;
+import cat.jiu.core.util.timer.Timer;
 import cat.jiu.mcs.util.type.CustomStuffType;
 
 import net.minecraft.block.Block;
@@ -23,7 +23,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraftforge.common.util.Constants;
 
 public class TileEntityChangeBlock extends TileEntity implements ITickable {
-	private ITime time = null;
+	private ITimer time = null;
 	private long allTick = 0;
 	private boolean dropBlock = true;
 	private List<ItemStack> dropStacks = null;
@@ -126,7 +126,7 @@ public class TileEntityChangeBlock extends TileEntity implements ITickable {
 		return this.time.toString();
 	}
 	
-	public ITime getTime() {return this.time;}
+	public ITimer getTime() {return this.time;}
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
@@ -134,7 +134,7 @@ public class TileEntityChangeBlock extends TileEntity implements ITickable {
 		super.writeToNBT(nbt);
 		
 		nbt.setBoolean("dropBlock", this.dropBlock);
-		nbt.setTag("times", this.time.writeToNBT(new NBTTagCompound(), false));
+		nbt.setTag("times", this.time.writeTo(NBTTagCompound.class));
 		nbt.setLong("allTicks", this.allTick);
 		
 		NBTTagList items = new NBTTagList();
@@ -151,8 +151,8 @@ public class TileEntityChangeBlock extends TileEntity implements ITickable {
 		super.readFromNBT(nbt);
 
 		this.dropBlock = nbt.getBoolean("dropBlock");
-		if(this.time == null) this.time = new Time();
-		this.time.readFromNBT(nbt.getCompoundTag("times"));
+		if(this.time == null) this.time = new Timer();
+		this.time.readFrom(nbt.getCompoundTag("times"));
 		this.allTick = nbt.getLong("allTicks");
 		
 		if(this.dropStacks == null) this.dropStacks = Lists.newArrayList();

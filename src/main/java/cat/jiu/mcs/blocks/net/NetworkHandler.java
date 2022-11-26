@@ -25,6 +25,5 @@ public class NetworkHandler {
 		INSTANCE.registerMessage(MsgCompressorScroolChest::handler, MsgCompressorScroolChest.class, nextID(), Side.SERVER);
 		INSTANCE.registerMessage(MsgCompressorPageChest::handler, MsgCompressorPageChest.class, nextID(), Side.SERVER);
 		INSTANCE.registerMessage(MsgCompressorEnergy::handler, MsgCompressorEnergy.class, nextID(), Side.CLIENT);
-		
 	}
 }

@@ -10,7 +10,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
-public class CommandReinitChangeBlock extends BaseCommand.CommandNormal {
+class CommandReinitChangeBlock extends BaseCommand.CommandNormal {
 	public CommandReinitChangeBlock(String name, int level) {
 		super(name, MCS.MODID, level);
 	}

@@ -11,7 +11,7 @@ public class MCSCommand extends BaseCommand.CommandTree {
 				new CommandGetOreDict("ore", 2),
 				new CommandTestMode("test", 0),
 				new CommandReinitChangeBlock("recb", 2),
-				new CommandGetTexture()
+				new CommandGenObjects("gen", 2)
 			}, "mcs", MCS.MODID, false, 2);
 	}
 }

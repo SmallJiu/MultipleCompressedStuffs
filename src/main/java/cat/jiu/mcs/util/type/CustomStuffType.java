@@ -4,9 +4,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import cat.jiu.core.api.ITime;
-import cat.jiu.core.util.Time;
-
+import cat.jiu.core.api.ITimer;
+import cat.jiu.core.util.timer.Timer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
@@ -36,7 +35,7 @@ public class CustomStuffType {
 		public final List<ItemStack> drops;
 		@Deprecated
 		public final int[] time;
-		public final ITime times;
+		public final ITimer times;
 		public final boolean dropBlock;
 
 		@Deprecated
@@ -47,13 +46,13 @@ public class CustomStuffType {
 		public ChangeBlockType(List<ItemStack> drops, int[] time, boolean dropBlock) {
 			this.drops = drops;
 			this.time = time;
-			this.times = new Time(time[2] < 0 ? 0 : time[2], time[1] < 0 ? 0 : time[1], time[0] <= 0 ? 1 : time[0]);
+			this.times = new Timer(time[2] < 0 ? 0 : time[2], time[1] < 0 ? 0 : time[1], time[0] <= 0 ? 1 : time[0]);
 			this.dropBlock = dropBlock;
 		}
-		public ChangeBlockType(ItemStack[] drops, ITime time, boolean dropBlock) {
+		public ChangeBlockType(ItemStack[] drops, ITimer time, boolean dropBlock) {
 			this(Lists.newArrayList(drops), time, dropBlock);
 		}
-		public ChangeBlockType(List<ItemStack> drops, ITime time, boolean dropBlock) {
+		public ChangeBlockType(List<ItemStack> drops, ITimer time, boolean dropBlock) {
 			this.drops = drops;
 			this.time = new int[] {(int) time.getMinute(), (int) time.getSecond(), (int) time.getTick()};
 			this.times = time;
@@ -78,10 +77,10 @@ public class CustomStuffType {
 
 		@Deprecated
 		public PotionEffectType(Potion potion, int m, int s, int tick, int level) {
-			this.effect = new PotionEffect(potion, (int) Time.parseTick(m, s, tick), level);
+			this.effect = new PotionEffect(potion, (int) Timer.parseTick(m, s, tick), level);
 		}
 		
-		public PotionEffectType(Potion potion, ITime time, int level) {
+		public PotionEffectType(Potion potion, ITimer time, int level) {
 			this.effect = new PotionEffect(potion, (int) time.getTicks(), level);
 		}
 
@@ -97,6 +96,16 @@ public class CustomStuffType {
 		public ToolModifiersType(double speed, double damage) {
 			this.speed = speed;
 			this.damage = damage;
+		}
+	}
+	
+	public static class HarvestType {
+		public final int level;
+		public final String tool;
+
+		public HarvestType(String tool, int level) {
+			this.level = level;
+			this.tool = tool;
 		}
 	}
 }

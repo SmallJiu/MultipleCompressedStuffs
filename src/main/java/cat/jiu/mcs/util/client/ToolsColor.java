@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 @EventBusSubscriber(value = Side.CLIENT)
-public class RegisterToolColor {
+public class ToolsColor {
 	static final int[] colors = {Color.RED.getRGB(), Color.ORANGE.getRGB(), Color.YELLOW.getRGB(), Color.GREEN.getRGB(), Color.BLUE.getRGB(), Color.MAGENTA.getRGB(), Color.GRAY.getRGB()};
 	static int leg = 0;
 	static int tick = 0;

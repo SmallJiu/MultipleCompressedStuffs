@@ -2,7 +2,7 @@ package cat.jiu.mcs.items.compressed;
 
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
-import cat.jiu.mcs.util.base.sub.BaseItemSub;
+import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityEgg;
@@ -15,7 +15,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 
-public class CompressedEgg extends BaseItemSub {
+public class CompressedEgg extends BaseCompressedItem {
 	public CompressedEgg(String modid, ItemStack unItem) {
 		super(modid, unItem);
 	}
@@ -25,7 +25,7 @@ public class CompressedEgg extends BaseItemSub {
 		ItemStack stack = player.getHeldItem(hand);
 		ActionResult<ItemStack> lag = new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
 		
-		if(MCS.test()) {
+		if(MCS.dev()) {
 			{
 				world.playSound((EntityPlayer) null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_EGG_THROW, SoundCategory.PLAYERS, 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
 

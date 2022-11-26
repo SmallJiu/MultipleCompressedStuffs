@@ -26,10 +26,8 @@ public class TileEntityCompressorSlave extends TileEntity {
 	
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-//		long i = System.currentTimeMillis();
 		blackList.clear();
 		BlockPos pos = this.findOriginalPos(this.pos);
-//		MCS.instance.log.info("Size: " + blackList.size() + ", " + (System.currentTimeMillis()-i) + " ms");
 		if(pos != null) {
 			return this.world.getTileEntity(pos).hasCapability(capability, facing);
 		}

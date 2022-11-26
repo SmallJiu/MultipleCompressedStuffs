@@ -83,7 +83,7 @@ public abstract class BaseBlock extends Block implements ICompressedStuff {
 			this.setSoundType(unBlock.getSoundType());
 		}
 
-		ForgeRegistries.ITEMS.register(new BaseBlockItem(this).setRegistryName(this.getRegistryName()));
+		ForgeRegistries.ITEMS.register(new BaseCompressedBlockItem(this).setRegistryName(this.getRegistryName()));
 	}
 	
 	@Override
@@ -170,7 +170,7 @@ public abstract class BaseBlock extends Block implements ICompressedStuff {
 		return lag;
 	}
 
-	private boolean useWrenchBreak(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, boolean useMap) {
+	protected boolean useWrenchBreak(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, boolean useMap) {
 		ItemStack handitem = player.getHeldItem(hand);
 
 		if(player.isSneaking()) {

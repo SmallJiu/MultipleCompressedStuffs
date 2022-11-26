@@ -32,9 +32,7 @@
 		}
 	},
 	"botania": {
-		"item": {},
 		"block": {
-			"has": {},
 			"normal": {
 				"compressed_mana_stell_block": "botania:blocks/storage0",
 				"compressed_terrasteel_stell_block": "botania:blocks/storage1",
@@ -58,18 +56,14 @@
 		}
 	},
 	"torcherino":{
-		"item": {},
 		"block": {
-			"has": {},
 			"normal": {
 				"compressed_torcherino": "null and null, use java to set"
 			}
 		}
 	},
 	"environmentaltech": {
-		"item": {},
 		"block": {
-			"has": {},
 			"normal": {
 				"compressed_aethium_block": "environmentaltech:blocks/aethium_normal",
 				"compressed_mica_block": "environmentaltech:blocks/mica",
@@ -82,9 +76,7 @@
 		}
 	},
 	"tconstruct": {
-		"item": {},
 		"block": {
-			"has": {},
 			"normal": {
 				"compressed_clear_glass_block": "tconstruct:blocks/connected/clear_glass/normal.png",
 				"compressed_soil_block": "tconstruct:blocks/grout",
@@ -101,7 +93,6 @@
 	},
 	"draconicevolution": {
 		"block": {
-			"has": {},
 			"normal": {
 				"compressed_creative_rf_source": "draconicevolution:blocks/animated/creative_rf_source",
 				"compressed_draconic_block": {
@@ -127,7 +118,6 @@
 	},
 	"ic2": {
 		"block": {
-			"has": {},
 			"normal": {
 				"compressed_advanced_machine": "ic2:blocks/resource/advanced_machine",
 				"compressed_basalt": "ic2:blocks/resource/basalt",
@@ -536,7 +526,6 @@
 		}
 	},
 	"projecte": {
-		"item": {},
 		"block": {
 			"normal": {
 				"compressed_dark_matter_block": "projecte:blocks/dm",
@@ -554,7 +543,6 @@
 	},
 	"appliedenergistics2": {
 		"block": {
-			"has": {},
 			"normal": {
 				"compressed_certus_quartz_glass": "mcs:blocks/un/quartz_glass",
 				"compressed_certus_quartz_vibrant_glass": "mcs:blocks/un/quartz_glass",
@@ -620,7 +608,6 @@
 	},
 	"thermalfoundation": {
 		"block": {
-			"has": {},
 			"normal": {
 				"compressed_aluminum_block": "thermalfoundation:blocks/storage/block_aluminum",
 				"compressed_aluminum_ore_block": "thermalfoundation:blocks/ore/ore_aluminum",

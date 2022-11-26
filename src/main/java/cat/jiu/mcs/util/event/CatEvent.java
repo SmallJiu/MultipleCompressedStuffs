@@ -1,7 +1,7 @@
 package cat.jiu.mcs.util.event;
 
-import cat.jiu.core.api.events.entity.IEntityDeathEvent;
-import cat.jiu.core.api.events.entity.IEntityTickEvent;
+import cat.jiu.core.api.events.iface.entity.IEntityDeathEvent;
+import cat.jiu.core.api.events.iface.entity.IEntityTickEvent;
 import cat.jiu.core.util.JiuRandom;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.config.Configs;
@@ -16,16 +16,16 @@ import net.minecraft.world.World;
 public class CatEvent implements IEntityDeathEvent, IEntityTickEvent {
 	private final JiuRandom rand = new JiuRandom();
 	@Override
-	public void onEntityDeath(Entity entity, World world, BlockPos pos) {
+	public void onEntityDeath(Entity entity) {
 		if(Configs.Custom.custem_already_stuff.item.can_drop_cat_hair && entity instanceof EntityOcelot) {
-			onCatDropItem((EntityOcelot) entity, world, pos, true);
+			onCatDropItem((EntityOcelot) entity, entity.world, entity.getPosition(), true);
 		}
 	}
 
 	@Override
-	public void onEntityTick(Entity entity, World world, BlockPos pos) {
+	public void onEntityTick(Entity entity) {
 		if(Configs.Custom.custem_already_stuff.item.can_drop_cat_hair && entity instanceof EntityOcelot) {
-			onCatDropItem((EntityOcelot) entity, world, pos, false);
+			onCatDropItem((EntityOcelot) entity, entity.world, entity.getPosition(), false);
 		}
 	}
 

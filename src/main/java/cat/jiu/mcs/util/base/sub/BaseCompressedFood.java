@@ -12,6 +12,7 @@ import com.google.common.collect.Maps;
 import cat.jiu.core.util.RegisterModel;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.api.recipe.ISmeltingRecipe;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.core.api.IHasModel;
 import cat.jiu.core.util.JiuUtils;
@@ -39,17 +40,17 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuff {
-	public static BaseItemFood register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
+public class BaseCompressedFood extends ItemFood implements IHasModel, ICompressedStuff, ISmeltingRecipe {
+	public static BaseCompressedFood register(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab) {
 		if(baseItem == null || baseItem.isEmpty()) return null;
 		if(Loader.isModLoaded(ownerMod) || ownerMod.equals("custom")) {
-			return new BaseItemFood(name, baseItem.getItem(), baseItem.getMetadata(), ownerMod, tab, true);
+			return new BaseCompressedFood(name, baseItem.getItem(), baseItem.getMetadata(), ownerMod, tab, true);
 		}else {
 			return null;
 		}
 	}
 
-	public static BaseItemFood register(String name, ItemStack baseItem, String ownerMod) {
+	public static BaseCompressedFood register(String name, ItemStack baseItem, String ownerMod) {
 		return register(name, baseItem, ownerMod, MCS.COMPERESSED_ITEMS);
 	}
 
@@ -62,7 +63,7 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 	protected final boolean baseItemIsNotFood;
 	protected final RegisterModel model = new RegisterModel(MCS.MODID);
 
-	public BaseItemFood(String name, Item baseFood, int meta, String ownerMod, CreativeTabs tab, float saturation, boolean isWolfFood, boolean hasSubtypes) {
+	public BaseCompressedFood(String name, Item baseFood, int meta, String ownerMod, CreativeTabs tab, float saturation, boolean isWolfFood, boolean hasSubtypes) {
 		super(8, saturation, isWolfFood);
 		this.name = name;
 		this.tab = tab;
@@ -92,42 +93,42 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 		}else if(name.equalsIgnoreCase(unCompressedItem.getItem().getRegistryName().getResourceDomain())) {
 			throw new RuntimeException("name must not be owner mod. Name: " + name + ", OwnerMod: " + unCompressedItem.getItem().getRegistryName().getResourceDomain());
 		}
-		RegisterModel.NeedToRegistryModel.add(this);
+		RegisterModel.addNeedRegistryModel(MCS.MODID, this);
 	}
 
-	public BaseItemFood(String name, Item baseFood, int meta, String ownerMod, CreativeTabs tab, boolean isWolfFood, boolean hasSubtypes) {
+	public BaseCompressedFood(String name, Item baseFood, int meta, String ownerMod, CreativeTabs tab, boolean isWolfFood, boolean hasSubtypes) {
 		this(name, baseFood, meta, ownerMod, tab, 0.6F, isWolfFood, hasSubtypes);
 	}
 
-	public BaseItemFood(String name, Item baseFood, int meta, String ownerMod, CreativeTabs tab, boolean hasSubtypes) {
+	public BaseCompressedFood(String name, Item baseFood, int meta, String ownerMod, CreativeTabs tab, boolean hasSubtypes) {
 		this(name, baseFood, meta, ownerMod, tab, false, hasSubtypes);
 	}
 
-	public BaseItemFood(String name, Item baseFood, int meta, String ownerMod, CreativeTabs tab) {
+	public BaseCompressedFood(String name, Item baseFood, int meta, String ownerMod, CreativeTabs tab) {
 		this(name, baseFood, meta, ownerMod, tab, true);
 	}
 
-	public BaseItemFood(String name, Item baseFood, int meta, String ownerMod) {
+	public BaseCompressedFood(String name, Item baseFood, int meta, String ownerMod) {
 		this(name, baseFood, meta, ownerMod, MCS.COMPERESSED_ITEMS);
 	}
 
-	public BaseItemFood(String name, Item baseFood, int meta) {
+	public BaseCompressedFood(String name, Item baseFood, int meta) {
 		this(name, baseFood, meta, "minecraft");
 	}
 
-	public BaseItemFood(String name, Item baseFood) {
+	public BaseCompressedFood(String name, Item baseFood) {
 		this(name, baseFood, 0);
 	}
 
-	private final List<String> otherOredict = ICompressedStuff.super.addOtherOreDictionary();
+	private final List<String> otherOredict = ICompressedStuff.super.getOtherOreDictionary();
 
-	public BaseItemFood addOtherOreDict(String oredict) {
+	public BaseCompressedFood addOtherOreDict(String oredict) {
 		this.otherOredict.add(oredict);
 		return this;
 	}
 
 	@Override
-	public List<String> addOtherOreDictionary() {
+	public List<String> getOtherOreDictionary() {
 		return this.otherOredict;
 	}
 
@@ -145,14 +146,14 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 
 	private boolean makeRecipe = true;
 
-	public BaseItemFood setMakeDefaultStackRecipe(boolean makeRecipe) {
+	public BaseCompressedFood setMakeDefaultStackRecipe(boolean makeRecipe) {
 		this.makeRecipe = makeRecipe;
 		return this;
 	}
 
 	boolean createOredict = true;
 
-	public BaseItemFood createOreDictionary(boolean flag) {
+	public BaseCompressedFood createOreDictionary(boolean flag) {
 		this.createOredict = flag;
 		return this;
 	}
@@ -179,14 +180,14 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 
 	Boolean hasEffect = null;
 
-	public BaseItemFood hasEffect(boolean hasEffect) {
+	public BaseCompressedFood hasEffect(boolean hasEffect) {
 		this.hasEffect = hasEffect;
 		return this;
 	}
 
 	private Map<Integer, Boolean> HasEffectMap = Maps.newHashMap();
 
-	public BaseItemFood setHasEffectMap(Map<Integer, Boolean> map) {
+	public BaseCompressedFood setHasEffectMap(Map<Integer, Boolean> map) {
 		this.HasEffectMap = map;
 		return this;
 	}
@@ -241,7 +242,7 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 
 	Map<Integer, EnumRarity> RarityMap = null;
 
-	public BaseItemFood setRarityMap(Map<Integer, EnumRarity> map) {
+	public BaseCompressedFood setRarityMap(Map<Integer, EnumRarity> map) {
 		this.RarityMap = map;
 		return this;
 	}
@@ -264,7 +265,7 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 
 	private Map<Integer, Integer> HealAmountMap = null;
 
-	public BaseItemFood setHealAmountMap(Map<Integer, Integer> map) {
+	public BaseCompressedFood setHealAmountMap(Map<Integer, Integer> map) {
 		this.HealAmountMap = map;
 		return this;
 	}
@@ -273,7 +274,7 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 	private float saturationModifier;
 	private boolean isWolfFood;
 
-	public BaseItemFood setFoodEntry(int amount, float saturation, boolean isWolfFood) {
+	public BaseCompressedFood setFoodEntry(int amount, float saturation, boolean isWolfFood) {
 		this.healAmount = amount;
 		this.saturationModifier = saturation;
 		this.isWolfFood = isWolfFood;
@@ -309,7 +310,7 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 
 	private Map<Integer, Float> SaturationModifierMap = null;
 
-	public BaseItemFood setSaturationModifierMap(Map<Integer, Float> map) {
+	public BaseCompressedFood setSaturationModifierMap(Map<Integer, Float> map) {
 		this.SaturationModifierMap = map;
 		return this;
 	}
@@ -349,17 +350,17 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 
 	private Map<Integer, List<CustomStuffType.PotionEffectType>> potionEffect = Maps.newHashMap();
 
-	public BaseItemFood addPotionEffect(Map<Integer, List<CustomStuffType.PotionEffectType>> effect) {
+	public BaseCompressedFood addPotionEffect(Map<Integer, List<CustomStuffType.PotionEffectType>> effect) {
 		this.potionEffect = effect;
 		return this;
 	}
 
-	public BaseItemFood addPotionEffect(int meta, CustomStuffType.PotionEffectType... effects) {
+	public BaseCompressedFood addPotionEffect(int meta, CustomStuffType.PotionEffectType... effects) {
 		potionEffect.put(meta, Lists.newArrayList(effects));
 		return this;
 	}
 
-	public BaseItemFood addPotionEffect(int[] metas, CustomStuffType.PotionEffectType[]... effects) {
+	public BaseCompressedFood addPotionEffect(int[] metas, CustomStuffType.PotionEffectType[]... effects) {
 		if(metas.length == 1) {
 			if(metas[0] == -1) {
 				List<CustomStuffType.PotionEffectType> effect = Lists.newArrayList(effects[0]);
@@ -382,14 +383,14 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 
 	ItemStack container = null;
 
-	public BaseItemFood setContainer(ItemStack container) {
+	public BaseCompressedFood setContainer(ItemStack container) {
 		this.container = container;
 		return this;
 	}
 
 	private Map<Integer, ItemStack> ContainerMap = Maps.newHashMap();
 
-	public BaseItemFood setContainerMap(Map<Integer, ItemStack> map) {
+	public BaseCompressedFood setContainerMap(Map<Integer, ItemStack> map) {
 		this.ContainerMap = map;
 		return this;
 	}
@@ -420,7 +421,7 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 
 		if(this.container != null) {
 			if(Configs.Custom.custem_already_stuff.item.give_food_container) {
-				if(this.container.getItem() instanceof BaseItemSub || this.container.getItem() instanceof BaseItemFood || this.isSubBlock(this.container)) {
+				if(this.container.getItem() instanceof BaseCompressedItem || this.container.getItem() instanceof BaseCompressedFood || this.isSubBlock(this.container)) {
 					player.addItemStackToInventory(new ItemStack(this.container.getItem(), 1, stack.getMetadata()));
 				}else {
 					player.addItemStackToInventory(this.container.copy());
@@ -431,7 +432,7 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 
 	private boolean isSubBlock(ItemStack stack) {
 		if(JiuUtils.item.isBlock(stack)) {
-			if(JiuUtils.item.getBlockFromItemStack(stack) instanceof BaseBlockSub) {
+			if(JiuUtils.item.getBlockFromItemStack(stack) instanceof BaseCompressedBlock) {
 				return true;
 			}
 		}
@@ -440,56 +441,56 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 
 	private List<String> shiftInfos = new ArrayList<String>();
 
-	public BaseItemFood addCustemShiftInformation(String... custemInfo) {
+	public BaseCompressedFood addCustemShiftInformation(String... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
 			shiftInfos.add(custemInfo[i]);
 		}
 		return this;
 	}
 
-	public BaseItemFood addCustemShiftInformation(List<String> infos) {
+	public BaseCompressedFood addCustemShiftInformation(List<String> infos) {
 		this.shiftInfos.addAll(infos);
 		return this;
 	}
 
 	private Map<Integer, List<String>> metaShiftInfos = Maps.newHashMap();
 
-	public BaseItemFood addCustemShiftInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedFood addCustemShiftInformation(Map<Integer, List<String>> infos) {
 		this.metaShiftInfos = infos;
 		return this;
 	}
 
 	private List<String> infos = new ArrayList<String>();
 
-	public BaseItemFood addCustemInformation(String... custemInfo) {
+	public BaseCompressedFood addCustemInformation(String... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
 			infos.add(custemInfo[i]);
 		}
 		return this;
 	}
 
-	public BaseItemFood addCustemInformation(List<String> infos) {
+	public BaseCompressedFood addCustemInformation(List<String> infos) {
 		this.infos.addAll(infos);
 		return this;
 	}
 
 	private Map<Integer, List<String>> metaInfos = null;
 
-	public BaseItemFood addCustemInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedFood addCustemInformation(Map<Integer, List<String>> infos) {
 		this.metaInfos = infos;
 		return this;
 	}
 
 	ItemStack infoStack = null;
 
-	public BaseItemFood setInfoStack(ItemStack stack) {
+	public BaseCompressedFood setInfoStack(ItemStack stack) {
 		this.infoStack = stack;
 		return this;
 	}
 
 	private Map<Integer, ItemStack> infoStacks = null;
 
-	public BaseItemFood setInfoStack(Map<Integer, ItemStack> infoStacks) {
+	public BaseCompressedFood setInfoStack(Map<Integer, ItemStack> infoStacks) {
 		this.infoStacks = infoStacks;
 		return this;
 	}
@@ -501,7 +502,7 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.unCompressedItem, infoStacks);
 		MCSUtil.info.addCompressedInfo(meta, tooltip, this.getUnCompressedItemLocalizedName(), this);
 
-		if(MCS.test()) {
+		if(MCS.dev()) {
 			String[] names = JiuUtils.other.custemSplitString(this.name, "_");
 			tooltip.add(names.length + " : " + this.getUnCompressedName());
 		}
@@ -565,5 +566,25 @@ public class BaseItemFood extends ItemFood implements IHasModel, ICompressedStuf
 	@Override
 	public CompressedLevel getLevel() {
 		return this.type;
+	}
+	
+	private ICompressedStuff smeltingOutput;
+	public BaseCompressedFood setSmeltingOutput(ICompressedStuff stuff) {
+		this.smeltingOutput = stuff;
+		return this;
+	}
+	private int smeltingMetaDisparity = 0;
+	public BaseCompressedFood setSmeltingMetaDisparity(int smeltingMetaDisparity) {
+		this.smeltingMetaDisparity = smeltingMetaDisparity;
+		return this;
+	}
+	@Override
+	public boolean canCreateRecipe(int meta) {
+		return this.smeltingOutput!=null;
+	}
+	@Override
+	public ItemStack getSmeltingOutput(int meta) {
+		int outmeta = meta-smeltingMetaDisparity;
+		return outmeta < 0 ? null : smeltingOutput.getStack(outmeta);
 	}
 }

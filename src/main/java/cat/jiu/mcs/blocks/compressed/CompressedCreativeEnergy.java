@@ -4,7 +4,8 @@ import java.util.List;
 
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCreativeEnergy;
-import cat.jiu.mcs.util.base.sub.BaseBlockSub;
+import cat.jiu.mcs.util.base.sub.BaseCompressedBlock;
+
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -16,7 +17,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class CompressedCreativeEnergy extends BaseBlockSub {
+public class CompressedCreativeEnergy extends BaseCompressedBlock {
 	public CompressedCreativeEnergy(String nameIn, ItemStack unCompressedItem) {
 		super(nameIn, unCompressedItem, "mcs", CreativeTabs.TRANSPORTATION);
 		this.setInfoStack(new ItemStack(Items.AIR));

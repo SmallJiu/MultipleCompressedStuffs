@@ -2,6 +2,8 @@ itemGroup.compressed_stuffs_blocks=多重压缩-方块
 itemGroup.compressed_stuffs_items=多重压缩-物品
 itemGroup.compressed_stuffs_tools=多重压缩-工具
 
+cmd.mcs.dev.gen=/mcs gen <max> <x> <y> <z> -- 生成一堆数量在<max>左右的随机物品到指定坐标
+
 info.mcs.energy=能量
 
 info.mcs.warn.ic.craft_energy=警告：将不会继承合成材料的电量到成品上
