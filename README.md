@@ -1,6 +1,6 @@
 # MultipleCompressedStuffs
 
-#未经同意，禁止搬运
+未经同意，禁止搬运
 
 Last modid is MultipleCompressedBlocks,
 Now modid is MultipleCompressedStuffs
