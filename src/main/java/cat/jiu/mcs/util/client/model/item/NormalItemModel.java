@@ -20,6 +20,11 @@ public class NormalItemModel extends BaseModel {
 		super(originalTexture, defaultParent, owner, name, i);
 		this.meta = meta;
 	}
+	protected boolean dontAddCompressedTexture;
+	public NormalItemModel setDontAddCompressedTexture() {
+		this.dontAddCompressedTexture = true;
+		return this;
+	}
 
 	@Override
 	protected void genData(JsonObject json) {
@@ -38,15 +43,15 @@ public class NormalItemModel extends BaseModel {
 			}
 		}
 		
-		textures.addProperty("layer"+json.size(), this.getCompressedTexture(this.meta+1));
+		if(!this.dontAddCompressedTexture) textures.addProperty("layer"+json.size(), this.getCompressedTexture(this.meta+1));
 		json.add("textures", textures);
 	}
 	
-	protected String getCompressedTexture(int compressedState) {
-		if(compressedState == 32767) {
+	protected String getCompressedTexture(int level) {
+		if(level >= Short.MAX_VALUE) {
 			return "mcs:items/infinity";
 		}else {
-			return "mcs:items/compressed_"+ + compressedState;
+			return "mcs:items/compressed_"+ + level;
 		}
 	}
 }

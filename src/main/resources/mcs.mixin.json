@@ -4,7 +4,7 @@
 	"package": "cat.jiu.mcs.mixin",
 	"compatibilityLevel": "JAVA_8",
 	"mixins": [
-		"MixinAEStorageCell"
+//		"MixinAEStorageCell"
 	],
 	"client": [
 		

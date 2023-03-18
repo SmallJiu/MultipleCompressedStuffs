@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 public class GuiHandler implements IGuiHandler {
 	public static final int COMPRESSOR = 1;
 	public static final int CHEST_SCROOL_GUI = 2;
-	public static final int CHEST_PAGE_GUI = 3;
 
 	public static void register() {
 		NetworkRegistry.INSTANCE.registerGuiHandler(MCS.MODID, new GuiHandler());
@@ -33,11 +32,7 @@ public class GuiHandler implements IGuiHandler {
 				}
 			case CHEST_SCROOL_GUI:
 				if(te instanceof TileEntityCompressedChest) {
-					return new ContainerCompressedScroolChest(player, world, pos);
-				}
-			case CHEST_PAGE_GUI:
-				if(te instanceof TileEntityCompressedChest) {
-					return new ContainerCompressedPageChest(player, world, pos);
+					return new ContainerCompressedChest(player, world, pos);
 				}
 		}
 
@@ -55,11 +50,7 @@ public class GuiHandler implements IGuiHandler {
 				}
 			case CHEST_SCROOL_GUI:
 				if(te instanceof TileEntityCompressedChest) {
-					return new GUICompressedScroolChest(player, world, pos);
-				}
-			case CHEST_PAGE_GUI:
-				if(te instanceof TileEntityCompressedChest) {
-					return new GUICompressedPageChest(player, world, pos);
+					return new GUICompressedChest(player, world, pos);
 				}
 		}
 

@@ -2,7 +2,6 @@ package cat.jiu.mcs.util.client.waila;
 
 import java.util.List;
 
-import cat.jiu.core.capability.JiuEnergyStorage;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCompressor;
 
@@ -30,20 +29,18 @@ public class CompressorPlugin implements IWailaDataProvider {
 	public List<String> getWailaBody(ItemStack itemStack, List<String> tooltip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
 		TileEntity tile = accessor.getTileEntity();
 		if(tile != null && accessor.getNBTData() != null && tile instanceof TileEntityCompressor) {
-			JiuEnergyStorage energy = JiuEnergyStorage.empty();
-			energy.readFromNBT(accessor.getNBTData().getCompoundTag("energy"), true);
-			
-			if(accessor.getNBTData().hasKey("debug")) {
+			NBTTagCompound nbt = accessor.getNBTData();
+			if(nbt.getBoolean("debug")) {
 				tooltip.add("Debug: on");
 			}
 			
 			StringBuilder s = new StringBuilder();
-			s.append(I18n.format("info.mcs.energy"));
-			s.append(": ");
-			s.append(JiuUtils.big_integer.format(energy.getEnergyStoredWithBigInteger(), 3));
-			s.append(" JE / ");
-			s.append(JiuUtils.big_integer.format(energy.getMaxEnergyStoredWithBigInteger(), 3));
-			s.append(" JE");
+			s.append(I18n.format("info.mcs.energy"))
+			 .append(": ")
+			 .append(JiuUtils.big_integer.format(JiuUtils.big_integer.create(nbt.getString("energy")), 3))
+			 .append(" JE / ")
+			 .append(JiuUtils.big_integer.format(JiuUtils.big_integer.create(nbt.getString("maxEnergy")), 1))
+			 .append(" JE");
 			
 			tooltip.add(s.toString());
 		}
@@ -53,8 +50,9 @@ public class CompressorPlugin implements IWailaDataProvider {
 	@Override
 	public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity tile, NBTTagCompound tag, World world, BlockPos pos) {
 		if(tile != null && tile instanceof TileEntityCompressor) {
-			if(((TileEntityCompressor) tile).debug) tag.setBoolean("debug", true);
-			tag.setTag("energy", ((TileEntityCompressor) tile).storage.writeToNBT(null, true));
+			tag.setBoolean("debug", ((TileEntityCompressor) tile).debug);
+			tag.setString("energy", ((TileEntityCompressor) tile).storage.getEnergyStoredWithBigInteger().toString());
+			tag.setString("maxEnergy", ((TileEntityCompressor) tile).storage.getMaxEnergyStoredWithBigInteger().toString());
 		}
 		return tag;
 	}

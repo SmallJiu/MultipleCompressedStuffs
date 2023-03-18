@@ -18,7 +18,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
 
-version = "1.12.2-3.0.4-a0"
+version = "1.12.2-3.0.5-a0"
 group = "cat.jiu.mcs"
 archivesBaseName = "MultipleCompressedStuffs"
 

@@ -4,12 +4,9 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import cat.jiu.core.api.events.iface.player.IPlayerCraftedItemEvent;
-import cat.jiu.core.util.JiuCoreEvents;
 import cat.jiu.core.util.JiuUtils;
-import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
-
+import cat.jiu.mcs.util.init.MCSCreativeTab;
 import ic2.api.item.ICustomDamageItem;
 import ic2.api.item.IElectricItem;
 import ic2.core.IC2;
@@ -31,7 +28,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
-public class IC2EnergyCrystal extends BaseCompressedItem implements IPlayerCraftedItemEvent, IElectricItem, IPseudoDamageItem, ICustomDamageItem {
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+public class IC2EnergyCrystal extends BaseCompressedItem implements IElectricItem, IPseudoDamageItem, ICustomDamageItem {
 	protected final double baseMaxEnergy;
 	protected final int energyLevel;
 	protected final double fransferLimit;
@@ -48,11 +51,11 @@ public class IC2EnergyCrystal extends BaseCompressedItem implements IPlayerCraft
 		}else {
 			throw new RuntimeException("'" + baseItem.toString() + "' is NOT IC Energy Item");
 		}
-		JiuCoreEvents.addEvent(this);
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	public IC2EnergyCrystal(String name, ItemStack baseItem) {
-		this(name, baseItem, MCS.COMPERESSED_ITEMS);
+		this(name, baseItem, MCSCreativeTab.ITEMS);
 	}
 
 	public IC2EnergyCrystal(String name, String unCompressedItem, int meta, CreativeTabs tab) {
@@ -64,7 +67,7 @@ public class IC2EnergyCrystal extends BaseCompressedItem implements IPlayerCraft
 	}
 
 	public IC2EnergyCrystal(String name, String unCompressedItem) {
-		this(name, unCompressedItem, 0, MCS.COMPERESSED_ITEMS);
+		this(name, unCompressedItem, 0, MCSCreativeTab.ITEMS);
 	}
 
 	@Override
@@ -72,6 +75,7 @@ public class IC2EnergyCrystal extends BaseCompressedItem implements IPlayerCraft
 		return false;
 	}
 
+	@SideOnly(Side.CLIENT)
 	@Override
 	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
 		if(Minecraft.getMinecraft().currentScreen instanceof GuiCrafting) {
@@ -82,8 +86,12 @@ public class IC2EnergyCrystal extends BaseCompressedItem implements IPlayerCraft
 		super.addInformation(stack, world, tooltip, advanced);
 	}
 
-	@Override
-	public void onPlayerCraftedItemInGui(EntityPlayer player, IInventory gui, ItemStack stack) {
+	@SubscribeEvent
+	public void onPlayerCraftedItemInGui(PlayerEvent.ItemCraftedEvent event) {
+		this.onPlayerCraftedItemInGui(event.player, event.craftMatrix, event.crafting);
+	}
+
+	private void onPlayerCraftedItemInGui(EntityPlayer player, IInventory gui, ItemStack stack) {
 		if(!player.world.isRemote) {
 			if(stack.getItem() == this) {
 				List<ItemStack> craftIn = Lists.newArrayList();

@@ -1,20 +1,12 @@
 package cat.jiu.mcs.mixin;
 
-import java.util.Map;
-
-import org.spongepowered.asm.launch.MixinBootstrap;
-import org.spongepowered.asm.mixin.Mixins;
+import cat.jiu.core.util.base.MixinConfiguration;
 
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
-public class Configuration implements IFMLLoadingPlugin {
+@IFMLLoadingPlugin.MCVersion(value = "1.12.2")
+public class Configuration extends MixinConfiguration {
 	public Configuration() {
-		MixinBootstrap.init();
-		Mixins.addConfigurations("mcs.mixin.json");
+		super("mcs.mixin.json");
 	}
-	public String[] getASMTransformerClass() {return null;}
-	public String getModContainerClass() {return null;}
-	public String getSetupClass() {return null;}
-	public void injectData(Map<String, Object> data) {}
-	public String getAccessTransformerClass() {return null;}
 }

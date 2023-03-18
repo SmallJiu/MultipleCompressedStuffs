@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-import cat.jiu.core.api.events.iface.player.IPlayerPlaceBlock;
+import cat.jiu.core.events.entity.player.PlayerPlaceEvent;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.tileentity.TileEntityChangeBlock;
@@ -16,10 +16,18 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class OtherModBlockChange implements IPlayerPlaceBlock {
-	@Override
-	public void onPlayerPlaceBlock(EntityPlayer player, BlockPos pos, World world, IBlockState placedBlock, IBlockState placeedAgainst) {
+@EventBusSubscriber
+public class OtherModBlockChange {
+	
+	@SubscribeEvent
+	public static void onPlayerPlaceBlock(PlayerPlaceEvent.PlaceBlock event) {
+		onPlayerPlaceBlock(event.player, event.pos, event.world, event.placedBlock, event.placeedAgainst);
+	}
+	
+	private static void onPlayerPlaceBlock(EntityPlayer player, BlockPos pos, World world, IBlockState placedBlock, IBlockState placeedAgainst) {
 		if(world.isRemote) return;
 		String name = placedBlock.getBlock().getRegistryName().toString();
 		int meta = JiuUtils.item.getMetaFromBlockState(placedBlock);
@@ -33,11 +41,11 @@ public class OtherModBlockChange implements IPlayerPlaceBlock {
 			String log = JiuUtils.day.getDate() + " Player: " + player.getName() + " Place [" + JiuUtils.item.getStackFromBlockState(placedBlock).getDisplayName() + "] at" + " Dim: " + player.dimension + ", DimName: " + world.provider.getDimensionType().getName().toLowerCase() + ", " + pos;
 			MCS.getLogOS().info(log);
 			
-			this.writeLog("logs/jiu/" + MCS.MODID + "/" + "mcs_server.log", log);
+			writeLog("logs/jiu/" + MCS.MODID + "/" + "mcs_server.log", log);
 		}
 	}
 	
-	private void writeLog(String path, String arg) {
+	private static void writeLog(String path, String arg) {
 		File filepath = new File(path);
 
 		if(!filepath.exists()) {

@@ -1,9 +1,9 @@
 package cat.jiu.mcs.blocks.net.container;
 
 import cat.jiu.core.util.JiuUtils;
-import cat.jiu.core.util.base.BaseUI;
+import cat.jiu.core.util.base.BaseUI.*;
 import cat.jiu.mcs.blocks.net.NetworkHandler;
-import cat.jiu.mcs.blocks.net.msg.MsgCompressorPageChest;
+import cat.jiu.mcs.blocks.net.msg.MsgCompressorChest;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCompressedChest;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,74 +14,85 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
 
-public class ContainerCompressedPageChest extends BaseUI.BaseContainer<TileEntityCompressedChest> {
+public class ContainerCompressedChest extends BaseContainer<TileEntityCompressedChest> {
 	protected final int meta;
-	protected final int slots;
-	private final int maxPage;
+	protected int slots;
 	private final SoundEvent closeSound;
 
-	public ContainerCompressedPageChest(EntityPlayer player, World world, BlockPos pos) {
+	public ContainerCompressedChest(EntityPlayer player, World world, BlockPos pos) {
 		super(player, world, pos);
 		this.meta = JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos));
 		
 		if(this.te != null) {
 			this.closeSound = this.te.getCloseSound();
 			this.slots = this.te.getSlotSize();
-			this.maxPage = this.slots / 54;
-			super.addHandlerSlot(this.te.getSlots(), 8, 18, 9, 6, args->new SlotItemHandler((IItemHandler)args[0], (int)args[1], (int)args[2], (int)args[3]));
+			this.outRows = (this.slots + 9 - 1) / 9 - 6;
+			this.selectRows = (int) ((double) (currentScroll * (float) outRows) + 0.5D);
+			if(this.selectRows < 0) {
+				this.selectRows = 0;
+			}
+
+			int slotIndex = 0;
+			for(int y = 0; y < 6; y++) {
+				for(int x = 0; x < 9; x++) {
+					this.addSlotToContainer(new UndefinedIndexSlot(this.te.getSlots(), slotIndex, 8 + 18 * x, 18 + 18 * y));
+					slotIndex += 1;
+				}
+			}
+//			super.addHandlerSlot(this.te.getSlots(), 8, 18, 9, 6, args -> {
+//				return new UndefinedIndexSlot((IItemHandler)args[0], (int)args[1], (int)args[2], (int)args[3]);
+//			});
 			super.addPlayerInventorySlot(8, 140);
-			this.toPage(0);
+			this.scrollTo(0.0F);
 		}else {
 			throw new RuntimeException("It is not Compressed Chest! : " + pos.toString());
 		}
 	}
-	
-	public boolean toPage(int page) {
-		if(!this.canNextPage()) return false; // 检查能不能翻页
-		if(page < 0) return false; // 检查页数是不是小于0
-		if(page > this.maxPage) return false; // 检查页数是不是大于最大页数
-		
+
+	float currentScroll = 0.0F;// 滚动的位置
+	int outRows = 0;// 超出物品栏的栏数
+	int selectRows = 0;// 已展示的超出物品栏的栏数
+
+	public void scrollTo(float currentScroll) {
 		if(this.world.isRemote) {
-			NetworkHandler.INSTANCE.sendToServer(new MsgCompressorPageChest(page));
+			NetworkHandler.INSTANCE.sendToServer(new MsgCompressorChest(currentScroll));
 		}
 		TileEntity te = this.world.getTileEntity(this.pos);
-		if(te instanceof TileEntityCompressedChest) {
-			this.te = (TileEntityCompressedChest) te;
-			int stackIndex = page * 54;
-			System.out.println("Page: " + page + ", StartIndex: " + stackIndex);
-			for(int slotY = 0; slotY < 6; ++slotY) {
-				for(int slotX = 0; slotX < 9; ++slotX) {
-					int slotIndex = slotX + slotY * 9;
-					System.out.println("Page: " + page + ", StackIndex: " + stackIndex + ", SlotIndex: " + slotIndex);
-					Slot selectSlot = this.getSlot(slotIndex);
-					if(stackIndex >= 0 && stackIndex < this.slots) {
-						selectSlot.putStack(this.te.getStack(stackIndex));
-					}else {
-						selectSlot.putStack(ItemStack.EMPTY);
-					}
-					stackIndex += 1;
+		if(te instanceof TileEntityCompressedChest) this.te = (TileEntityCompressedChest) te;
+		
+		this.currentScroll = currentScroll;
+
+		this.outRows = (this.slots + 9 - 1) / 9 - 6;
+		this.selectRows = MathHelper.clamp((int) ((double) (currentScroll * (float) outRows) + 0.5D), 0, outRows);
+
+		for(int slotY = 0; slotY < 6; ++slotY) {
+			for(int slotX = 0; slotX < 9; ++slotX) {
+				int stackIndex = slotX + (slotY + selectRows) * 9;
+				int slotIndex = slotX + slotY * 9;
+
+				Slot selectSlot = this.getSlot(slotIndex);
+				if(selectSlot instanceof UndefinedIndexSlot) {
+					((UndefinedIndexSlot) selectSlot).setIndex(stackIndex);
+				}
+
+				if(this.canAddItemToSlot(slotX, slotY)) {
+					selectSlot.putStack(this.te.getStack(stackIndex));
+				}else {
+					selectSlot.putStack(ItemStack.EMPTY);
 				}
 			}
-			
-			return true;
 		}
-		
-		return false;
 	}
 	
-	public int getMaxPage() {
-		return this.maxPage;
-	}
-
-	public boolean canNextPage() {
-		return this.slots > 54;
+	public boolean canAddItemToSlot(int slotX, int slotY) {
+		int stackIndex = slotX + (slotY + selectRows) * 9;
+		return stackIndex >= 0 && stackIndex < this.slots;
 	}
 
 	@Override
@@ -111,6 +122,13 @@ public class ContainerCompressedPageChest extends BaseUI.BaseContainer<TileEntit
 		}
 		
 		return oldStack;
+	}
+
+	public boolean canScroll() {
+		return this.slots > 54;
+	}
+	public int getSlots() {
+		return slots;
 	}
 
 	@SideOnly(Side.CLIENT)

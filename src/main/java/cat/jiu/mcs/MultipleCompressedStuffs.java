@@ -1,27 +1,24 @@
 package cat.jiu.mcs;
 
 import java.io.File;
-import java.util.Map;
-
-import javax.annotation.Nonnull;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.common.collect.Maps;
+import appeng.core.AppEng;
 
+import cat.jiu.core.JiuCore;
 import cat.jiu.core.JiuCore.LogOS;
+import cat.jiu.core.api.IMod;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.core.util.helpers.DayUtils;
 import cat.jiu.mcs.command.MCSCommand;
 import cat.jiu.mcs.proxy.ServerProxy;
-import cat.jiu.mcs.util.client.model.texture.ModTextures;
 import cat.jiu.mcs.util.init.*;
 
 import moze_intel.projecte.emc.EMCMapper;
 import moze_intel.projecte.emc.SimpleStack;
 
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -34,6 +31,8 @@ import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod(
 	modid = MCS.MODID,
@@ -42,8 +41,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 	useMetadata = true,
 	guiFactory = "cat.jiu.mcs.config.ConfigGuiFactory",
 	dependencies =
-	  "required-after:jiucore@[1.1.5-a0,];"
-	+ "required-after:mixinbooter;"
+	  "required-after:jiucore@[" + JiuCore.VERSION + ",];"
 	+ "after:thermalfoundation;"
 	+ "after:projecte;"
 	+ "after:botania;"
@@ -52,31 +50,28 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 	+ "after:tconstruct;"
 	+ "after:avaritia;"
 	+ "after:ic2;"
-	+ "after:appliedenergistics2;"
+	+ "after:"+AppEng.MOD_ID+";"
 	+ "after:torcherino;"
 	+ "after:waila",
 	acceptedMinecraftVersions = "[1.12.2]")
-public class MultipleCompressedStuffs {
+public class MultipleCompressedStuffs implements IMod {
 	private static Logger logger = LogManager.getLogger(MCS.MODID);
 	private static LogOS logos = new LogOS(getLogger());
 	public static final String MODID = "mcs";
 	public static final String NAME = "MultipleCompressedStuffs";
 	public static final String OWNER = "small_jiu";
-	protected static final String JIUCORE_VERSION = "1.1.5-a0";
-	public static final String VERSION = "3.0.4-a0";
-	public static final CreativeTabs COMPERESSED_BLOCKS = new CreativeTabCompressedStuffsBlocks();
-	public static final CreativeTabs COMPERESSED_ITEMS = new CreativeTabCompressedStuffsItems();
-	public static final CreativeTabs COMPERESSED_TOOLS = new CreativeTabCompressedStuffsTools();
+	public static final String VERSION = "3.0.5-a0";
 	
-	private static final Map<String, ModTextures> mod_texture = Maps.newHashMap();
-	public static boolean hasModTextures(String modid) {return mod_texture.containsKey(modid);}
-	public static ModTextures getTextures(String modid) {return mod_texture.get(modid);}
-	public static boolean addModTextures(String modid, @Nonnull ModTextures textures) {
-		if(mod_texture!=null && !mod_texture.containsKey(modid)) {
-			mod_texture.put(modid, textures);
-			return true;
-		}
-		return false;
+	@Deprecated
+	public static final CreativeTabs COMPERESSED_BLOCKS = MCSCreativeTab.BLOCKS;
+	@Deprecated
+	public static final CreativeTabs COMPERESSED_ITEMS = MCSCreativeTab.ITEMS;
+	@Deprecated
+	public static final CreativeTabs COMPERESSED_TOOLS = MCSCreativeTab.TOOLS;
+	@Deprecated
+	@SideOnly(Side.CLIENT)
+	public static boolean hasModTextures(String modid) {
+		return proxy.getAsClientProxy().hasModTexture(modid);
 	}
 	
 	private static Boolean isDev = null; // if is IDE, you can set to 'true' to enable some test stuff
@@ -86,6 +81,7 @@ public class MultipleCompressedStuffs {
 		}
 		return isDev;
 	}
+	
 	private static boolean DevelopmentEnvironment;
 	public static final boolean isDevelopmentEnvironment() {
 		return DevelopmentEnvironment;
@@ -112,31 +108,36 @@ public class MultipleCompressedStuffs {
 		serverSide = "cat.jiu.mcs.proxy.ServerProxy",
 		modId = MCS.MODID)
 	public static ServerProxy proxy;
-
-	@Mod.EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
-		proxy.preInit(event);
-		CriteriaTriggers.register(CraftCompressedStuffTrigger.instance);
+	@Override
+	public ServerProxy getProxy() {
+		return proxy;
 	}
-
+	
 	@Mod.EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
-		proxy.postInit(event);
+	public void onPreInit(FMLPreInitializationEvent event) {
+		IMod.super.onPreInit(event);
+	}
+	
+	@Mod.EventHandler
+	public void onPostInit(FMLPostInitializationEvent event) {
+		IMod.super.onPostInit(event);
 	}
 
 	public static long startmodel = 0L;
 
 	@Mod.EventHandler
 	public void onLoadComplete(FMLLoadCompleteEvent event) {
+		IMod.super.onLoadComplete(event);
 		getLogOS().info("");
 		
-		getLogOS().info("Register Blocks (took " + (proxy.startblock - proxy.startcustom) + " ms)");
-		getLogOS().info("Register Custom Entry (took " + proxy.startcustom + " ms)");
-		getLogOS().info("Register Items (took " + proxy.startitem + " ms)");
-		getLogOS().info("Register Models (took " + startmodel + " ms)");
-		getLogOS().info("Register OreDictionarys (took " + proxy.startore + " ms)");
-		getLogOS().info("Register Recipes (took " + proxy.startrecipe + " ms)");
-		getLogOS().info("Load Complete (took " + (proxy.startblock + proxy.startitem + startmodel + proxy.startore + proxy.startrecipe) + " ms)");
+		getLogOS().info("Register Blocks (took {} ms)", proxy.startblock - proxy.startcustom);
+		getLogOS().info("Register Custom Entry (took {} ms)", proxy.startcustom);
+		getLogOS().info("Register Items (took {} ms)", proxy.startitem);
+		getLogOS().info("Load stuff {}", MCSResources.getStuffs().size());
+		getLogOS().info("Register Models (took {} ms)", startmodel);
+		getLogOS().info("Register OreDictionarys (took {} ms)", proxy.startore);
+		getLogOS().info("Register Recipes (took {} ms)", proxy.startrecipe);
+		getLogOS().info("Load Complete (took {} ms)", proxy.startblock + proxy.startitem + startmodel + proxy.startore + proxy.startrecipe);
 
 		getLogOS().info("");
 
@@ -161,6 +162,7 @@ public class MultipleCompressedStuffs {
 
 	@Mod.EventHandler // 服务器启动中
 	public void onServerStarting(FMLServerStartingEvent event) {
+		IMod.super.onServerStarting(event);
 		event.registerServerCommand(new MCSCommand());
 
 		if(Loader.isModLoaded("projecte")) {

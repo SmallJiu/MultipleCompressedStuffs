@@ -11,6 +11,7 @@ import cat.jiu.core.util.base.BaseUI;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.net.NetworkHandler;
 import cat.jiu.mcs.blocks.net.container.ContainerCompressor;
+import cat.jiu.mcs.blocks.net.msg.MsgCompressorClientEnergy;
 import cat.jiu.mcs.blocks.net.msg.MsgCompressorCount;
 import cat.jiu.mcs.blocks.net.msg.MsgCompressorSlotActivate;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCompressor;
@@ -28,25 +29,25 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GUICompressor extends BaseUI.BaseGui<ContainerCompressor, TileEntityCompressor> {
+	public static final ResourceLocation TEXTURE = new ResourceLocation(MCS.MODID + ":textures/gui/container/compressor.png");
+	protected boolean isClose = false;
 	public GUICompressor(EntityPlayer player, World world, BlockPos pos) {
-		super(new ContainerCompressor(player, world, pos), player, world, pos, new ResourceLocation(MCS.MODID + ":textures/gui/container/compressor.png"), 187, 176);
-	}
-
-	@Override
-	public void drawGuiScreen(int mouseX, int mouseY, float partialTicks) {
-		if(super.isInRange(mouseX, mouseY, 11, 6, 24, 66) ) {
-			List<String> text = Lists.newArrayList();
-			text.add(JiuUtils.big_integer.format(BigInteger.valueOf(this.container.getEnergy()), 3) + " / " + JiuUtils.big_integer.format(this.te.maxEnergy, 1) + " JE");
-			text.add(JiuUtils.big_integer.format(this.container.getEnergy()) + " JE");
-			this.drawHoveringText(text, mouseX, mouseY);
-		}
+		super(new ContainerCompressor(player, world, pos), player, world, pos, TEXTURE, 187, 176);
+		new Thread(()->{
+			while(!this.isClose) {
+				try {
+					Thread.sleep(500);
+					NetworkHandler.INSTANCE.sendToServer(new MsgCompressorClientEnergy(this.pos));
+				}catch(InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
 	}
 
 	@Override
 	public void init() {
-		GlStateManager.pushMatrix();
-		GlStateManager.scale(1, 1, 1);
-
+		NetworkHandler.INSTANCE.sendToServer(new MsgCompressorClientEnergy(this.pos));
 		this.itemRender = new CompressorRenderItem(this.mc.renderEngine, this.itemRender.getItemModelMesher().getModelManager(), this.mc.getItemColors());
 
 		if(this.te != null) {
@@ -79,7 +80,6 @@ public class GUICompressor extends BaseUI.BaseGui<ContainerCompressor, TileEntit
 				});
 			}
 		}
-		GlStateManager.popMatrix();
 	}
 
 	@Override
@@ -114,6 +114,25 @@ public class GUICompressor extends BaseUI.BaseGui<ContainerCompressor, TileEntit
 		super.drawTexturedModalRect(11, 66 - i, 13, 0, 13, 0 + i);
 		this.drawCenteredString(this.fontRenderer, I18n.format("info.mcs.compressor.cache_count"), 141, 5, 16777215);
 		this.drawCenteredString(this.fontRenderer, Integer.toString(this.container.getShrinkCount()), 140, 18, 16777215);
+		
 		GlStateManager.popMatrix();
+	}
+
+	@Override
+	public void drawGuiScreen(int mouseX, int mouseY, float partialTicks) {
+		int x = (this.width - this.xSize) / 2;
+		int y = (this.height - this.ySize) / 2;
+		if(super.isInRange(mouseX, mouseY, x+12, y+7, 12, 59) ) {
+			List<String> text = Lists.newArrayList();
+			text.add(JiuUtils.big_integer.format(BigInteger.valueOf(this.container.getEnergy()), 3) + " / " + JiuUtils.big_integer.format(TileEntityCompressor.maxEnergy, 1) + " JE");
+			text.add(JiuUtils.big_integer.format(this.container.getEnergy()) + " JE");
+			this.drawHoveringText(text, mouseX, mouseY);
+		}
+	}
+	
+	@Override
+	public void onGuiClosed() {
+		super.onGuiClosed();
+		this.isClose = true;
 	}
 }

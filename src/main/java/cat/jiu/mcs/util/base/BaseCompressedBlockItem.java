@@ -1,8 +1,9 @@
 package cat.jiu.mcs.util.base;
 
+import cat.jiu.core.types.StackCaches;
 import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.api.recipe.ISmeltingRecipe;
-import cat.jiu.mcs.util.CompressedLevel;
+import cat.jiu.mcs.util.MCSUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Items;
@@ -36,17 +37,14 @@ public class BaseCompressedBlockItem extends ItemBlock implements ICompressedStu
 	public String getItemStackDisplayName(ItemStack stack) {
 		if(this.getUnCompressedStack().getItem() == Items.AIR) {
 			return super.getItemStackDisplayName(stack);
-		}else {
-			if(this.getUnCompressedStack().getItem() instanceof ItemBlock) {
-				return I18n.format(I18n.format("tile.mcs.compressed_" + stack.getMetadata() + ".name", 1) + this.getUnCompressedItemLocalizedName(), 1).trim();
-			}else {
-				if(stack.getMetadata() == 0) {
-					return this.getUnCompressedItemLocalizedName() + I18n.format("tile.mcs.block.name", 1);
-				}else {
-					return I18n.format("tile.mcs.compressed_" + (stack.getMetadata() - 1) + ".name", 1) + this.getUnCompressedItemLocalizedName() + I18n.format("tile.mcs.block.name", 1);
-				}
-			}
 		}
+		if(!this.subBlock.isHas()) {
+			return MCSUtil.info.getStuffDisplayName(this, stack.getMetadata());
+		}
+		if(stack.getMetadata() == 0) {
+			return this.getUnCompressedItemLocalizedName() + I18n.format("tile.mcs.block.name");
+		}
+		return MCSUtil.info.getStuffDisplayName(this, stack.getMetadata()-1);
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -73,7 +71,7 @@ public class BaseCompressedBlockItem extends ItemBlock implements ICompressedStu
 	}
 	
 	@Override
-	public CompressedLevel getLevel() {
+	public StackCaches getLevel() {
 		return this.subBlock.getLevel();
 	}
 	@Override

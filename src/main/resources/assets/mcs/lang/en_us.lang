@@ -35,7 +35,6 @@ info.mcs.oredict=OreDictionary
 info.mcs.food_amount=food_amount
 info.mcs.saturation_modifier=SaturationModifier
 
-
 info.mcs.waila.less_time=Remaining Time 
 info.mcs.waila.day=Day
 info.mcs.waila.hour=Hour
@@ -62,20 +61,5 @@ info.compressed_15.name=205891132094649 %s
 info.compressed_16.name=1853020188851841 %s 
 info.compressed_32766.name=I don't know how many
 
-tile.mcs.compressed_0.name=Compressed 
-tile.mcs.compressed_1.name=Double Compressed 
-tile.mcs.compressed_2.name=Triple Compressed 
-tile.mcs.compressed_3.name=Quadruple Compressed 
-tile.mcs.compressed_4.name=Quintuple Compressed 
-tile.mcs.compressed_5.name=Sextuple Compressed 
-tile.mcs.compressed_6.name=Septuple Compressed 
-tile.mcs.compressed_7.name=Octuple Compressed 
-tile.mcs.compressed_8.name=Nonuple Compressed 
-tile.mcs.compressed_9.name=Tenfold Compressed 
-tile.mcs.compressed_10.name=11 Compressed 
-tile.mcs.compressed_11.name=12 Compressed 
-tile.mcs.compressed_12.name=13 Compressed 
-tile.mcs.compressed_13.name=14 Compressed 
-tile.mcs.compressed_14.name=15 Compressed 
-tile.mcs.compressed_15.name=16 Compressed 
-tile.mcs.compressed_32766.name=Infinity Compressed 
+tile.mcs.compressed.name=%s Compressed %s
+tile.mcs.compressed_infinity.name=Infinity Compressed %s

@@ -5,6 +5,7 @@ import java.util.List;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.util.MCSUtil;
+import cat.jiu.mcs.util.ModSubtypes;
 import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
 
 import ic2.api.item.ICustomDamageItem;
@@ -23,6 +24,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class IC2ReactorAssembly extends BaseCompressedItem implements IReactorComponent, ICustomDamageItem {
 	protected final IReactorComponent baseComponent;
@@ -49,10 +52,11 @@ public class IC2ReactorAssembly extends BaseCompressedItem implements IReactorCo
 		return false;
 	}
 
+	@SideOnly(Side.CLIENT)
 	@Override
 	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
 		if(this.baseDamageItem != null) {
-			if(stack.getMetadata() == 32766) {
+			if(stack.getMetadata() == ModSubtypes.INFINITY) {
 				tooltip.add(Localization.translate("ic2.reactoritem.durability") + " " + TextFormatting.BOLD + TextFormatting.AQUA + I18n.format("item.unbreakable"));
 			}else {
 				tooltip.add(Localization.translate("ic2.reactoritem.durability") + " " + (this.getMaxBigDamage(stack) - this.getBigDamage(stack)) + "/" + this.getMaxBigDamage(stack));
@@ -63,7 +67,7 @@ public class IC2ReactorAssembly extends BaseCompressedItem implements IReactorCo
 
 	@Override
 	public boolean showDurabilityBar(ItemStack stack) {
-		if(stack.getMetadata() == 32766) return false;
+		if(stack.getMetadata() == ModSubtypes.INFINITY) return false;
 		return this.getBigDamage(stack) > 0;
 	}
 
@@ -85,7 +89,7 @@ public class IC2ReactorAssembly extends BaseCompressedItem implements IReactorCo
 	}
 
 	public long getMaxBigDamage(ItemStack stack) {
-		if(this.baseDamageItem != null && stack.getMetadata() < 32766) {
+		if(this.baseDamageItem != null && stack.getMetadata() < ModSubtypes.INFINITY) {
 			int base = this.baseDamageItem.getMaxCustomDamage(this.unCompressedItem);
 			return (long) MCSUtil.item.getMetaValue(base, stack);
 		}
@@ -98,7 +102,7 @@ public class IC2ReactorAssembly extends BaseCompressedItem implements IReactorCo
 	}
 
 	public void setBigDamage(ItemStack stack, long damage) {
-		if(stack.getMetadata() < 32766) {
+		if(stack.getMetadata() < ModSubtypes.INFINITY) {
 			NBTTagCompound nbt = StackUtil.getOrCreateNbtData(stack);
 			nbt.setLong("advDmg", damage);
 		}

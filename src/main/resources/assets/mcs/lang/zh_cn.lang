@@ -53,23 +53,8 @@ tile.mcs.compressor_slave.name=压缩器传动方块
 
 tile.mcs.block.name=块
 
-tile.mcs.compressed_0.name=一重压缩
-tile.mcs.compressed_1.name=二重压缩
-tile.mcs.compressed_2.name=三重压缩
-tile.mcs.compressed_3.name=四重压缩
-tile.mcs.compressed_4.name=五重压缩
-tile.mcs.compressed_5.name=六重压缩
-tile.mcs.compressed_6.name=七重压缩
-tile.mcs.compressed_7.name=八重压缩
-tile.mcs.compressed_8.name=九重压缩
-tile.mcs.compressed_9.name=十重压缩
-tile.mcs.compressed_10.name=十一重压缩
-tile.mcs.compressed_11.name=十二重压缩
-tile.mcs.compressed_12.name=十三重压缩
-tile.mcs.compressed_13.name=十四重压缩
-tile.mcs.compressed_14.name=十五重压缩
-tile.mcs.compressed_15.name=十六重压缩
-tile.mcs.compressed_32766.name=无限重
+tile.mcs.compressed.name=%s重压缩%s
+tile.mcs.compressed_infinity.name=无限重%s
 
 advancement.mcs.compressed_1.name="压缩世界"
 advancement.mcs.compressed_1.info=合成一个一重的压缩物品
@@ -129,6 +114,8 @@ config.mcs.recipe.all=启用默认合成表
 config.mcs.recipe.ore=启用默认矿物词典
 config.mcs.use_scrool_gui=启用压缩箱子的滚动物品栏
 config.mcs.recipe.infinite=启用无限重的合成表
+config.mcs.max_meta=最大压缩层数
+config.mcs.max_meta.enable=启用最大层数的物品
 
 config.mcs.enable_mod_stuff=启用联动物品(需在ModStuff开启具体mod)
 config.mcs.enable_test_stuff=使用mod预览内容

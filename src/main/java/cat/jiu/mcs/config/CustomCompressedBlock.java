@@ -8,9 +8,9 @@ public class CustomCompressedBlock {
 //	@Config.Comment("Enable Test Mod Stuffs")
 //	public boolean Enable_Test_Stuff = false;
 
-	@Config.RequiresMcRestart
 	@Config.LangKey("config.mcs.enable_mod_stuff")
 	@Config.Comment("Enable Other Mod Stuffs")
+	@Config.RequiresMcRestart
 	public boolean Enable_Mod_Stuff = false;
 
 	public final ModStuff Mod_Stuff = new ModStuff();

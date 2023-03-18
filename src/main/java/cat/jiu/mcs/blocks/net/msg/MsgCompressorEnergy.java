@@ -10,27 +10,27 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class MsgCompressorEnergy implements IMessage {
-	private int energy;
+	private long energy;
 	public MsgCompressorEnergy() {}
-	public MsgCompressorEnergy(int energy) {
+	public MsgCompressorEnergy(long energy) {
 		this.energy = energy;
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		this.energy = buf.readInt();
+		this.energy = buf.readLong();
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(this.energy);
+		buf.writeLong(this.energy);
 	}
 
 	public IMessage handler(MessageContext ctx) {
-		Container con = Minecraft.getMinecraft().player.openContainer;
+		Container con = ctx.side.isClient() ? Minecraft.getMinecraft().player.openContainer : ctx.getServerHandler().player.openContainer;
 		if(con instanceof ContainerCompressor) {
 			((ContainerCompressor) con).setEnergy(this.energy);
 		}
-		return this;
+		return null;
 	}
 }

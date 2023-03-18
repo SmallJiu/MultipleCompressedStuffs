@@ -33,15 +33,17 @@ public class Configs {
 	@Config.Comment("enable infinite compressed state recipe")
 	@Config.RequiresMcRestart
 	public static boolean enable_infinite_recipe = false;
-
-	@Config.LangKey("config.mcs.use_scrool_gui")
-	@Config.Comment("Use scrool compressed chest gui, false will use page gui")
-	public static boolean use_scrool_gui = true;
+	
+	@Config.LangKey("config.mcs.max_meta")
+	@Config.Comment("set max compressed stuff meta")
+	@Config.RangeInt(min = 4, max = Short.MAX_VALUE-2)
+	@Config.RequiresMcRestart
+	public static int Max_Compressed_Stuff = 16;
 
 	@Config.LangKey("config.mcs.recipe.cancel_oredict_for_recipe")
 	@Config.Comment("OreDictionary of not involved in recipes")
 	@Config.RequiresMcRestart
-	public static String[] cancel_oredict_for_recipe = new String[]{
+	public static String[] cancel_oredict_for_recipe = {
 			"blockMetal", "blockGlowstone", "blockGlowstone", "cropBeetroot", "blockWoolWhite",
 			"woolWhite", "blockWool", "leadHardenedGlass", "listAllmeatcooked", "fish",
 			"dye", "dyeWhite", "clathrateEnder", "clathrateGlowstone", "clathrateRedstone",
@@ -49,28 +51,42 @@ public class Configs {
 			"dyeBrown", "dyeGreen", "dyeBlack", "chest", "sandstone",
 			"dirt", "chestWood"
 	};
-
+	
 	public static final CustomCompressedBlock Custom = new CustomCompressedBlock();
 	public static final TooltipInformation Tooltip_Information = new TooltipInformation();
-
+//	public static final MaxCompressed Max_Compressed = new MaxCompressed();
+	
+	public static class MaxCompressed {
+		@Config.LangKey("config.mcs.max_meta")
+		@Config.Comment("set max compressed stuff meta")
+		@Config.RangeInt(min = 8, max = Short.MAX_VALUE-2)
+		@Config.RequiresMcRestart
+		public int Max_Compressed_Stuff = 16;
+		
+		@Config.LangKey("config.mcs.max_meta.enable")
+		@Config.Comment("set max compressed stuff meta")
+		@Config.RequiresMcRestart
+		public String[] Enable_Max_Compressed = {};
+	}
+	
 	public static class TooltipInformation {
 		public final CustemnInformation CustemInfo = new CustemnInformation();
 		@Config.LangKey("config.mcs.show_owner_type")
 		@Config.Comment("show the item owner type")
 		public boolean show_owner_type = true;
 
-		@Config.RequiresMcRestart
 		@Config.LangKey("config.mcs.can_custom_tab_background")
 		@Config.Comment("set can custom creative_tab background")
+		@Config.RequiresMcRestart
 		public boolean can_custom_creative_tab_background = false;
 
 		@Config.LangKey("config.mcs.show_food_amount")
 		@Config.Comment("show Food Amount in Tooltip Information")
 		public boolean show_food_amount = false;
 
-		@Config.RequiresMcRestart
 		@Config.LangKey("config.mcs.get_real_food_amout")
 		@Config.Comment("get real food amout")
+		@Config.RequiresMcRestart
 		public boolean get_actual_food_amout = false;
 
 		@Config.LangKey("config.mcs.show_oredict")

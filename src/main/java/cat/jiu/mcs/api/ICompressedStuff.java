@@ -1,13 +1,13 @@
 package cat.jiu.mcs.api;
 
+import java.util.Collections;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
+import cat.jiu.core.types.StackCaches;
 import cat.jiu.mcs.config.Configs;
-import cat.jiu.mcs.util.CompressedLevel;
+import cat.jiu.mcs.util.ModSubtypes;
 import cat.jiu.mcs.util.base.sub.BaseCompressedBlock;
-
+import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -24,7 +24,11 @@ public interface ICompressedStuff {
 
 	String getUnCompressedName();
 	
-	CompressedLevel getLevel();
+	StackCaches getLevel();
+	
+	default void checkUnCompressed() {
+		
+	}
 	
 	default boolean isHas() {return false;}
 
@@ -34,6 +38,10 @@ public interface ICompressedStuff {
 	
 	default BaseCompressedBlock getAsCompressedBlock() {
 		return (BaseCompressedBlock) this.getAsBlock();
+	}
+	
+	default BaseCompressedItem getAsCompressedItem() {
+		return (BaseCompressedItem) this.getAsItem();
 	}
 	
 	default boolean isItem() {
@@ -57,24 +65,54 @@ public interface ICompressedStuff {
 	}
 	
 	default ItemStack getStack() {
-		return this.getLevel().getStack(0);
+		return this.getStack(0);
 	}
 
 	default ItemStack getStack(int meta) {
-		return this.getLevel().getStack(meta);
+		return this.getStack(1, meta);
 	}
 
 	default ItemStack getStack(int count, int meta) {
-		if(!this.isStuff()) return null;
-		if(count == 1) {
-			return this.getLevel().getStack(meta);
-		}else {
-			return new ItemStack(this.getAsItem(), count, meta);
+		if(!this.isStuff()) throw new UnsupportedOperationException(String.format("%s not a Item or Block!", this.getClass()));
+		ItemStack stack = null;
+		do {
+			if(count == 1) {
+				if(meta > 15 && this.isBlock()) {
+					stack = this.getLevel().get(15);
+					break;
+				}
+				if(meta < 0) {
+					stack = this.getLevel().get(0);
+					break;
+				}
+				if(meta >= ModSubtypes.INFINITY) {
+					this.getLevel().put(meta);
+					stack = this.getLevel().get(ModSubtypes.INFINITY);
+					break;
+				}
+				if(meta > ModSubtypes.MAX-1) {
+					if(this.isBlock() && meta > 15) {
+						stack = this.getLevel().get(15);
+						break;
+					}else if(meta < ModSubtypes.INFINITY) {
+						stack = this.getLevel().get(ModSubtypes.MAX-1);
+						break;
+					}
+				}
+				stack = this.getLevel().get(meta);
+				break;
+			}
+			stack = new ItemStack(this.getAsItem(), count, meta);
+		}while(false);
+		
+		if(stack==null) {
+			throw new IndexOutOfBoundsException(String.format("%s: %s", this.getAsItem().getRegistryName(), meta));
 		}
+		return stack;
 	}
 
 	default List<String> getOtherOreDictionary() {
-		return Lists.newArrayList();
+		return Collections.emptyList();
 	}
 
 	default String getDefaultOreDictionary(int meta) {

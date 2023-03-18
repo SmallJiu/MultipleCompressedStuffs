@@ -26,9 +26,7 @@
 			}
 		},
 		"item": {
-			"foods":{
-				"compressed_cosmic_meatballs": "avaritia:items/cosmic_meatballs/layer_0"
-			}
+			"compressed_cosmic_meatballs": "avaritia:items/cosmic_meatballs/layer_0"
 		}
 	},
 	"botania": {
@@ -58,7 +56,42 @@
 	"torcherino":{
 		"block": {
 			"normal": {
-				"compressed_torcherino": "null and null, use java to set"
+				"compressed_torcherino": {
+					"parent": "mcs:block/compressed_torcherino",
+					"model":{
+						"textures":{ "all": "mcs:blocks/un/torcherino/compressed_%level%" }
+					},
+					"meta": {
+						"0": { "textures":{ "all": "torcherino:blocks/compressed_torcherino" }},
+						"1": { "textures":{ "all": "torcherino:blocks/double_compressed_torcherino" }}
+					}
+				}
+				/*
+				"compressed_torcherino":{
+					"models":[
+						{
+							"parent": "mcs:block/compressed_torcherino",
+							"textures":{
+								"all": "torcherino:blocks/compressed_torcherino"
+							}
+						}
+					]
+					"models":{
+						"0":{
+							"parent": "mcs:block/compressed_torcherino",
+							"textures":{
+								"all": "torcherino:blocks/compressed_torcherino"
+							}
+						},
+						"5":{
+							"parent": "mcs:block/compressed_torcherino",
+							"textures":{
+								"all": "mcs:blocks/un/torcherino/compressed_%level%"
+							}
+						}
+					}
+				}
+				*/
 			}
 		}
 	},
@@ -451,78 +484,71 @@
 			"compressed_stick": "minecraft:items/stick",
 			"compressed_string": "minecraft:items/string",
 			"compressed_sugar": "minecraft:items/sugar",
-			"foods":{
-				"compressed_apple": "minecraft:items/apple",
-				"compressed_baked_potato": "minecraft:items/potato_baked",
-				"compressed_beef": "minecraft:items/beef_raw",
-				"compressed_beetroot": "minecraft:items/beetroot",
-				"compressed_beetroot_soup": "minecraft:items/beetroot_soup",
-				"compressed_bread": "minecraft:items/bread",
-				"compressed_carrot": "minecraft:items/carrot",
-				"compressed_chicken": "minecraft:items/chicken_raw",
-				"compressed_clown_fish": "minecraft:items/fish_clownfish_raw",
-				"compressed_cooked_beef": "minecraft:items/beef_cooked",
-				"compressed_cooked_chicken": "minecraft:items/chicken_cooked",
-				"compressed_cooked_fish": "minecraft:items/fish_cod_cooked",
-				"compressed_cooked_mutton": "minecraft:items/mutton_cooked",
-				"compressed_cooked_prokchop": "minecraft:items/porkchop_cooked",
-				"compressed_cooked_rabbit": "minecraft:items/rabbit_cooked",
-				"compressed_cooked_salmon_fish": "minecraft:items/fish_salmon_cooked",
-				"compressed_cookie": "minecraft:items/cookie",
-				"compressed_enchanted_gold_apple": "minecraft:items/apple_golden",
-				"compressed_fish": "minecraft:items/fish_cod_raw",
-				"compressed_golden_carrot": "minecraft:items/carrot_golden",
-				"compressed_gold_apple": "minecraft:items/apple_golden",
-				"compressed_mushron_stew": "minecraft:items/mushroom_stew",
-				"compressed_mutton": "minecraft:items/mutton_raw",
-				"compressed_porkchop": "minecraft:items/porkchop_raw",
-				"compressed_potato": "minecraft:items/potato",
-				"compressed_puffer_fish": "minecraft:items/fish_pufferfish_raw",
-				"compressed_pumpkin_pie": "minecraft:items/pumpkin_pie",
-				"compressed_rabbit": "minecraft:items/rabbit_raw",
-				"compressed_rabbit_stew": "minecraft:items/rabbit_stew",
-				"compressed_rotten_flesh": "minecraft:items/rotten_flesh",
-				"compressed_salmon_fish": "minecraft:items/fish_salmon_raw",
-				"compressed_speckled_melon": "minecraft:items/melon_speckled",
-				"compressed_spider_eye": "minecraft:items/spider_eye"
-			},
-			"tools":{
-				"sword":{
-					"compressed_diamond_sword": "minecraft:items/diamond_sword",
-					"compressed_golden_sword": "minecraft:items/gold_sword",
-					"compressed_iron_sword": "minecraft:items/iron_sword",
-					"compressed_stone_sword": "minecraft:items/stone_sword",
-					"compressed_wooden_sword": "minecraft:items/wood_sword"
-				},
-				"pickaxe":{
-					"compressed_diamond_pickaxe": "minecraft:items/diamond_pickaxe",
-					"compressed_golden_pickaxe": "minecraft:items/gold_pickaxe",
-					"compressed_iron_pickaxe": "minecraft:items/iron_pickaxe",
-					"compressed_stone_pickaxe": "minecraft:items/stone_pickaxe",
-					"compressed_wooden_pickaxe": "minecraft:items/wood_pickaxe"
-				},
-				"shovel":{
-					"compressed_diamond_shovel": "minecraft:items/diamond_shovel",
-					"compressed_golden_shovel": "minecraft:items/gold_shovel",
-					"compressed_iron_shovel": "minecraft:items/iron_shovel",
-					"compressed_stone_shovel": "minecraft:items/stone_shovel",
-					"compressed_wooden_shovel": "minecraft:items/wood_shovel"
-				},
-				"axe":{
-					"compressed_diamond_axe": "minecraft:items/diamond_axe",
-					"compressed_golden_axe": "minecraft:items/gold_axe",
-					"compressed_iron_axe": "minecraft:items/iron_axe",
-					"compressed_stone_axe": "minecraft:items/stone_axe",
-					"compressed_wooden_axe": "minecraft:items/wood_axe"
-				},
-				"hoe":{
-					"compressed_diamond_hoe": "minecraft:items/diamond_hoe",
-					"compressed_golden_hoe": "minecraft:items/gold_hoe",
-					"compressed_iron_hoe": "minecraft:items/iron_hoe",
-					"compressed_stone_hoe": "minecraft:items/stone_hoe",
-					"compressed_wooden_hoe": "minecraft:items/wood_hoe"
-				}
-			}
+			
+			// foods
+			"compressed_apple": "minecraft:items/apple",
+			"compressed_baked_potato": "minecraft:items/potato_baked",
+			"compressed_beef": "minecraft:items/beef_raw",
+			"compressed_beetroot": "minecraft:items/beetroot",
+			"compressed_beetroot_soup": "minecraft:items/beetroot_soup",
+			"compressed_bread": "minecraft:items/bread",
+			"compressed_carrot": "minecraft:items/carrot",
+			"compressed_chicken": "minecraft:items/chicken_raw",
+			"compressed_clown_fish": "minecraft:items/fish_clownfish_raw",
+			"compressed_cooked_beef": "minecraft:items/beef_cooked",
+			"compressed_cooked_chicken": "minecraft:items/chicken_cooked",
+			"compressed_cooked_fish": "minecraft:items/fish_cod_cooked",
+			"compressed_cooked_mutton": "minecraft:items/mutton_cooked",
+			"compressed_cooked_prokchop": "minecraft:items/porkchop_cooked",
+			"compressed_cooked_rabbit": "minecraft:items/rabbit_cooked",
+			"compressed_cooked_salmon_fish": "minecraft:items/fish_salmon_cooked",
+			"compressed_cookie": "minecraft:items/cookie",
+			"compressed_enchanted_gold_apple": "minecraft:items/apple_golden",
+			"compressed_fish": "minecraft:items/fish_cod_raw",
+			"compressed_golden_carrot": "minecraft:items/carrot_golden",
+			"compressed_gold_apple": "minecraft:items/apple_golden",
+			"compressed_mushron_stew": "minecraft:items/mushroom_stew",
+			"compressed_mutton": "minecraft:items/mutton_raw",
+			"compressed_porkchop": "minecraft:items/porkchop_raw",
+			"compressed_potato": "minecraft:items/potato",
+			"compressed_puffer_fish": "minecraft:items/fish_pufferfish_raw",
+			"compressed_pumpkin_pie": "minecraft:items/pumpkin_pie",
+			"compressed_rabbit": "minecraft:items/rabbit_raw",
+			"compressed_rabbit_stew": "minecraft:items/rabbit_stew",
+			"compressed_rotten_flesh": "minecraft:items/rotten_flesh",
+			"compressed_salmon_fish": "minecraft:items/fish_salmon_raw",
+			"compressed_speckled_melon": "minecraft:items/melon_speckled",
+			"compressed_spider_eye": "minecraft:items/spider_eye",
+			
+			"compressed_diamond_sword": "minecraft:items/diamond_sword",
+			"compressed_golden_sword": "minecraft:items/gold_sword",
+			"compressed_iron_sword": "minecraft:items/iron_sword",
+			"compressed_stone_sword": "minecraft:items/stone_sword",
+			"compressed_wooden_sword": "minecraft:items/wood_sword",
+			
+			"compressed_diamond_pickaxe": "minecraft:items/diamond_pickaxe",
+			"compressed_golden_pickaxe": "minecraft:items/gold_pickaxe",
+			"compressed_iron_pickaxe": "minecraft:items/iron_pickaxe",
+			"compressed_stone_pickaxe": "minecraft:items/stone_pickaxe",
+			"compressed_wooden_pickaxe": "minecraft:items/wood_pickaxe",
+			
+			"compressed_diamond_shovel": "minecraft:items/diamond_shovel",
+			"compressed_golden_shovel": "minecraft:items/gold_shovel",
+			"compressed_iron_shovel": "minecraft:items/iron_shovel",
+			"compressed_stone_shovel": "minecraft:items/stone_shovel",
+			"compressed_wooden_shovel": "minecraft:items/wood_shovel",
+			
+			"compressed_diamond_axe": "minecraft:items/diamond_axe",
+			"compressed_golden_axe": "minecraft:items/gold_axe",
+			"compressed_iron_axe": "minecraft:items/iron_axe",
+			"compressed_stone_axe": "minecraft:items/stone_axe",
+			"compressed_wooden_axe": "minecraft:items/wood_axe",
+			
+			"compressed_diamond_hoe": "minecraft:items/diamond_hoe",
+			"compressed_golden_hoe": "minecraft:items/gold_hoe",
+			"compressed_iron_hoe": "minecraft:items/iron_hoe",
+			"compressed_stone_hoe": "minecraft:items/stone_hoe",
+			"compressed_wooden_hoe": "minecraft:items/wood_hoe"
 		}
 	},
 	"projecte": {

@@ -7,7 +7,7 @@ import org.lwjgl.input.Mouse;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.core.util.base.BaseUI;
 import cat.jiu.mcs.MCS;
-import cat.jiu.mcs.blocks.net.container.ContainerCompressedScroolChest;
+import cat.jiu.mcs.blocks.net.container.ContainerCompressedChest;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,7 +22,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GUICompressedScroolChest extends BaseUI.BaseGui<ContainerCompressedScroolChest, TileEntity> {
+public class GUICompressedChest extends BaseUI.BaseGui<ContainerCompressedChest, TileEntity> {
 	private static ResourceLocation TEXTURE = new ResourceLocation(MCS.MODID + ":textures/gui/container/compressed_chest.png");
 	private float currentScroll;
 	private int selectRows = 0;
@@ -30,8 +30,8 @@ public class GUICompressedScroolChest extends BaseUI.BaseGui<ContainerCompressed
 	private boolean wasClicking;
 	private final ItemStack chest;
 
-	public GUICompressedScroolChest(EntityPlayer player, World world, BlockPos pos) {
-		super(new ContainerCompressedScroolChest(player, world, pos), player, world, pos, TEXTURE, 192, 222);
+	public GUICompressedChest(EntityPlayer player, World world, BlockPos pos) {
+		super(new ContainerCompressedChest(player, world, pos), player, world, pos, TEXTURE, 192, 222);
 		this.chest = JiuUtils.item.getStackFromBlockState(world.getBlockState(pos));
 	}
 
@@ -87,7 +87,6 @@ public class GUICompressedScroolChest extends BaseUI.BaseGui<ContainerCompressed
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-		this.mc.getTextureManager().bindTexture(this.background);
 		int guiLeft = this.guiLeft + 174;
 		int guiTop = this.guiTop + 18;
 		int guiMaxDown = guiTop + 118;
@@ -114,7 +113,15 @@ public class GUICompressedScroolChest extends BaseUI.BaseGui<ContainerCompressed
 		s.append(this.container.getTileEntity().getSlotSize());
 		
 		this.drawCenteredString(this.fontRenderer, s.toString(), 48, 5, 0XFFFFFF);
-
+		
+		this.mc.getTextureManager().bindTexture(GUICompressor.TEXTURE);
+		for(int slotY = 0; slotY < 6; ++slotY) {
+			for(int slotX = 0; slotX < 9; ++slotX) {
+				if(!super.getContainer().canAddItemToSlot(slotX, slotY)) {
+					this.drawTexturedModalRect(8 + 18 * slotX, 18 + 18 * slotY, 188, 59, 16, 16);
+				}
+			}
+		}
 		GlStateManager.popMatrix();
 	}
 }

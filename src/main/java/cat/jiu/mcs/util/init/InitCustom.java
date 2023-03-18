@@ -20,7 +20,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 import cat.jiu.core.util.JiuUtils;
-import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.exception.JsonElementNotFoundException;
 import cat.jiu.mcs.exception.JsonException;
 import cat.jiu.mcs.exception.UnknownTypeException;
@@ -33,8 +32,6 @@ import cat.jiu.mcs.util.base.sub.tool.BaseCompressedPickaxe;
 import cat.jiu.mcs.util.base.sub.tool.BaseCompressedShovel;
 import cat.jiu.mcs.util.base.sub.tool.BaseCompressedSword;
 import cat.jiu.mcs.util.client.CompressedStuffResourcePack;
-import cat.jiu.mcs.util.client.model.texture.object.BlockTexture;
-import cat.jiu.mcs.util.client.model.texture.object.ItemTexture;
 import cat.jiu.mcs.util.type.CustomStuffType;
 import cat.jiu.mcs.util.type.CustomType;
 
@@ -78,28 +75,28 @@ public class InitCustom {
 								}
 								switch(type) {
 									case BLOCK:
-										initBlock(itemObject, name, itemObject.get("unItem"), InitCustomItem.getTab(itemObject, MCS.COMPERESSED_BLOCKS));
+										initBlock(itemObject, name, itemObject.get("unItem"), InitCustomItem.getTab(itemObject, MCSCreativeTab.BLOCKS));
 										break;
 									case ITEM_NORMA:
-										initNormalItem(itemObject, name, unItem, InitCustomItem.getTab(itemObject, MCS.COMPERESSED_ITEMS));
+										initNormalItem(itemObject, name, unItem, InitCustomItem.getTab(itemObject, MCSCreativeTab.ITEMS));
 										break;
 									case ITEM_FOOD:
-										initFood(itemObject, name, unItem, InitCustomItem.getTab(itemObject, MCS.COMPERESSED_ITEMS), fileObject, i);
+										initFood(itemObject, name, unItem, InitCustomItem.getTab(itemObject, MCSCreativeTab.ITEMS), fileObject, i);
 										break;
 									case ITEM_SWORD:
-										initSword(itemObject, name, unItem, InitCustomItem.getTab(itemObject, MCS.COMPERESSED_TOOLS));
+										initSword(itemObject, name, unItem, InitCustomItem.getTab(itemObject, MCSCreativeTab.TOOLS));
 										break;
 									case ITEM_PICKAXE:
-										initPickaxe(itemObject, name, unItem, InitCustomItem.getTab(itemObject, MCS.COMPERESSED_TOOLS));
+										initPickaxe(itemObject, name, unItem, InitCustomItem.getTab(itemObject, MCSCreativeTab.TOOLS));
 										break;
 									case ITEM_SHOVEL:
-										initShovel(itemObject, name, unItem, InitCustomItem.getTab(itemObject, MCS.COMPERESSED_TOOLS));
+										initShovel(itemObject, name, unItem, InitCustomItem.getTab(itemObject, MCSCreativeTab.TOOLS));
 										break;
 									case ITEM_AXE:
-										initAxe(itemObject, name, unItem, InitCustomItem.getTab(itemObject, MCS.COMPERESSED_TOOLS));
+										initAxe(itemObject, name, unItem, InitCustomItem.getTab(itemObject, MCSCreativeTab.TOOLS));
 										break;
 									case ITEM_HOE:
-										initHoe(itemObject, name, unItem, InitCustomItem.getTab(itemObject, MCS.COMPERESSED_TOOLS));
+										initHoe(itemObject, name, unItem, InitCustomItem.getTab(itemObject, MCSCreativeTab.TOOLS));
 										break;
 									default:
 										break;
@@ -130,7 +127,7 @@ public class InitCustom {
 		block.setCreativeTab(tab);
 		
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, new BlockTexture(json.get("texture")));
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
 		}
 
 		if(json.has("enableDefaultRecipe")) {
@@ -192,7 +189,7 @@ public class InitCustom {
 			return;
 		item.setCreativeTab(tab);
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, new ItemTexture(json.get("texture")));
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
 		}
 
 		if(json.has("enableDefaultRecipe")) {
@@ -227,7 +224,7 @@ public class InitCustom {
 		BaseCompressedFood item = BaseCompressedFood.register(name, unItem, "custom", tab);
 		item.setCreativeTab(tab);
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, new ItemTexture(json.get("texture")));
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
 		}
 		
 		if(json.has("enableDefaultRecipe")) {
@@ -299,7 +296,7 @@ public class InitCustom {
 			return;
 		item.setCreativeTab(tab);
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, new ItemTexture(json.get("texture")));
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
 		}
 
 		if(json.has("enableDefaultRecipe")) {
@@ -351,7 +348,7 @@ public class InitCustom {
 			return;
 		item.setCreativeTab(tab);
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, new ItemTexture(json.get("texture")));
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
 		}
 
 		if(json.has("enableDefaultRecipe")) {
@@ -423,7 +420,7 @@ public class InitCustom {
 			return;
 		item.setCreativeTab(tab);
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, new ItemTexture(json.get("texture")));
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
 		}
 
 		if(json.has("enableDefaultRecipe")) {
@@ -485,7 +482,7 @@ public class InitCustom {
 			return;
 		item.setCreativeTab(tab);
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, new ItemTexture(json.get("texture")));
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
 		}
 
 		if(json.has("enableDefaultRecipe")) {
@@ -547,7 +544,7 @@ public class InitCustom {
 			return;
 		item.setCreativeTab(tab);
 		if(json.has("texture")) {
-			CompressedStuffResourcePack.customTextures.put(name, new ItemTexture(json.get("texture")));
+			CompressedStuffResourcePack.customTextures.put(name, json.get("texture"));
 		}
 
 		if(json.has("enableDefaultRecipe")) {

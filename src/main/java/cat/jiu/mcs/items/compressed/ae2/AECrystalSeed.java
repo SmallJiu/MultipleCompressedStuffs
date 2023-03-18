@@ -6,16 +6,13 @@ import appeng.api.AEApi;
 import appeng.api.definitions.IItemDefinition;
 import appeng.core.localization.ButtonToolTips;
 import appeng.tile.misc.TileQuartzGrowthAccelerator;
-import cat.jiu.core.api.events.iface.entity.IEntityJoinWorldEvent;
-import cat.jiu.core.api.events.iface.item.IItemInFluidTickEvent;
-import cat.jiu.core.util.JiuCoreEvents;
+
+import cat.jiu.core.events.item.ItemInWorldEvent;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
@@ -25,7 +22,13 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class AECrystalSeed extends BaseCompressedItem implements IItemInFluidTickEvent, IEntityJoinWorldEvent {
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+public class AECrystalSeed extends BaseCompressedItem {
 	protected final ICompressedStuff result;
 
 	public AECrystalSeed(String name, IItemDefinition baseItem, int meta, ICompressedStuff result) {
@@ -36,7 +39,7 @@ public class AECrystalSeed extends BaseCompressedItem implements IItemInFluidTic
 		super(name, baseItem);
 		this.result = result;
 		super.setInfoStack(ItemStack.EMPTY);
-		JiuCoreEvents.addEvent(this);
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	@Override
@@ -44,6 +47,7 @@ public class AECrystalSeed extends BaseCompressedItem implements IItemInFluidTic
 		return false;
 	}
 
+	@SideOnly(Side.CLIENT)
 	@Override
 	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
 		tooltip.add(AEApi.instance().definitions().blocks().quartzGlass().maybeStack(1).get().getDisplayName());
@@ -55,12 +59,12 @@ public class AECrystalSeed extends BaseCompressedItem implements IItemInFluidTic
 		super.addInformation(stack, world, tooltip, advanced);
 	}
 
-	@Override
-	public void onItemInFluidTick(EntityItem item, IBlockState state) {
-		if(item.getItem().getItem() instanceof AECrystalSeed) {
-			World world = item.world;
-			BlockPos pos = item.getPosition();
-			ItemStack stack = item.getItem();
+	@SubscribeEvent
+	public void onItemInFluidTick(ItemInWorldEvent.InFluid event) {
+		if(event.item.getItem().getItem() instanceof AECrystalSeed) {
+			World world = event.item.world;
+			BlockPos pos = event.item.getPosition();
+			ItemStack stack = event.item.getItem();
 			AECrystalSeed seed = (AECrystalSeed) stack.getItem();
 
 			JiuUtils.nbt.addItemNBT(stack, "tick", 1);
@@ -80,15 +84,15 @@ public class AECrystalSeed extends BaseCompressedItem implements IItemInFluidTic
 				JiuUtils.nbt.removeItemNBT(stack, "tick");
 				world.playEvent(2005, pos, 50);
 				world.playSound(null, pos, SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.WEATHER, 1, 1);
-				item.setItem(seed.result.getStack(stack.getCount(), stack.getMetadata()));
+				event.item.setItem(seed.result.getStack(stack.getCount(), stack.getMetadata()));
 			}
 		}
 	}
-
-	@Override
-	public void onEntityJoinWorld(Entity entity, World world, BlockPos pos, int dim) {
-		if(entity instanceof EntityItem && ((EntityItem) entity).getItem().getItem() instanceof AECrystalSeed) {
-			((EntityItem) entity).setNoDespawn();
+	
+	@SubscribeEvent
+	public void onEntityJoinWorld(EntityJoinWorldEvent event) {
+		if(event.getEntity() instanceof EntityItem && ((EntityItem) event.getEntity()).getItem().getItem() instanceof AECrystalSeed) {
+			((EntityItem) event.getEntity()).setNoDespawn();
 		}
 	}
 }

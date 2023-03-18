@@ -6,10 +6,9 @@ import javax.annotation.Nullable;
 
 import com.sci.torcherino.TorcherinoRegistry;
 
-import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCompressedTorcherino;
 import cat.jiu.mcs.util.base.sub.BaseCompressedBlock;
-
+import cat.jiu.mcs.util.init.MCSCreativeTab;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
@@ -25,7 +24,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class CompressedTorcherino extends BaseCompressedBlock {
 	public CompressedTorcherino(String nameIn, ItemStack unCompressedItem) {
-		super(nameIn, unCompressedItem, "torcherino", MCS.COMPERESSED_BLOCKS);
+		super(nameIn, unCompressedItem, "torcherino", MCSCreativeTab.BLOCKS);
 		this.setInfoStack(new ItemStack(Items.AIR));
 		super.setTickRandomly(true);
 		super.setNotNeedToolBreak();

@@ -1,13 +1,11 @@
 package cat.jiu.mcs.blocks.compressed;
 
-import cat.jiu.core.api.events.iface.player.IPlayerCraftedItemEvent;
-import cat.jiu.core.util.JiuCoreEvents;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.net.GuiHandler;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCompressedChest;
-import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.util.base.sub.BaseCompressedBlock;
+import cat.jiu.mcs.util.init.MCSBlocks;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockShulkerBox;
@@ -28,9 +26,13 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class CompressedChest extends BaseCompressedBlock implements IPlayerCraftedItemEvent {
+@EventBusSubscriber
+public class CompressedChest extends BaseCompressedBlock {
 	protected final int baseSlot;
 	protected final SoundEvent openSound;
 	protected final SoundEvent closeSound;
@@ -69,7 +71,6 @@ public class CompressedChest extends BaseCompressedBlock implements IPlayerCraft
 		this.openSound = openSound;
 		this.closeSound = closeSound;
 		this.setInfoStack(new ItemStack(Items.AIR));
-		JiuCoreEvents.addEvent(this);
 	}
 
 	@Override
@@ -77,7 +78,7 @@ public class CompressedChest extends BaseCompressedBlock implements IPlayerCraft
 		if(player.isSneaking()) {
 			if(this.useWrenchBreak(world, pos, state, player, hand, false)) return true;
 		}
-		player.openGui(MCS.MODID, Configs.use_scrool_gui ? GuiHandler.CHEST_SCROOL_GUI : GuiHandler.CHEST_PAGE_GUI, world, pos.getX(), pos.getY(), pos.getZ());
+		player.openGui(MCS.MODID, GuiHandler.CHEST_SCROOL_GUI, world, pos.getX(), pos.getY(), pos.getZ());
 		if(this.openSound != null) {
 			world.playSound(null, pos, this.openSound, SoundCategory.BLOCKS, 1, 1);
 		}
@@ -110,8 +111,10 @@ public class CompressedChest extends BaseCompressedBlock implements IPlayerCraft
 		return new TileEntityCompressedChest(meta, this.baseSlot, this.closeSound);
 	}
 
-	@Override
-	public void onPlayerCraftedItemInGui(EntityPlayer player, IInventory gui, ItemStack stack) {
+	@SubscribeEvent
+	public static void onPlayerCraftedItemInGui(PlayerEvent.ItemCraftedEvent event) {
+		EntityPlayer player = event.player;
+		IInventory gui = event.craftMatrix;
 		ItemStack in = null;
 		for(int i = 0; i < gui.getSizeInventory(); i++) {
 			ItemStack s = gui.getStackInSlot(i);
@@ -120,9 +123,9 @@ public class CompressedChest extends BaseCompressedBlock implements IPlayerCraft
 				break;
 			}
 		}
-		if(in != null && in.getItem() == Item.getItemFromBlock(this)) {
+		if(in != null && in.getItem() == Item.getItemFromBlock(MCSBlocks.minecraft.normal.C_chest_B)) {
 			if(JiuUtils.nbt.getItemNBT(in).getSize() > 0) {
-				ItemStackHandler stacks = new ItemStackHandler(((TileEntityCompressedChest) this.createNewTileEntity(player.world, in.getMetadata())).getSlotSize());
+				ItemStackHandler stacks = new ItemStackHandler(((TileEntityCompressedChest) MCSBlocks.minecraft.normal.C_chest_B.createNewTileEntity(player.world, in.getMetadata())).getSlotSize());
 				stacks.deserializeNBT(JiuUtils.nbt.getItemNBT(in).getCompoundTag("SlotItems"));
 				JiuUtils.item.spawnAsEntity(player.world, player.getPosition(), stacks);
 			}

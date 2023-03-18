@@ -44,6 +44,6 @@ public class MsgCompressorCount implements IMessage {
 				((TileEntityCompressor) te).setShrinkCount(count);
 			}
 		});
-		return this;
+		return null;
 	}
 }

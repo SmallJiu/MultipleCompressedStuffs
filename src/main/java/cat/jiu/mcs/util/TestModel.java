@@ -1,7 +1,5 @@
 package cat.jiu.mcs.util;
 
-import cat.jiu.core.api.events.iface.entity.IEntityJoinWorldEvent;
-import cat.jiu.core.api.events.iface.entity.IEntityTickEvent;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
 
@@ -9,22 +7,26 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
-public class TestModel implements IEntityJoinWorldEvent, IEntityTickEvent {
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+@EventBusSubscriber
+public class TestModel {
 	public static boolean test = false;
 
-	@Override
-	public void onEntityJoinWorld(Entity entity, World world, BlockPos pos, int dim) {
-		isTest(entity);
-		toVoid(entity);
+	@SubscribeEvent
+	public static void onEntityJoinWorld(EntityJoinWorldEvent event) {
+		isTest(event.getEntity());
+		toVoid(event.getEntity());
 	}
-
-	@Override
-	public void onEntityTick(Entity entity) {
-		isTest(entity);
-		toVoid(entity);
+	
+	@SubscribeEvent
+	public static void onEntityTick(LivingUpdateEvent event) {
+		isTest(event.getEntity());
+		toVoid(event.getEntity());
 	}
 
 	private static void isTest(Entity entity) {

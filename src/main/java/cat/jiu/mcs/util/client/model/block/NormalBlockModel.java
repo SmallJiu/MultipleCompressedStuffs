@@ -18,23 +18,10 @@ public class NormalBlockModel extends BaseModel {
 	@Override
 	protected void genData(JsonObject json) {
 		JsonObject textures = new JsonObject();
-		if("torcherino".equals(this.owner)) {
-			json.addProperty("parent", "mcs:block/compressed_torcherino");
-			switch(this.meta) {
-				case 0: 
-					textures.addProperty("all", "torcherino:blocks/compressed_torcherino");
-					break;
-				case 1: 
-					textures.addProperty("all", "torcherino:blocks/double_compressed_torcherino");
-					break;
-				default:
-					textures.addProperty("all", "mcs:blocks/un/torcherino/compressed_" + (this.meta+1));
-					break;
-			}
-		}else {
-			textures.add("all", this.originalTexture);
-			textures.addProperty("overlay", "mcs:blocks/compressed_" + (this.meta+1));
-		}
+		
+		textures.add("all", this.originalTexture);
+		textures.addProperty("overlay", "mcs:blocks/compressed_" + (this.meta+1));
+		
 		json.add("textures", textures);
 	}
 }

@@ -1,6 +1,6 @@
 package cat.jiu.mcs.blocks.net.msg;
 
-import cat.jiu.mcs.blocks.net.container.ContainerCompressedPageChest;
+import cat.jiu.mcs.blocks.net.container.ContainerCompressedChest;
 
 import io.netty.buffer.ByteBuf;
 
@@ -10,32 +10,32 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class MsgCompressorPageChest implements IMessage {
-	private int page = 0;
+public class MsgCompressorChest implements IMessage {
+	private float currentScroll = 0;
 
-	public MsgCompressorPageChest() {}
-	public MsgCompressorPageChest(int page) {
-		this.page = page;
+	public MsgCompressorChest() {}
+	public MsgCompressorChest(float currentScroll) {
+		this.currentScroll = currentScroll;
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		this.page = buf.readInt();
+		this.currentScroll = buf.readFloat();
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(this.page);
+		buf.writeFloat(this.currentScroll);
 	}
 
 	public IMessage handler(MessageContext ctx) {
 		WorldServer world = ctx.getServerHandler().player.getServerWorld();
 		world.addScheduledTask(() -> {
 			Container con = ctx.getServerHandler().player.openContainer;
-			if(con != null && con instanceof ContainerCompressedPageChest) {
-				((ContainerCompressedPageChest)con).toPage(this.page);
+			if(con != null && con instanceof ContainerCompressedChest) {
+				((ContainerCompressedChest)con).scrollTo(this.currentScroll);
 			}
 		});
-		return this;
+		return null;
 	}
 }

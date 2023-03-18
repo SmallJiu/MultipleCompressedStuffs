@@ -1,7 +1,5 @@
 package cat.jiu.mcs.util;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +8,7 @@ import java.util.stream.Collectors;
 import com.google.gson.JsonElement;
 
 import cat.jiu.core.util.JiuUtils;
+import cat.jiu.core.util.helpers.JsonUtil;
 import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.util.base.BaseCompressedBlockItem;
@@ -58,12 +57,15 @@ public class MCSUtil {
 			if(this.isInCreativeTab(item, tab)) {
 				if(item.getHasSubtypes()) {
 					for(ModSubtypes type : ModSubtypes.values()) {
-						items.add(compitem.getStack(type.getMeta()));
+						int meta = type.getMeta();
+						if(meta > 15 && compitem.isBlock()) break;
+						items.add(
+								compitem.getStack(
+										type.getMeta()));
 					}
-					items.add(compitem.getStack(Short.MAX_VALUE - 1));
+					if(compitem.isItem()) items.add(compitem.getStack(ModSubtypes.INFINITY));
 				}else {
 					items.add(new ItemStack(item));
-//					item.getItem().getSubItems(tab, items);
 				}
 			}
 		}
@@ -216,6 +218,30 @@ public class MCSUtil {
 		@SideOnly(Side.CLIENT)
 		public void addCompressedInfo(int meta, List<String> tooltip, String name, Item item) {
 			int level = meta + 1;
+			if(level >= Short.MAX_VALUE) {
+				if(Configs.Tooltip_Information.show_owner_type) {
+					String entry = "item";
+					if(item instanceof BaseCompressedBlockItem) {
+						entry = "block";
+					}else if(item instanceof BaseCompressedFood) {
+						entry = "food";
+					}else if(item instanceof BaseCompressedSword) {
+						entry = "sword";
+					}else if(item instanceof BaseCompressedPickaxe) {
+						entry = "pickaxe";
+					}else if(item instanceof BaseCompressedShovel) {
+						entry = "shovel";
+					}else if(item instanceof BaseCompressedAxe) {
+						entry = "axe";
+					}else if(item instanceof BaseCompressedHoe) {
+						entry = "hoe";
+					}
+
+					tooltip.add(I18n.format("info.mcs.owner_entry") + ": " + TextFormatting.AQUA.toString() + I18n.format("info.mcs.entry." + entry + ".name"));
+				}
+				return;
+			}
+			
 			if(Configs.use_3x3_recipes) {
 				if(Configs.Tooltip_Information.show_specific_number) {
 					if(!Configs.Tooltip_Information.can_custom_specific_number) {
@@ -268,12 +294,15 @@ public class MCSUtil {
 							case 15:
 								tooltip.add("1,853,020,188,851,841 x " + name);
 								break;
+							default:
+								tooltip.add("9^" + level + " x " + name);
+								break;
 						}
 					}else {
-						tooltip.add(I18n.format("info.compressed_3x3_" + level + ".name", 1) + " x " + name);
+						tooltip.add(I18n.format("info.compressed_3x3_" + level + ".name") + " x " + name);
 					}
 				}else {
-					tooltip.add(new BigInteger("9").pow(level) + " x " + name);
+					tooltip.add(BigInteger.valueOf(9).pow(level) + " x " + name);
 				}
 			}else {
 				if(Configs.Tooltip_Information.show_specific_number) {
@@ -327,15 +356,17 @@ public class MCSUtil {
 							case 15:
 								tooltip.add("4,294,967,296 x " + name);
 								break;
+							default:
+								tooltip.add("4^" + level + " x " + name);
+								break;
 						}
 					}else {
-						tooltip.add(I18n.format("info.compressed_2x2_" + level + ".name", 1) + " x " + name);
+						tooltip.add(I18n.format("info.compressed_2x2_" + level + ".name") + " x " + name);
 					}
 				}else {
-					tooltip.add(new BigInteger("4").pow(level) + " x " + name);
+					tooltip.add(BigInteger.valueOf(4).pow(level) + " x " + name);
 				}
 			}
-
 			if(Configs.Tooltip_Information.show_owner_type) {
 				String entry = "item";
 				if(item instanceof BaseCompressedBlockItem) {
@@ -357,19 +388,17 @@ public class MCSUtil {
 				tooltip.add(I18n.format("info.mcs.owner_entry") + ": " + TextFormatting.AQUA.toString() + I18n.format("info.mcs.entry." + entry + ".name"));
 			}
 		}
+		
+		public String getStuffDisplayName(ICompressedStuff stuff, int meta) {
+			if(meta >= ModSubtypes.INFINITY) {
+				return I18n.format("tile.mcs.compressed_infinity.name", stuff.getUnCompressedStack().getDisplayName());
+			}
+			return I18n.format("tile.mcs.compressed.name", meta+1, stuff.getUnCompressedStack().getDisplayName());
+		}
 	}
 	
-	@SuppressWarnings("unchecked")
+	@Deprecated
 	public static <T extends JsonElement> T copy(T json) {
-		if(json==null) return null;
-		
-		try {
-			Method method = json.getClass().getDeclaredMethod("deepCopy");
-			method.setAccessible(true);
-			return (T) method.invoke(json);
-		}catch(NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e0) {
-			e0.printStackTrace();
-			throw new RuntimeException(e0);
-		}
+		return JsonUtil.copy(json);
 	}
 }

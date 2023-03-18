@@ -15,10 +15,11 @@ import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.api.recipe.ISmeltingRecipe;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.core.api.IHasModel;
+import cat.jiu.core.types.StackCaches;
 import cat.jiu.core.util.JiuUtils;
-import cat.jiu.mcs.util.CompressedLevel;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
+import cat.jiu.mcs.util.init.MCSCreativeTab;
 import cat.jiu.mcs.util.init.MCSResources;
 import cat.jiu.mcs.util.type.CustomStuffType;
 
@@ -51,7 +52,7 @@ public class BaseCompressedFood extends ItemFood implements IHasModel, ICompress
 	}
 
 	public static BaseCompressedFood register(String name, ItemStack baseItem, String ownerMod) {
-		return register(name, baseItem, ownerMod, MCS.COMPERESSED_ITEMS);
+		return register(name, baseItem, ownerMod, MCSCreativeTab.ITEMS);
 	}
 
 	protected final String name;
@@ -109,7 +110,7 @@ public class BaseCompressedFood extends ItemFood implements IHasModel, ICompress
 	}
 
 	public BaseCompressedFood(String name, Item baseFood, int meta, String ownerMod) {
-		this(name, baseFood, meta, ownerMod, MCS.COMPERESSED_ITEMS);
+		this(name, baseFood, meta, ownerMod, MCSCreativeTab.ITEMS);
 	}
 
 	public BaseCompressedFood(String name, Item baseFood, int meta) {
@@ -167,15 +168,21 @@ public class BaseCompressedFood extends ItemFood implements IHasModel, ICompress
 		return this.makeRecipe;
 	}
 
+	protected String unCompressedName;
+	@Override
 	public String getUnCompressedName() {
-		String[] unNames = JiuUtils.other.custemSplitString(this.name, "_");
-		StringBuffer sb = new StringBuffer();
-		for(String s : unNames) {
-			if(!"compressed".equals(s)) {
-				sb.append(JiuUtils.other.upperFirst(s));
+		if(this.unCompressedName==null) {
+			String[] unNames = JiuUtils.other.custemSplitString(this.name, "_");
+			StringBuffer i = new StringBuffer();
+			for(String s : unNames) {
+				if(!"compressed".equals(s)) {
+					i.append(JiuUtils.other.upperFirst(s));
+				}
 			}
+			this.unCompressedName = i.toString();
 		}
-		return sb.toString();
+		
+		return this.unCompressedName;
 	}
 
 	Boolean hasEffect = null;
@@ -340,7 +347,7 @@ public class BaseCompressedFood extends ItemFood implements IHasModel, ICompress
 	@SideOnly(Side.CLIENT)
 	@Override
 	public String getItemStackDisplayName(ItemStack stack) {
-		return I18n.format("tile.mcs.compressed_" + stack.getMetadata() + ".name", stack.getMetadata()) + this.getUnCompressedItemLocalizedName();
+		return MCSUtil.info.getStuffDisplayName(this, stack.getMetadata());
 	}
 
 	@Override
@@ -542,7 +549,7 @@ public class BaseCompressedFood extends ItemFood implements IHasModel, ICompress
 			int meta = type.getMeta();
 			model.registerItemModel(this, meta, this.ownerMod +"/item/food/" + this.name, this.name + "." + meta);
 		}
-		model.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod +"/item/food/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+		model.registerItemModel(this, (ModSubtypes.INFINITY), this.ownerMod +"/item/food/" + this.name, this.name + "." + (ModSubtypes.INFINITY));
 	}
 
 	public final Item getUnCompressedItem() {
@@ -562,9 +569,9 @@ public class BaseCompressedFood extends ItemFood implements IHasModel, ICompress
 		return this.unCompressedItem.getDisplayName();
 	}
 	
-	private final CompressedLevel type = new CompressedLevel(this);
+	private final StackCaches type = new StackCaches(this, ModSubtypes.MAX);
 	@Override
-	public CompressedLevel getLevel() {
+	public StackCaches getLevel() {
 		return this.type;
 	}
 	
@@ -585,6 +592,9 @@ public class BaseCompressedFood extends ItemFood implements IHasModel, ICompress
 	@Override
 	public ItemStack getSmeltingOutput(int meta) {
 		int outmeta = meta-smeltingMetaDisparity;
+		if(this.smeltingOutput.isBlock() && outmeta > 15) {
+			outmeta = 15;
+		}
 		return outmeta < 0 ? null : smeltingOutput.getStack(outmeta);
 	}
 }

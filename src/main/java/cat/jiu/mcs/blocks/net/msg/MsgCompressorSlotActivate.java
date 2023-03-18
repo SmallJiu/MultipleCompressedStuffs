@@ -17,8 +17,7 @@ public class MsgCompressorSlotActivate implements IMessage {
 	private int slotID;
 	private boolean activate;
 
-	public MsgCompressorSlotActivate() {
-	}
+	public MsgCompressorSlotActivate() {}
 
 	public MsgCompressorSlotActivate(BlockPos pos, int slotID, boolean activate) {
 		this.pos = pos;
@@ -44,12 +43,12 @@ public class MsgCompressorSlotActivate implements IMessage {
 
 	public IMessage handler(MessageContext ctx) {
 		WorldServer world = ctx.getServerHandler().player.getServerWorld();
-		world.addScheduledTask(() -> {
-			TileEntity te = world.getTileEntity(this.pos);
-			if(te instanceof TileEntityCompressor) {
-				((TileEntityCompressor) te).setActivateSlot(this.slotID, this.activate);
-			}
-		});
-		return this;
+		
+		TileEntity te = world.getTileEntity(this.pos);
+		if(te instanceof TileEntityCompressor) {
+			((TileEntityCompressor) te).setActivateSlot(this.slotID, this.activate);
+		}
+		
+		return null;
 	}
 }

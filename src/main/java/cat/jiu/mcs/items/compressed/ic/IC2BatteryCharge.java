@@ -5,15 +5,13 @@ import java.util.Locale;
 
 import com.google.common.collect.Lists;
 
-import cat.jiu.core.api.events.iface.item.IItemInPlayerInventoryTick;
-import cat.jiu.core.api.events.iface.player.IPlayerCraftedItemEvent;
-import cat.jiu.core.util.JiuCoreEvents;
+import cat.jiu.core.events.item.ItemInPlayerEvent;
 import cat.jiu.core.util.JiuUtils;
-import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.util.MCSUtil;
+import cat.jiu.mcs.util.ModSubtypes;
 import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
 import cat.jiu.mcs.util.init.CraftCompressedStuffTrigger;
-
+import cat.jiu.mcs.util.init.MCSCreativeTab;
 import ic2.api.item.ElectricItem;
 import ic2.api.item.ICustomDamageItem;
 import ic2.api.item.IElectricItem;
@@ -38,10 +36,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class IC2BatteryCharge extends BaseCompressedItem implements IItemInPlayerInventoryTick, IPlayerCraftedItemEvent, IElectricItem, IPseudoDamageItem, ICustomDamageItem {
+public class IC2BatteryCharge extends BaseCompressedItem implements IElectricItem, IPseudoDamageItem, ICustomDamageItem {
 	protected final double baseMaxEnergy;
 	protected final int energyLevel;
 	protected final double fransferLimit;
@@ -64,23 +65,23 @@ public class IC2BatteryCharge extends BaseCompressedItem implements IItemInPlaye
 		}
 		this.setMaxStackSize(1);
 		this.setInfoStack(ItemStack.EMPTY);
-		JiuCoreEvents.addEvent(this);
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	public IC2BatteryCharge(String name, ItemStack baseItem) {
-		this(name, baseItem, MCS.COMPERESSED_ITEMS);
+		this(name, baseItem, MCSCreativeTab.ITEMS);
 	}
 
 	public IC2BatteryCharge(String name, String unCompressedItem, int meta, CreativeTabs tab) {
-		this(name, new ItemStack(Item.getByNameOrId("ic2:" + unCompressedItem), 1, (Short.MAX_VALUE - 1)), tab);
+		this(name, new ItemStack(Item.getByNameOrId("ic2:" + unCompressedItem), 1, (ModSubtypes.INFINITY)), tab);
 	}
 
 	public IC2BatteryCharge(String name, String unCompressedItem, CreativeTabs tab) {
-		this(name, unCompressedItem, (Short.MAX_VALUE - 1), tab);
+		this(name, unCompressedItem, (ModSubtypes.INFINITY), tab);
 	}
 
 	public IC2BatteryCharge(String name, String unCompressedItem) {
-		this(name, unCompressedItem, (Short.MAX_VALUE - 1), MCS.COMPERESSED_ITEMS);
+		this(name, unCompressedItem, (ModSubtypes.INFINITY), MCSCreativeTab.ITEMS);
 	}
 
 	@Override
@@ -102,9 +103,13 @@ public class IC2BatteryCharge extends BaseCompressedItem implements IItemInPlaye
 		}
 		return super.onItemRightClick(world, player, hand);
 	}
-
-	@Override
-	public void onPlayerCraftedItemInGui(EntityPlayer player, IInventory gui, ItemStack stack) {
+	
+	@SubscribeEvent
+	public void onPlayerCraftedItemInGui(PlayerEvent.ItemCraftedEvent event) {
+		this.onPlayerCraftedItemInGui(event.player, event.craftMatrix, event.crafting);
+	}
+	
+	private void onPlayerCraftedItemInGui(EntityPlayer player, IInventory gui, ItemStack stack) {
 		if(!player.world.isRemote) {
 			if(stack.getItem() == this) {
 				List<ItemStack> craftIn = Lists.newArrayList();
@@ -134,9 +139,13 @@ public class IC2BatteryCharge extends BaseCompressedItem implements IItemInPlaye
 			}
 		}
 	}
+	
+	@SubscribeEvent
+	public void onItemInPlayerInventoryTick(ItemInPlayerEvent.InInventory event) {
+		this.onItemInPlayerInventoryTick(event.getEntityPlayer(), event.stack, event.slot);
+	}
 
-	@Override
-	public void onItemInPlayerInventoryTick(EntityPlayer player, ItemStack invStack, int slot) {
+	private void onItemInPlayerInventoryTick(EntityPlayer player, ItemStack invStack, int slot) {
 		ICriterionTrigger<?> trigger =  CriteriaTriggers.get(CraftCompressedStuffTrigger.instance.getId());
 		if(trigger != null && trigger instanceof CraftCompressedStuffTrigger) {
 			((CraftCompressedStuffTrigger)trigger).trigger(player, invStack);

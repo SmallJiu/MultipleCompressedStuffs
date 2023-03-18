@@ -10,6 +10,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
+import cat.jiu.core.types.StackCaches;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.core.util.RegisterModel;
 import cat.jiu.core.util.base.BaseItemTool;
@@ -18,9 +19,9 @@ import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.api.recipe.IToolRecipe;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.exception.NonToolException;
-import cat.jiu.mcs.util.CompressedLevel;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
+import cat.jiu.mcs.util.init.MCSCreativeTab;
 import cat.jiu.mcs.util.init.MCSItems;
 import cat.jiu.mcs.util.init.MCSResources;
 import cat.jiu.mcs.util.type.CustomStuffType;
@@ -61,7 +62,7 @@ public class BaseCompressedHoe extends BaseItemTool.MetaHoe implements ICompress
 	}
 
 	public static BaseCompressedHoe register(String name, ItemStack baseItem, String ownerMod) {
-		return register(name, baseItem, ownerMod, MCS.COMPERESSED_TOOLS);
+		return register(name, baseItem, ownerMod, MCSCreativeTab.TOOLS);
 	}
 
 	protected final ItemStack baseToolStack;
@@ -103,13 +104,13 @@ public class BaseCompressedHoe extends BaseItemTool.MetaHoe implements ICompress
 		}
 	}
 	public BaseCompressedHoe(String name, ItemStack baseTool, ICompressedStuff craftMaterialStack, ICompressedStuff craftRodStack) {
-		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS, craftMaterialStack, craftRodStack);
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCSCreativeTab.TOOLS, craftMaterialStack, craftRodStack);
 	}
 	public BaseCompressedHoe(String name, ItemStack baseTool, ICompressedStuff craftMaterialStack) {
-		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS, craftMaterialStack);
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCSCreativeTab.TOOLS, craftMaterialStack);
 	}
 	public BaseCompressedHoe(String name, ItemStack baseTool) {
-		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCS.COMPERESSED_TOOLS);
+		this(name, baseTool, baseTool.getItem().getRegistryName().getResourceDomain(), MCSCreativeTab.TOOLS);
 	}
 
 	private static ToolMaterial getToolMaterial(ItemStack baseItem) {
@@ -119,15 +120,21 @@ public class BaseCompressedHoe extends BaseItemTool.MetaHoe implements ICompress
 		return ToolMaterial.WOOD;
 	}
 
+	protected String unCompressedName;
+	@Override
 	public String getUnCompressedName() {
-		String[] unNames = JiuUtils.other.custemSplitString(this.name, "_");
-		StringBuffer i = new StringBuffer();
-		for(String s : unNames) {
-			if(!"compressed".equals(s)) {
-				i.append(JiuUtils.other.upperFirst(s));
+		if(this.unCompressedName==null) {
+			String[] unNames = JiuUtils.other.custemSplitString(this.name, "_");
+			StringBuffer i = new StringBuffer();
+			for(String s : unNames) {
+				if(!"compressed".equals(s)) {
+					i.append(JiuUtils.other.upperFirst(s));
+				}
 			}
+			this.unCompressedName = i.toString();
 		}
-		return i.toString();
+		
+		return this.unCompressedName;
 	}
 
 	public Map<Integer, Integer> EnchantabilityLevelMap = Maps.newHashMap();
@@ -237,7 +244,7 @@ public class BaseCompressedHoe extends BaseItemTool.MetaHoe implements ICompress
 	@SideOnly(Side.CLIENT)
 	@Override
 	public String getItemStackDisplayName(ItemStack stack) {
-		return I18n.format("tile.mcs.compressed_" + stack.getMetadata() + ".name", stack.getMetadata()) + this.getUnCompressedItemLocalizedName();
+		return MCSUtil.info.getStuffDisplayName(this, stack.getMetadata());
 	}
 
 	private Map<Integer, Boolean> HasEffectMap = Maps.newHashMap();
@@ -347,19 +354,19 @@ public class BaseCompressedHoe extends BaseItemTool.MetaHoe implements ICompress
 			int meta = type.getMeta();
 			util.registerItemModel(this, meta, this.ownerMod + "/item/tools/hoe/" + this.name, this.name + "." + meta);
 		}
-		util.registerItemModel(this, (Short.MAX_VALUE - 1), this.ownerMod + "/item/tools/hoe/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+		util.registerItemModel(this, (ModSubtypes.INFINITY), this.ownerMod + "/item/tools/hoe/" + this.name, this.name + "." + (ModSubtypes.INFINITY));
 	}
 	
 	@Override
 	public void setDamage(ItemStack stack, int damage) {
-		if(stack.getMetadata() < 32766) {
+		if(stack.getMetadata() < ModSubtypes.INFINITY) {
 			super.setDamage(stack, damage);
 		}
 	}
 	
 	@Override
 	public void damageItem(ItemStack stack, int amount, EntityLivingBase entity) {
-		if(stack.getMetadata() < 32766) {
+		if(stack.getMetadata() < ModSubtypes.INFINITY) {
 			super.damageItem(stack, amount, entity);
 		}
 	}
@@ -392,9 +399,9 @@ public class BaseCompressedHoe extends BaseItemTool.MetaHoe implements ICompress
 		return this.baseToolStack.getDisplayName();
 	}
 	
-	private final CompressedLevel type = new CompressedLevel(this);
+	private final StackCaches type = new StackCaches(this, ModSubtypes.MAX);
 	@Override
-	public CompressedLevel getLevel() {
+	public StackCaches getLevel() {
 		return this.type;
 	}
 	@Override
@@ -403,23 +410,27 @@ public class BaseCompressedHoe extends BaseItemTool.MetaHoe implements ICompress
 	}
 	@Override
 	public ItemStack getMaterial(int meta) {
+		if(this.craftMaterialStack.isBlock() && meta > 15) {
+			meta = 15;
+		}
 		if(this.craftMaterialStack.isBlock() && (this.craftMaterialStack.isHas() || this.craftMaterialStack.getAsCompressedBlock().baseRecipeHasItem())) {
 			if(meta <= 0) {
 				return this.craftMaterialStack.getUnCompressedStack();
-			}else {
-				return this.craftMaterialStack.getStack(meta-1);
 			}
+			return this.craftMaterialStack.getStack(meta-1);
 		}
 		return this.craftMaterialStack.getStack(meta);
 	}
 	@Override
 	public ItemStack getRod(int meta) {
+		if(this.craftRodStack.isBlock() && meta > 15) {
+			meta = 15;
+		}
 		if(this.craftRodStack.isBlock() && (this.craftRodStack.isHas() || this.craftRodStack.getAsCompressedBlock().baseRecipeHasItem())) {
 			if(meta <= 0) {
 				return this.craftRodStack.getUnCompressedStack();
-			}else {
-				return this.craftRodStack.getStack(meta-1);
 			}
+			return this.craftRodStack.getStack(meta-1);
 		}
 		return this.craftRodStack.getStack(meta);
 	}

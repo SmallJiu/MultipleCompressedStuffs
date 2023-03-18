@@ -12,7 +12,7 @@ public class ItemBlockModel extends BaseModel {
 	public ItemBlockModel(String owner, String name, int meta, boolean isHas, long i) {
 		super(null,
 			JiuUtils.other.addJoins("/", new Object[] {"mcs:block", owner, (isHas ? "has" : "normal"), name, name + "." + meta}),
-			null, null, i);
+			owner, name, i);
 	}
 
 	@Override

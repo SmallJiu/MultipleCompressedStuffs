@@ -2,16 +2,10 @@ package cat.jiu.mcs.blocks.net.container;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
-import cat.jiu.core.api.handler.IBuilder;
 import cat.jiu.core.util.JiuUtils;
-import cat.jiu.mcs.blocks.net.NetworkHandler;
-import cat.jiu.mcs.blocks.net.msg.MsgCompressorEnergy;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCompressor;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
@@ -19,6 +13,7 @@ import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -27,26 +22,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.SlotItemHandler;
 
 public class ContainerCompressor extends Container {
-	int energy = 0;
+	long energy = 0;
 	int shrinkCount = 10;
-	int debug = 0;
-	private static final int energyID = 0;
+	boolean debug = false;
 	private static final int shrinkCountID = 1;
 	private static final int debugID = 2;
 	private final InventoryPlayer inventory;
 	private final World world;
 	private final BlockPos pos;
 	private TileEntityCompressor te = null;
-	private static IBuilder<List<Boolean>> activates = new IBuilder<List<Boolean>>() {
-		public List<Boolean> builder(Object... args) {
-			List<Boolean> s = Lists.newArrayList();
-			for(int i = 0; i < 16; i++) {
-				s.add(true);
-			}
-			return s;
-		}
-	};
-	private List<Boolean> activate = activates.builder();
+	private List<Boolean> activate = NonNullList.withSize(16, true);
 
 	public ContainerCompressor(EntityPlayer player, World world, BlockPos pos) {
 		this.inventory = player.inventory;
@@ -121,32 +106,24 @@ public class ContainerCompressor extends Container {
 
 		return oldStack;
 	}
-
-	@Override
-	public void detectAndSendChanges() {
-		super.detectAndSendChanges();
+	
+	public void checkChanged() {
 		if(this.world.getTileEntity(this.pos) instanceof TileEntityCompressor) {
 			this.te = (TileEntityCompressor) this.world.getTileEntity(this.pos);
 			this.activate = this.te.getActivateList();
 		}
 
 		if(!this.world.isRemote) {
-			if(this.energy != te.storage.getEnergyStoredWithLong()) {
-				this.energy = te.storage.getEnergyStoredWithBigInteger().intValue();
-				for(IContainerListener listener : this.listeners) {
-					listener.sendWindowProperty(this, ContainerCompressor.energyID, (int) this.energy);
-				}
-			}
 			if(this.shrinkCount != this.te.getShrinkCount()) {
 				this.shrinkCount = this.te.getShrinkCount();
 				for(IContainerListener listener : this.listeners) {
 					listener.sendWindowProperty(this, ContainerCompressor.shrinkCountID, this.shrinkCount);
 				}
 			}
-			if(this.debug != (this.te.debug ? 1 : 0)) {
-				this.debug = (this.te.debug ? 1 : 0);
+			if(this.debug != this.te.debug) {
+				this.debug = this.te.debug;
 				for(IContainerListener listener : this.listeners) {
-					listener.sendWindowProperty(this, ContainerCompressor.debugID, this.debug);
+					listener.sendWindowProperty(this, ContainerCompressor.debugID, this.te.debug ? 1 : 0);
 				}
 			}
 			for(int i = 0; i < this.activate.size(); i++) {
@@ -171,22 +148,13 @@ public class ContainerCompressor extends Container {
 			return;
 		}
 		switch(id) {
-			case energyID:
-				this.energy = data;
-				break;
 			case shrinkCountID:
 				this.shrinkCount = data;
 				break;
 			case debugID:
-				this.debug = data;
+				this.debug = data == 1;
 				break;
 		}
-	}
-
-	@Override
-	public void addListener(IContainerListener listener) {
-		super.addListener(listener);
-		listener.sendWindowProperty(this, 0, (int) this.te.storage.getEnergyStoredWithLong());
 	}
 
 	public TileEntityCompressor getTileEntity() {
@@ -194,14 +162,14 @@ public class ContainerCompressor extends Container {
 	}
 	
 	public boolean isDebug() {
-		return this.debug == 1;
+		return this.debug;
 	}
 	
-	public void setEnergy(int energy) {
+	public void setEnergy(long energy) {
 		this.energy = energy;
 	}
 
-	public int getEnergy() {
+	public long getEnergy() {
 		return this.energy;
 	}
 
@@ -215,39 +183,7 @@ public class ContainerCompressor extends Container {
 
 	@Override
 	public boolean canInteractWith(EntityPlayer player) {
-		if(!player.world.isRemote && this.te != null) {
-			if(this.energy != te.storage.getEnergyStoredWithLong()) {
-				this.energy = te.storage.getEnergyStoredWithBigInteger().intValue();
-				for(IContainerListener listener : this.listeners) {
-					if(listener instanceof EntityPlayerMP) {
-						NetworkHandler.INSTANCE.sendTo(new MsgCompressorEnergy(this.energy), (EntityPlayerMP) listener);
-					}
-				}
-			}
-			if(this.shrinkCount != this.te.getShrinkCount()) {
-				this.shrinkCount = this.te.getShrinkCount();
-				for(IContainerListener listener : this.listeners) {
-					listener.sendWindowProperty(this, ContainerCompressor.shrinkCountID, this.shrinkCount);
-				}
-			}
-			if(this.debug != (this.te.debug ? 1 : 0)) {
-				this.debug = (this.te.debug ? 1 : 0);
-				for(IContainerListener listener : this.listeners) {
-					listener.sendWindowProperty(this, ContainerCompressor.debugID, this.debug);
-				}
-			}
-			for(int i = 0; i < this.activate.size(); i++) {
-				boolean slot = this.activate.get(i);
-				if(slot != this.te.slotCanCraft(i)) {
-					slot = this.te.slotCanCraft(i);
-					this.activate.set(i, this.te.slotCanCraft(i));
-					for(IContainerListener listener : this.listeners) {
-						listener.sendWindowProperty(this, 10000 + i, slot ? 1 : 0);
-					}
-				}
-			}
-		}
-		
+		this.checkChanged();
 		boolean haveBlock = player.world.getBlockState(this.pos).getBlock() != Blocks.AIR;
 		return player.world.equals(this.world) && player.getDistanceSq(this.pos) <= 32.0 && haveBlock;
 	}

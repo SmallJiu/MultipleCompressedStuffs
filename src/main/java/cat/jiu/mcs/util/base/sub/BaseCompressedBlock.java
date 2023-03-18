@@ -9,21 +9,23 @@ import javax.annotation.Nullable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import cat.jiu.core.api.ITime;
+import cat.jiu.core.api.ITimer;
+import cat.jiu.core.types.StackCaches;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.core.util.RegisterModel;
-import cat.jiu.core.util.Time;
 import cat.jiu.core.util.base.BaseBlock;
+import cat.jiu.core.util.timer.Timer;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.api.recipe.ISmeltingRecipe;
 import cat.jiu.mcs.blocks.tileentity.TileEntityChangeBlock;
 import cat.jiu.mcs.config.Configs;
-import cat.jiu.mcs.util.CompressedLevel;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
+import cat.jiu.mcs.util.PropertySubtypes;
 import cat.jiu.mcs.util.base.BaseCompressedBlockItem;
 import cat.jiu.mcs.util.init.MCSBlocks;
+import cat.jiu.mcs.util.init.MCSCreativeTab;
 import cat.jiu.mcs.util.init.MCSResources;
 import cat.jiu.mcs.util.type.CustomStuffType;
 
@@ -33,7 +35,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -88,7 +89,6 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 			MCSResources.STUFF_NAME.add(nameIn);
 			MCSResources.putCompressedStuff(baseItem, this);
 		}
-		
 		if(baseItem.getItem() instanceof ItemBlock) {
 			Block unBlock = JiuUtils.item.getBlockFromItemStack(baseItem);
 			IBlockState unState = JiuUtils.item.getStateFromItemStack(baseItem);
@@ -128,7 +128,7 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 	}
 
 	public BaseCompressedBlock(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, float hardnessIn) {
-		this(nameIn, unCompressedItem, ownerMod, MCS.COMPERESSED_BLOCKS, hardnessIn);
+		this(nameIn, unCompressedItem, ownerMod, MCSCreativeTab.BLOCKS, hardnessIn);
 	}
 
 	public BaseCompressedBlock(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod, CreativeTabs tabIn) {
@@ -136,7 +136,7 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 	}
 
 	public BaseCompressedBlock(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod) {
-		this(nameIn, unCompressedItem, ownerMod, MCS.COMPERESSED_BLOCKS);
+		this(nameIn, unCompressedItem, ownerMod, MCSCreativeTab.BLOCKS);
 	}
 
 	public BaseCompressedBlock(@Nonnull ItemStack unCompressedItem, String ownerMod) {
@@ -186,7 +186,7 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 	
 	private Map<Integer, CustomStuffType.ChangeBlockType> ChangeBlocks;
 	public BaseCompressedBlock setChangeBlock(int meta, int tick, int s, int m, boolean canDrops, ItemStack... drops) {
-		return this.addChangeBlock(meta, new Time(m, s, tick), canDrops, drops);
+		return this.addChangeBlock(meta, new Timer(m, s, tick), canDrops, drops);
 	}
 	
 	private Map<Integer, List<String>> metaShiftInfos;
@@ -332,21 +332,31 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 	
 	// Custom implement start
 
+	protected boolean getHarvestToolError;
 	@Override
 	public String getHarvestTool(IBlockState state) {
 		if(this.noToolBreak) return null;
 		if(HarvestMap != null && !HarvestMap.isEmpty()) {
 			if(HarvestMap.containsKey(JiuUtils.item.getMetaFromBlockState(state))) {
 				return HarvestMap.get(JiuUtils.item.getMetaFromBlockState(state)).tool;
-			}else if(!this.isHas()) {
-				return this.getBaseBlock().getHarvestTool(this.getBaseState());
+			}else if(!this.isHas() && !this.getHarvestToolError) {
+				try {
+					return this.getBaseBlock().getHarvestTool(this.getBaseState());
+				}catch(Throwable e) {
+					this.getHarvestToolError = true;
+				}
 			}
-		}else if(!this.isHas()) {
-			return this.getBaseBlock().getHarvestTool(this.getBaseState());
+		}else if(!this.isHas() && !this.getHarvestToolError) {
+			try {
+				return this.getBaseBlock().getHarvestTool(this.getBaseState());
+			}catch(Throwable e) {
+				this.getHarvestToolError = true;
+			}
 		}
 		return super.getHarvestTool(state);
 	}
 
+	protected boolean getHarvestLevelError;
 	@Override
 	public int getHarvestLevel(IBlockState state) {
 		if(this.noToolBreak) return 0;
@@ -354,70 +364,109 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 		if(HarvestMap != null && !HarvestMap.isEmpty()) {
 			if(HarvestMap.containsKey(JiuUtils.item.getMetaFromBlockState(state))) {
 				return HarvestMap.get(JiuUtils.item.getMetaFromBlockState(state)).level;
-			}else if(!this.isHas()) {
-				return this.getBaseBlock().getHarvestLevel(this.getBaseState());
+			}else if(!this.isHas() && !this.getHarvestLevelError) {
+				try {
+					return this.getBaseBlock().getHarvestLevel(this.getBaseState());
+				}catch(Throwable e) {
+					this.getHarvestLevelError = true;
+				}
 			}
-		}else if(!this.isHas()) {
+		}else if(!this.isHas() && !this.getHarvestLevelError) {
 			return this.getBaseBlock().getHarvestLevel(this.getBaseState());
 		}
 		return super.getHarvestLevel(state);
 	}
 
+	protected boolean getBlockHardnessError;
 	@Override
 	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
 		if(this.noToolBreak) return 0F;
 		if(HardnessMap != null && !HardnessMap.isEmpty()) {
 			if(HardnessMap.containsKey(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)))) {
 				return HardnessMap.get(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)));
-			}else if(!this.isHas()) {
-				return this.getBaseBlock().getBlockHardness(this.getBaseState(), world, pos);
+			}else if(!this.isHas() && !this.getBlockHardnessError) {
+				try {
+					return this.getBaseBlock().getBlockHardness(this.getBaseState(), world, pos);
+				}catch(Throwable e) {
+					this.getBlockHardnessError = true;
+				}
 			}
-		}else if(!this.isHas()) {
-			return this.getBaseBlock().getBlockHardness(this.getBaseState(), world, pos);
+		}else if(!this.isHas() && !this.getBlockHardnessError) {
+			try {
+				return this.getBaseBlock().getBlockHardness(this.getBaseState(), world, pos);
+			}catch(Throwable e) {
+				this.getBlockHardnessError = true;
+			}
 		}
 		return super.getBlockHardness(blockState, world, pos);
 	}
-
+	
+	protected boolean isBeaconBaseError;
 	@Override
 	public boolean isBeaconBase(IBlockAccess world, BlockPos pos, BlockPos beacon) {
 		if(BeaconBaseMap != null && !BeaconBaseMap.isEmpty()) {
 			if(BeaconBaseMap.containsKey(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)))) {
 				return BeaconBaseMap.get(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)));
-			}else if(!this.isHas()) {
-				return this.getBaseBlock().isBeaconBase(world, pos, beacon);
+			}else if(!this.isHas() && !this.isBeaconBaseError) {
+				try {
+					return this.getBaseBlock().isBeaconBase(world, pos, beacon);
+				}catch(Throwable e) {
+					this.isBeaconBaseError = true;
+				}
 			}
-		}else if(!this.isHas()) {
-			return this.getBaseBlock().isBeaconBase(world, pos, beacon);
+		}else if(!this.isHas() && !this.isBeaconBaseError) {
+			try {
+				return this.getBaseBlock().isBeaconBase(world, pos, beacon);
+			}catch(Throwable e) {
+				this.isBeaconBaseError = true;
+			}
 		}
 
 		return super.isBeaconBase(world, pos, beacon);
 	}
-
+	
+	private boolean getLightError;
 	@Override
 	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
 		if(LightValueMap != null && !LightValueMap.isEmpty()) {
 			if(LightValueMap.containsKey(JiuUtils.item.getMetaFromBlockState(state))) {
 				return LightValueMap.get(JiuUtils.item.getMetaFromBlockState(state));
-			}else if(!this.isHas()) {
-				return this.getBaseBlock().getLightValue(this.getBaseState(), world, pos);
+			}else if(!this.isHas() && !this.getLightError) {
+				try {
+					return this.getBaseBlock().getLightValue(this.getBaseState(), world, pos);
+				}catch(Throwable e) {
+					this.getLightError = true;
+				}
 			}
-		}else if(!this.isHas()) {
-			return this.getBaseBlock().getLightValue(this.getBaseState(), world, pos);
+		}else if(!this.isHas() && !this.getLightError) {
+			try {
+				return this.getBaseBlock().getLightValue(this.getBaseState(), world, pos);
+			}catch(Throwable e) {
+				this.getLightError = true;
+			}
 		}
-
 		return super.getLightValue(state, world, pos);
 	}
 	
+	protected boolean getExplosionResistanceError;
 	@Override
 	public float getExplosionResistance(World world, BlockPos pos, Entity exploder, Explosion explosion) {
 		if(ExplosionResistanceMap != null && !ExplosionResistanceMap.isEmpty()) {
 			if(ExplosionResistanceMap.containsKey(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)))) {
 				return ExplosionResistanceMap.get(JiuUtils.item.getMetaFromBlockState(world.getBlockState(pos)));
-			}else if(!this.isHas()) {
-				return this.getBaseBlock().getExplosionResistance(world, pos, exploder, explosion);
+			}else if(!this.isHas() && !this.getExplosionResistanceError) {
+				try {
+					return this.getBaseBlock().getExplosionResistance(world, pos, exploder, explosion);
+				}catch(Throwable e) {
+					this.getExplosionResistanceError = true;
+				}
 			}
-		}else if(!this.isHas()) {
-			return this.getBaseBlock().getExplosionResistance(world, pos, exploder, explosion);
+		}else if(!this.isHas() && !this.getExplosionResistanceError) {
+			try {
+				return this.getBaseBlock().getExplosionResistance(world, pos, exploder, explosion);
+			}catch(Throwable e) {
+				this.getExplosionResistanceError = true;
+			}
 		}
 		return super.getExplosionResistance(world, pos, exploder, explosion);
 	}
@@ -533,10 +582,15 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 		return false;
 	}
 
+	protected boolean getSoundTypeError;
 	@Override
 	public SoundType getSoundType(IBlockState state, World world, BlockPos pos, @Nullable Entity entity) {
-        if(JiuUtils.item.isBlock(this.baseItem)) {
-        	return JiuUtils.item.getBlockFromItemStack(this.baseItem).getSoundType(JiuUtils.item.getStateFromItemStack(this.baseItem), world, pos, entity);
+        if(JiuUtils.item.isBlock(this.baseItem) && !this.getSoundTypeError) {
+        	try {
+				return this.getBaseBlock().getSoundType(this.getBaseState(), world, pos, entity);
+			}catch(Throwable e) {
+				this.getSoundTypeError = true;
+			}
         }
 		return super.getSoundType(state, world, pos, entity);
     }
@@ -553,7 +607,7 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 		return false;
 	}
 	
-	public BaseCompressedBlock addChangeBlock(int meta, ITime time, boolean canDrops, ItemStack... drops) {
+	public BaseCompressedBlock addChangeBlock(int meta, ITimer time, boolean canDrops, ItemStack... drops) {
 		if(this.ChangeBlocks == null) this.ChangeBlocks = Maps.newHashMap();
 		this.ChangeBlocks.put(meta, new CustomStuffType.ChangeBlockType(drops, time, canDrops));
 		return this;
@@ -631,24 +685,36 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 		return this.ownerMod;
 	}
 
+	protected String unCompressedName;
 	@Override
 	public String getUnCompressedName() {
-		String[] unNames = JiuUtils.other.custemSplitString(this.name, "_");
-		StringBuffer i = new StringBuffer();
-		for(String s : unNames) {
-			if(!"compressed".equals(s)) {
-				i.append(JiuUtils.other.upperFirst(s));
+		if(this.unCompressedName==null) {
+			String[] unNames = JiuUtils.other.custemSplitString(this.name, "_");
+			StringBuffer i = new StringBuffer();
+			for(String s : unNames) {
+				if(!"compressed".equals(s)) {
+					i.append(JiuUtils.other.upperFirst(s));
+				}
 			}
+			this.unCompressedName = i.toString();
 		}
-		return i.toString();
+		
+		return this.unCompressedName;
 	}
 	// implements ICompressedStuff end
 	
 	// implements BaseBlock.Sub start
+	private PropertySubtypes property;
 	@Override
-	protected PropertyEnum<ModSubtypes> getPropertyEnum() {
-		return PropertyEnum.create("level", ModSubtypes.class);
+	protected PropertySubtypes getBlockStateProperty() {
+		if(this.property==null) this.property = new PropertySubtypes("level");
+		return this.property;
 	}
+	@Override
+	protected ModSubtypes[] getPropertyArray() {
+		return ModSubtypes.values(ModSubtypes.MAX <= 16 ? ModSubtypes.MAX : 16);
+	}
+	
 	@Override
 	public ItemBlock getRegisterItemBlock() {
 		return new BaseCompressedBlockItem(this);
@@ -665,7 +731,7 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 		if(this.state != null) has = this.state;
 
 		util.setBlockStateMapper(this, false, this.ownerMod + "/" + has + "/" + this.name);
-		for(ModSubtypes type : ModSubtypes.values()) {
+		for(ModSubtypes type : ModSubtypes.values(ModSubtypes.MAX <= 16 ? ModSubtypes.MAX : 16)) {
 			int meta = type.getMeta();
 			String dir = this.ownerMod + "/block/" + has + "/" + this.name;
 			String file = this.name + "." + meta;
@@ -673,9 +739,9 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 		}
 	}
 	
-	private final CompressedLevel type = new CompressedLevel(this);
+	private final StackCaches type = new StackCaches(this, ModSubtypes.MAX <= 16 ? ModSubtypes.MAX : 16);
 	@Override
-	public CompressedLevel getLevel() {
+	public StackCaches getLevel() {
 		return this.type;
 	}
 	// implements BaseBlock.Sub end
@@ -774,6 +840,9 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 	@Override
 	public ItemStack getSmeltingOutput(int meta) {
 		int outmeta = meta-smeltingMetaDisparity;
+		if(this.smeltingOutput.isBlock() && outmeta > 15) {
+			outmeta = 15;
+		}
 		return outmeta < 0 ? null : smeltingOutput.getStack(outmeta);
 	}
 	// static
@@ -803,7 +872,7 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 	}
 
 	public static BaseCompressedBlock register(String nameIn, @Nonnull ItemStack unCompressedItem, String ownerMod) {
-		return register(nameIn, unCompressedItem, ownerMod, MCS.COMPERESSED_BLOCKS);
+		return register(nameIn, unCompressedItem, ownerMod, MCSCreativeTab.BLOCKS);
 	}
 
 	public static BaseCompressedBlock register(String nameIn, @Nonnull ItemStack unCompressedItem) {

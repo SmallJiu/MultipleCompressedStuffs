@@ -6,7 +6,7 @@ import cat.jiu.core.util.JiuUtils;
 import cat.jiu.core.util.base.BaseItemTool;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.net.client.gui.GUICompressor;
-
+import cat.jiu.mcs.util.ModSubtypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -29,7 +29,7 @@ public class CountTooltip {
 		if(GuiScreen.isShiftKeyDown() && stack.getCount() >= 1000 && Minecraft.getMinecraft().currentScreen instanceof GUICompressor) {
 			tooltip.add(I18n.format("info.mcs.count") + ": " + stack.getCount());
 		}
-		if(stack.getItem() instanceof BaseItemTool.MetaTool && stack.getMetadata() >= 32766) {
+		if(stack.getItem() instanceof BaseItemTool.MetaTool && stack.getMetadata() >= ModSubtypes.INFINITY) {
 			tooltip.add(tooltip.size()-1, TextFormatting.BLUE + I18n.format("item.unbreakable"));
 		}
 		if(MCS.dev() && !stack.isEmpty()) {

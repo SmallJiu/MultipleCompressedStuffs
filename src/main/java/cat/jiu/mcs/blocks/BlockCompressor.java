@@ -9,7 +9,6 @@ import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.net.GuiHandler;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCompressor;
 
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -36,7 +35,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class BlockCompressor extends BaseBlock.Normal implements ITileEntityProvider {
+public class BlockCompressor extends BaseBlock.Normal {
 	public BlockCompressor() {
 		super(MCS.MODID, "compressor", Material.ANVIL, SoundType.METAL, CreativeTabs.TRANSPORTATION, 10F);
 		this.setBlockModelResourceLocation(MCS.MODID + "/block", this.name);
@@ -88,12 +87,11 @@ public class BlockCompressor extends BaseBlock.Normal implements ITileEntityProv
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if(player.isSneaking()) {
 			if(this.useWrenchBreak(world, pos, state, player, hand, facing, hitX, hitY, hitZ)) return true;
-			return true;
 		}else {
 			int x = pos.getX(), y = pos.getY(), z = pos.getZ();
 			player.openGui(MCS.MODID, GuiHandler.COMPRESSOR, world, x, y, z);
-			return true;
 		}
+		return true;
 	}
 	
 	private boolean useWrenchBreak(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
@@ -153,7 +151,12 @@ public class BlockCompressor extends BaseBlock.Normal implements ITileEntityProv
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(World world, int meta) {
+	public boolean hasTileEntity(IBlockState state) {
+		return true;
+	}
+
+	@Override
+	public TileEntity createTileEntity(World world, IBlockState state) {
 		return new TileEntityCompressor();
 	}
 

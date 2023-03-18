@@ -215,10 +215,9 @@ public class MCSBlocks {
 	}
 
 	public static class OreStuff {
-		private final boolean TF = Configs.Custom.Mod_Stuff.ThermalFoundation;
-		private final boolean IC = Configs.Custom.Mod_Stuff.IndustrialCraft;
-		@SuppressWarnings("unused")
-		private final boolean AE = Configs.Custom.Mod_Stuff.AppliedEnergistics2;
+		public final boolean TF = Configs.Custom.Mod_Stuff.ThermalFoundation;
+		public final boolean IC = Configs.Custom.Mod_Stuff.IndustrialCraft;
+		public final boolean AE = Configs.Custom.Mod_Stuff.AppliedEnergistics2;
 
 		public final OreBlock block = new OreBlock();
 		public final Ore ore = new Ore();
@@ -254,16 +253,15 @@ public class MCSBlocks {
 			// compressed__ore_block
 		}
 
-		@SuppressWarnings("unused")
-		private BaseCompressedBlock register(String ore, String unCompressed, String ownerModid, boolean isOre) {
+		public BaseCompressedBlock register(String ore, String unCompressed, String ownerModid, boolean isOre) {
 			return this.register(ore, unCompressed, 0, ownerModid, isOre);
 		}
 
-		private BaseCompressedBlock register(String ore, String unCompressed, int meta, String ownerModid, boolean isOre) {
+		public BaseCompressedBlock register(String ore, String unCompressed, int meta, String ownerModid, boolean isOre) {
 			return this.register(ore, new ItemStack(Item.getByNameOrId(ownerModid + ":" + unCompressed), 1, meta), ownerModid, isOre);
 		}
 
-		private BaseCompressedBlock register(String ore, ItemStack unCompressedItem, String ownerModid, boolean isOre) {
+		public BaseCompressedBlock register(String ore, ItemStack unCompressedItem, String ownerModid, boolean isOre) {
 			BaseCompressedBlock block = BaseCompressedBlock.register("compressed_" + ore + (isOre ? "_ore" : "") + "_block", unCompressedItem, ownerModid);
 			if(!isOre) block.setBaseRecipeIsItem();
 			return block;
@@ -285,7 +283,7 @@ public class MCSBlocks {
 
 		}
 
-		private BaseCompressedBlock register(String nameIn, ItemStack unCompressedItem) {
+		public BaseCompressedBlock register(String nameIn, ItemStack unCompressedItem) {
 			return BaseCompressedBlock.register(nameIn, unCompressedItem, "thermalfoundation");
 		}
 	}
@@ -306,8 +304,7 @@ public class MCSBlocks {
 			}
 		}
 
-		@SuppressWarnings("unused")
-		private BaseCompressedBlock register(String nameIn, ItemStack unCompressedItem) {
+		public BaseCompressedBlock register(String nameIn, ItemStack unCompressedItem) {
 			return BaseCompressedBlock.register(nameIn, unCompressedItem, "enderio");
 		}
 	}
@@ -333,7 +330,7 @@ public class MCSBlocks {
 
 		}
 
-		private BaseCompressedBlock register(String nameIn, ItemStack unCompressedItem) {
+		public BaseCompressedBlock register(String nameIn, ItemStack unCompressedItem) {
 			if(!JiuUtils.item.equalsStack(unCompressedItem, new ItemStack(Items.AIR), false)) {
 				return BaseCompressedBlock.register(nameIn, unCompressedItem, "projecte");
 			}else {
@@ -347,18 +344,10 @@ public class MCSBlocks {
 		public final Has has = new Has();
 
 		public class Normal {
-			public final BaseCompressedBlock C_DRACONIUM_BLOCK_B;
-			public final BaseCompressedBlock C_DRACONIC_BLOCK_B;
-			public final BaseCompressedBlock C_INFUSED_OBSIDIAN_BLOCK_B;
-			public final BaseCompressedBlock C_CREATIVE_RF_SOURCE_B;
-
-			public Normal() {
-				C_DRACONIUM_BLOCK_B = register("compressed_draconium_block", new ItemStack(DEFeatures.draconiumBlock, 1, 0)).setBaseRecipeIsItem();
-				C_DRACONIC_BLOCK_B = register("compressed_draconic_block", new ItemStack(DEFeatures.draconicBlock)).setBaseRecipeIsItem();
-				C_INFUSED_OBSIDIAN_BLOCK_B = register("compressed_infused_obsidian_block", new ItemStack(DEFeatures.infusedObsidian));
-				C_CREATIVE_RF_SOURCE_B = new CompressedCreativeRFSource("compressed_creative_rf_source", new ItemStack(DEFeatures.creativeRFSource));
-
-			}
+			public final BaseCompressedBlock C_DRACONIUM_BLOCK_B = register("compressed_draconium_block", new ItemStack(DEFeatures.draconiumBlock, 1, 0)).setBaseRecipeIsItem();
+			public final BaseCompressedBlock C_DRACONIC_BLOCK_B = register("compressed_draconic_block", new ItemStack(DEFeatures.draconicBlock)).setBaseRecipeIsItem();
+			public final BaseCompressedBlock C_INFUSED_OBSIDIAN_BLOCK_B = register("compressed_infused_obsidian_block", new ItemStack(DEFeatures.infusedObsidian));
+			public final BaseCompressedBlock C_CREATIVE_RF_SOURCE_B = new CompressedCreativeRFSource("compressed_creative_rf_source", new ItemStack(DEFeatures.creativeRFSource));
 		}
 
 		public static class Has {
@@ -367,7 +356,7 @@ public class MCSBlocks {
 			}
 		}
 
-		private BaseCompressedBlock register(String nameIn, ItemStack unCompressedItem) {
+		public BaseCompressedBlock register(String nameIn, ItemStack unCompressedItem) {
 			return BaseCompressedBlock.register(nameIn, unCompressedItem, "draconicevolution");
 		}
 	}
@@ -386,11 +375,11 @@ public class MCSBlocks {
 			public final BaseCompressedBlock C_IONITE_BLOCK_B = register("compressed_ionite_block", "environmentaltech:ionite").setModelState("normal").setBaseRecipeIsItem();
 		}
 
-		private BaseCompressedBlock register(String nameIn, String unCompressedItem) {
+		public BaseCompressedBlock register(String nameIn, String unCompressedItem) {
 			return register(nameIn, unCompressedItem, 0);
 		}
 
-		private BaseCompressedBlock register(String nameIn, String unCompressedItem, int meta) {
+		public BaseCompressedBlock register(String nameIn, String unCompressedItem, int meta) {
 			return register(nameIn, new ItemStack(Block.getBlockFromName(unCompressedItem), 1, meta));
 		}
 
@@ -416,7 +405,7 @@ public class MCSBlocks {
 
 		}
 
-		private BaseCompressedBlock register(String nameIn, ItemStack unCompressedItem) {
+		public BaseCompressedBlock register(String nameIn, ItemStack unCompressedItem) {
 			return BaseCompressedBlock.register(nameIn, unCompressedItem, "avaritia");
 		}
 	}
@@ -439,7 +428,7 @@ public class MCSBlocks {
 
 		}
 
-		private BaseCompressedBlock register(String nameIn, ItemStack unCompressedItem) {
+		public BaseCompressedBlock register(String nameIn, ItemStack unCompressedItem) {
 			return BaseCompressedBlock.register(nameIn, unCompressedItem, "tconstruct");
 		}
 	}
@@ -472,7 +461,7 @@ public class MCSBlocks {
 			public final BaseCompressedBlock C_QUARTZ_TYPE_SUNNY_B = register("compressed_quartz_sunny_block", ItemStack.EMPTY).setModelState("normal").setBaseRecipeIsItem();
 		}
 
-		private BaseCompressedBlock register(String nameIn, ItemStack unCompressedItem) {
+		public BaseCompressedBlock register(String nameIn, ItemStack unCompressedItem) {
 			return BaseCompressedBlock.register(nameIn, unCompressedItem, "botania");
 		}
 	}
@@ -499,11 +488,11 @@ public class MCSBlocks {
 		public class Has {
 		}
 
-		private BaseCompressedBlock register(String nameIn, String unCompressedItem) {
+		public BaseCompressedBlock register(String nameIn, String unCompressedItem) {
 			return register(nameIn, unCompressedItem, 0);
 		}
 
-		private BaseCompressedBlock register(String nameIn, String unCompressedItem, int meta) {
+		public BaseCompressedBlock register(String nameIn, String unCompressedItem, int meta) {
 			return BaseCompressedBlock.register(nameIn, new ItemStack(Item.getByNameOrId("ic2:" + unCompressedItem), 1, meta), "ic2");
 		}
 	}
@@ -523,11 +512,11 @@ public class MCSBlocks {
 
 		}
 
-		private BaseCompressedBlock register(String name, IItemDefinition item) {
-			return this.register(name, item.maybeStack(1).get());
+		public BaseCompressedBlock register(String name, IItemDefinition item) {
+			return register(name, item.maybeStack(1).get());
 		}
 
-		private BaseCompressedBlock register(String nameIn, ItemStack stack) {
+		public BaseCompressedBlock register(String nameIn, ItemStack stack) {
 			return BaseCompressedBlock.register(nameIn, stack, "appliedenergistics2");
 		}
 	}

@@ -327,7 +327,7 @@ public class MCSItems {
 				if(item == null) {
 					return null;
 				}
-				return item.setModelMaterial("dust").setSmeltingMetaDisparity(1).setSmeltingOutput(stuff);
+				return item.setModelMaterial("dust").setSmeltingOutput(stuff);
 			}
 		}
 	}
@@ -366,10 +366,10 @@ public class MCSItems {
 			public final BaseCompressedItem C_GEAR_SIGNALUM_I = register("compressed_gear_signalum", TFItems.itemMaterial.gearSignalum).setModelMaterial("gear");
 
 			// Dust 金属粉
-			public final BaseCompressedItem C_DUST_LUMIUM_I = register("compressed_dust_lumium", TFItems.itemMaterial.dustLumium).setModelMaterial("dust").setSmeltingMetaDisparity(1).setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_LUMIUM_B);
-			public final BaseCompressedItem C_DUST_ENDERIUM_I = register("compressed_dust_enderium", TFItems.itemMaterial.dustEnderium).setModelMaterial("dust").setSmeltingMetaDisparity(1).setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_ENDERIUM_B);
-			public final BaseCompressedItem C_DUST_MITHRIL_I = register("compressed_dust_mithril", TFItems.itemMaterial.dustMithril).setModelMaterial("dust").setSmeltingMetaDisparity(1).setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_MITHRIL_B);
-			public final BaseCompressedItem C_DUST_SIGNALUM_I = register("compressed_dust_signalum", TFItems.itemMaterial.dustSignalum).setModelMaterial("dust").setSmeltingMetaDisparity(1).setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_SIGNALUM_B);
+			public final BaseCompressedItem C_DUST_LUMIUM_I = register("compressed_dust_lumium", TFItems.itemMaterial.dustLumium).setModelMaterial("dust").setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_LUMIUM_B);
+			public final BaseCompressedItem C_DUST_ENDERIUM_I = register("compressed_dust_enderium", TFItems.itemMaterial.dustEnderium).setModelMaterial("dust").setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_ENDERIUM_B);
+			public final BaseCompressedItem C_DUST_MITHRIL_I = register("compressed_dust_mithril", TFItems.itemMaterial.dustMithril).setModelMaterial("dust").setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_MITHRIL_B);
+			public final BaseCompressedItem C_DUST_SIGNALUM_I = register("compressed_dust_signalum", TFItems.itemMaterial.dustSignalum).setModelMaterial("dust").setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_SIGNALUM_B);
 
 		}
 
@@ -392,7 +392,7 @@ public class MCSItems {
 
 			public final BaseCompressedItem C_CHAOS_SHARD_I = register("compressed_chaos_shard", new ItemStack(DEFeatures.chaosShard));
 			public final BaseCompressedItem C_DRAGON_HEART_I = register("compressed_dragon_heart", new ItemStack(DEFeatures.dragonHeart));
-			public final BaseCompressedItem C_DRACONIUM_DUST_I = register("compressed_draconium_dust", new ItemStack(DEFeatures.draconiumDust)).setSmeltingOutput(MCSBlocks.draconic_evolution.normal.C_DRACONIUM_BLOCK_B).setSmeltingMetaDisparity(1);
+			public final BaseCompressedItem C_DRACONIUM_DUST_I = register("compressed_draconium_dust", new ItemStack(DEFeatures.draconiumDust)).setSmeltingOutput(MCSBlocks.draconic_evolution.normal.C_DRACONIUM_BLOCK_B);
 		}
 
 		private BaseCompressedItem register(String nameIn, ItemStack unCompressedItem) {

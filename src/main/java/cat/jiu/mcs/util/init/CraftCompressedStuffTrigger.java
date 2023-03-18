@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import cat.jiu.core.util.base.BaseAdvancement;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
+
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;

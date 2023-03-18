@@ -66,7 +66,7 @@ public interface IToolRecipe extends ICompressedRecipe {
 		}
 	}
 	default boolean canCreateRecipe(int meta) {
-		return true;
+		return meta <= 15;
 	}
 	ItemStack getMaterial(int meta);
 	ItemStack getRod(int meta);

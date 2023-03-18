@@ -18,11 +18,15 @@ import cat.jiu.mcs.util.init.MCSResources;
 
 import ic2.api.item.IElectricItem;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
@@ -38,9 +42,10 @@ import net.minecraftforge.items.ItemStackHandler;
 
 public class TileEntityCompressor extends TileEntity implements ITickable {
 	/** Energy */ public final String ENERGY = "Energy";
-	public final long maxEnergy = 5000000;
+	public static final long maxEnergy = 5000000;
+	public static final int maxPut = 1000000;
 	// public final long maxEnergy = Long.MAX_VALUE;
-	public final JiuEnergyStorage storage = new JiuEnergyStorage(maxEnergy, 1000000, 1000000);
+	public final JiuEnergyStorage storage = new JiuEnergyStorage(maxEnergy, maxPut, maxPut);
 	public final ItemStackHandler energySlot = new ItemStackHandler();
 	public final BigItemStackHandler compressedSlot = new BigItemStackHandler(17, this);
 	private final List<Boolean> activate = Lists.newArrayList(true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true);
@@ -81,7 +86,8 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 
 	@Override
 	public void update() {
-		if(!this.world.isRemote) {
+		if(!MCS.proxy.isClient()) {
+//			System.out.println(this.energySlot.serializeNBT());
 			this.markDirty();
 			if(this.compressedSlot.getSlots() == 0) {
 				this.compressedSlot.setSize(17);
@@ -166,17 +172,23 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 		int energy = TileEntityFurnace.getItemBurnTime(stack);
 		if(energy <= 0) {
 			Item item = stack.getItem();
-			if(item == Items.REDSTONE) {
-				energy = 1000;
+			if(item instanceof ItemBlock) {
+				Block block = ((ItemBlock) item).getBlock();
+				if(block == Blocks.REDSTONE_BLOCK) {
+					energy = 9000;
+				}
+			}else {
+				if(item == Items.REDSTONE) {
+					energy = 1000;
+				}
 			}
 		}
-		
 		return energy;
 	}
 
 	private void addEnergy() {
 		ItemStack stack = this.energySlot.getStackInSlot(0);
-		if(!stack.isEmpty() && stack != null) {
+		if(stack != null && !stack.isEmpty()) {
 			int itemEnergy = this.getEnergy(stack) / 10;
 			if(itemEnergy > 0) {
 				long i = this.storage.getEnergyStoredWithLong() + itemEnergy;
@@ -192,7 +204,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 				}
 			}else if(stack.hasCapability(CapabilityEnergy.ENERGY, (EnumFacing) null)) {
 				long i = this.storage.getEnergyStoredWithLong() + itemEnergy;
-				if(!(i > this.maxEnergy)) {
+				if(!(i > TileEntityCompressor.maxEnergy)) {
 					if(i < this.storage.getMaxEnergyStoredWithLong()) {
 						IEnergyStorage energy = stack.getCapability(CapabilityEnergy.ENERGY, (EnumFacing) null);
 						this.storage.receiveEnergyWithLong(energy.extractEnergy((int) this.storage.receiveEnergyWithLong(10001, true), false), false);
@@ -201,7 +213,7 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 				}
 			}else if(stack.hasCapability(CapabilityJiuEnergy.ENERGY, (EnumFacing) null)) {
 				long i = this.storage.getEnergyStoredWithLong() + itemEnergy;
-				if(!(i > this.maxEnergy)) {
+				if(!(i > TileEntityCompressor.maxEnergy)) {
 					if(i < this.storage.getMaxEnergyStoredWithLong()) {
 						IJiuEnergyStorage energy = stack.getCapability(CapabilityJiuEnergy.ENERGY, (EnumFacing) null);
 						this.storage.receiveEnergyWithLong(energy.extractEnergyWithLong(this.storage.receiveEnergyWithLong(10001, true), false), false);
@@ -240,8 +252,8 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 
 		nbt.setTag("EnergySlot", this.energySlot.serializeNBT());
 		nbt.setTag("CompressedSlot", this.compressedSlot.serializeNBT());
-		nbt.setTag("Energy", this.storage.writeToNBT(null, false));
-
+		nbt.setString("Energy", this.storage.getEnergyStoredWithBigInteger().toString());
+		
 		NBTTagList activates = new NBTTagList();
 		for(int i = 0; i < this.activate.size(); i++) {
 			NBTTagCompound activateNbt = new NBTTagCompound();
@@ -257,7 +269,20 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
-		this.storage.readFromNBT(nbt.getCompoundTag("Energy"), false);
+		
+		NBTBase energyTag = nbt.getTag("Energy");
+		String energyStr = "0";
+		if(energyTag instanceof NBTTagCompound) {
+			energyStr = ((NBTTagCompound)energyTag).getString("Energy");
+		}else if(energyTag instanceof NBTTagString) {
+			energyStr = ((NBTTagString)energyTag).getString();
+		}
+		
+		BigInteger energy = JiuUtils.big_integer.create(energyStr);
+		if(!JiuUtils.big_integer.lessOrEqual(energy, BigInteger.ZERO)) {
+			this.storage.setEnergy(energy);
+		}
+		
 		this.shrinkCount = nbt.getInteger("ShrinkCount") < 8 ? 10 : nbt.getInteger("ShrinkCount");
 		this.debug = nbt.getBoolean("Debug");
 
@@ -281,22 +306,14 @@ public class TileEntityCompressor extends TileEntity implements ITickable {
 
 		return super.hasCapability(cap, side);
 	}
-	final JiuEnergyStorage capStorage = new JiuEnergyStorage(0,0,0,0) {
-		public BigInteger receiveEnergyWithBigInteger(BigInteger maxReceive, boolean simulate) {return storage.receiveEnergyWithBigInteger(maxReceive, simulate);}
-		public java.math.BigInteger extractEnergyWithBigInteger(java.math.BigInteger maxExtract, boolean simulate) {return BigInteger.ZERO;}
-		public boolean canReceive() {return storage.canReceive();}
-		public boolean canExtract() {return false;}
-		public BigInteger getEnergyStoredWithBigInteger() {return storage.getEnergyStoredWithBigInteger();}
-		public BigInteger getMaxEnergyStoredWithBigInteger() {return storage.getMaxEnergyStoredWithBigInteger();}
-	};
 
 	@Override
 	public <T> T getCapability(Capability<T> cap, EnumFacing side) {
 		if(cap == CapabilityEnergy.ENERGY) {
-			return CapabilityEnergy.ENERGY.cast(this.capStorage.toFEStorage());
+			return CapabilityEnergy.ENERGY.cast(this.storage.toFEStorage());
 		}
 		if(cap == CapabilityJiuEnergy.ENERGY) {
-			return CapabilityJiuEnergy.ENERGY.cast(this.capStorage);
+			return CapabilityJiuEnergy.ENERGY.cast(this.storage);
 		}
 		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			if(side == EnumFacing.UP) {

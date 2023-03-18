@@ -1,6 +1,7 @@
 package cat.jiu.mcs.util.client.model;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -29,11 +30,18 @@ public abstract class BaseModel {
 		this.i = i;
 		if(defaultParent != null) this.stateJson.addProperty("parent", defaultParent);
 	}
-
+	
+	protected void addParent(String parent) {
+		this.stateJson.addProperty("parent", parent);
+	}
+	
 	protected abstract void genData(JsonObject json);
-
-	public final InputStream toStream() {
+	
+	public final InputStream toStream() throws IOException {
 		this.genData(this.stateJson);
+		if(this.stateJson.entrySet().isEmpty()) {
+			throw new IOException(String.format("Not model data found. owner: %s, name: %s", this.owner, this.name));
+		}
 		InputStream steam = new ByteArrayInputStream(this.stateJson.toString().getBytes(StandardCharsets.UTF_8));
 		MCS.startmodel += System.currentTimeMillis() - i;
 		return steam;

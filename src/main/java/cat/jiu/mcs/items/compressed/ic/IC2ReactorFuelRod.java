@@ -4,9 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Queue;
 
-import cat.jiu.core.api.events.iface.item.IItemInPlayerHandTick;
-import cat.jiu.core.api.events.iface.item.IItemInPlayerInventoryTick;
-import cat.jiu.core.util.JiuCoreEvents;
+import cat.jiu.core.events.item.ItemInPlayerEvent;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
 
@@ -19,8 +17,10 @@ import ic2.core.item.reactor.ItemReactorUranium;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class IC2ReactorFuelRod extends IC2ReactorAssembly implements IItemInPlayerInventoryTick, IItemInPlayerHandTick {
+public class IC2ReactorFuelRod extends IC2ReactorAssembly {
 	public final int numberOfCells;
 	protected final ItemReactorUranium base;
 	protected final BaseCompressedItem depletedItem;
@@ -40,11 +40,19 @@ public class IC2ReactorFuelRod extends IC2ReactorAssembly implements IItemInPlay
 		}
 		this.numberOfCells = this.base.numberOfCells;
 		this.depletedItem = depletedItem;
-		JiuCoreEvents.addEvent(this);
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 
-	@Override
-	public void onItemInPlayerHandTick(EntityPlayer player, ItemStack mainHand, ItemStack offHand) {
+	@SubscribeEvent
+	public void onItemInPlayerHandTick(ItemInPlayerEvent.InHand event) {
+		if(event.isMainHand) {
+			onItemInPlayerHandTick(event.getEntityPlayer(), event.stack, null);
+		}else {
+			onItemInPlayerHandTick(event.getEntityPlayer(), null, event.stack);
+		}
+	}
+
+	private void onItemInPlayerHandTick(EntityPlayer player, ItemStack mainHand, ItemStack offHand) {
 		if(mainHand != null && !mainHand.isEmpty() && mainHand.getItem() instanceof IC2ReactorFuelRod) {
 			if(!ItemArmorHazmat.hasCompleteHazmat(player)) {
 				IC2Potion.radiation.applyTo(player, (int) MCSUtil.item.getMetaValue(200, mainHand.getMetadata()), 100);
@@ -56,8 +64,12 @@ public class IC2ReactorFuelRod extends IC2ReactorAssembly implements IItemInPlay
 		}
 	}
 
-	@Override
-	public void onItemInPlayerInventoryTick(EntityPlayer player, ItemStack invStack, int slot) {
+	@SubscribeEvent
+	public void onItemInPlayerInventoryTick(ItemInPlayerEvent.InInventory event) {
+		onItemInPlayerInventoryTick(event.getEntityPlayer(), event.stack, event.slot);
+	}
+
+	private void onItemInPlayerInventoryTick(EntityPlayer player, ItemStack invStack, int slot) {
 		if(invStack.getItem() instanceof IC2ReactorFuelRod) {
 			if(!ItemArmorHazmat.hasCompleteHazmat(player)) {
 				IC2Potion.radiation.applyTo(player, (int) MCSUtil.item.getMetaValue(200, invStack.getMetadata()), 100);

@@ -14,10 +14,11 @@ import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.api.recipe.ISmeltingRecipe;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.core.api.IHasModel;
+import cat.jiu.core.types.StackCaches;
 import cat.jiu.core.util.JiuUtils;
-import cat.jiu.mcs.util.CompressedLevel;
 import cat.jiu.mcs.util.MCSUtil;
 import cat.jiu.mcs.util.ModSubtypes;
+import cat.jiu.mcs.util.init.MCSCreativeTab;
 import cat.jiu.mcs.util.init.MCSResources;
 
 import net.minecraft.client.util.ITooltipFlag;
@@ -63,7 +64,7 @@ public class BaseCompressedItem extends Item implements IHasModel, ICompressedSt
 	}
 
 	public static BaseCompressedItem register(String name, ItemStack baseItem, String ownerMod) {
-		return register(name, baseItem, ownerMod, MCS.COMPERESSED_ITEMS);
+		return register(name, baseItem, ownerMod, MCSCreativeTab.ITEMS);
 	}
 
 	public BaseCompressedItem(String name, ItemStack baseItem, String ownerMod, CreativeTabs tab, boolean hasSubtypes) {
@@ -99,7 +100,7 @@ public class BaseCompressedItem extends Item implements IHasModel, ICompressedSt
 	}
 
 	public BaseCompressedItem(String name, ItemStack baseItem) {
-		this(name, baseItem, MCS.COMPERESSED_ITEMS);
+		this(name, baseItem, MCSCreativeTab.ITEMS);
 	}
 
 	public String getOwnerMod() {
@@ -141,15 +142,21 @@ public class BaseCompressedItem extends Item implements IHasModel, ICompressedSt
 		return this.createOredict;
 	}
 
+	protected String unCompressedName;
+	@Override
 	public String getUnCompressedName() {
-		String[] unNames = JiuUtils.other.custemSplitString(this.name, "_");
-		StringBuffer i = new StringBuffer();
-		for(String s : unNames) {
-			if(!"compressed".equals(s)) {
-				i.append(JiuUtils.other.upperFirst(s));
+		if(this.unCompressedName==null) {
+			String[] unNames = JiuUtils.other.custemSplitString(this.name, "_");
+			StringBuffer i = new StringBuffer();
+			for(String s : unNames) {
+				if(!"compressed".equals(s)) {
+					i.append(JiuUtils.other.upperFirst(s));
+				}
 			}
+			this.unCompressedName = i.toString();
 		}
-		return i.toString();
+		
+		return this.unCompressedName;
 	}
 
 	private Map<Integer, Boolean> HasEffectMap = Maps.newHashMap();
@@ -199,7 +206,7 @@ public class BaseCompressedItem extends Item implements IHasModel, ICompressedSt
 	@SideOnly(Side.CLIENT)
 	@Override
 	public String getItemStackDisplayName(ItemStack stack) {
-		return I18n.format("tile.mcs.compressed_" + stack.getMetadata() + ".name", stack.getMetadata()) + this.getUnCompressedItemLocalizedName();
+		return MCSUtil.info.getStuffDisplayName(this, stack.getMetadata());
 	}
 
 	@Override
@@ -310,9 +317,9 @@ public class BaseCompressedItem extends Item implements IHasModel, ICompressedSt
 			}
 		}
 		if(this.model_material != null) {
-			model.registerItemModel(this, Short.MAX_VALUE - 1, this.ownerMod + "/item/normal/" + this.model_material + "/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+			model.registerItemModel(this, ModSubtypes.INFINITY, this.ownerMod + "/item/normal/" + this.model_material + "/" + this.name, this.name + "." + (ModSubtypes.INFINITY));
 		}else {
-			model.registerItemModel(this, Short.MAX_VALUE - 1, this.ownerMod + "/item/normal/" + this.name, this.name + "." + (Short.MAX_VALUE - 1));
+			model.registerItemModel(this, ModSubtypes.INFINITY, this.ownerMod + "/item/normal/" + this.name, this.name + "." + (ModSubtypes.INFINITY));
 		}
 	}
 
@@ -332,9 +339,9 @@ public class BaseCompressedItem extends Item implements IHasModel, ICompressedSt
 	public final String getUnCompressedItemLocalizedName() {
 		return this.unCompressedItem.getDisplayName();
 	}
-	private final CompressedLevel type = new CompressedLevel(this);
+	private final StackCaches type = new StackCaches(this, ModSubtypes.MAX);
 	@Override
-	public CompressedLevel getLevel() {
+	public StackCaches getLevel() {
 		return this.type;
 	}
 	
@@ -355,6 +362,9 @@ public class BaseCompressedItem extends Item implements IHasModel, ICompressedSt
 	@Override
 	public ItemStack getSmeltingOutput(int meta) {
 		int outmeta = meta-smeltingMetaDisparity;
+		if(this.smeltingOutput.isBlock() && outmeta > 15) {
+			outmeta = 15;
+		}
 		return outmeta < 0 ? null : smeltingOutput.getStack(outmeta);
 	}
 }

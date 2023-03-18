@@ -13,6 +13,7 @@ import appeng.api.features.IInscriberRegistry;
 import appeng.api.features.InscriberProcessType;
 
 import cat.jiu.core.util.JiuUtils;
+import cat.jiu.mcs.util.ModSubtypes;
 import cat.jiu.mcs.util.init.MCSBlocks;
 import cat.jiu.mcs.util.init.MCSItems;
 import cat.jiu.mcs.util.init.MCSResources;
@@ -48,11 +49,12 @@ public class MCSRecipe {
 			if(stuff == null) continue;
 			if(stuff instanceof ICompressedRecipe) {
 				ICompressedRecipe r = (ICompressedRecipe) stuff;
-				for(int meta = 0; meta < 16; meta++) {
+				for(int meta = 0; meta < ModSubtypes.MAX; meta++) {
+					if(meta > 15 && stuff.isBlock()) break;
 					if(r.canCreateRecipe(meta)) r.createRecipe(recipe, stuff, meta);
 				}
 				if(stuff.isItem() && Configs.enable_infinite_recipe) {
-					if(r.canCreateRecipe(Short.MAX_VALUE-1)) r.createRecipe(recipe, stuff, Short.MAX_VALUE-1);
+					if(r.canCreateRecipe(ModSubtypes.INFINITY)) r.createRecipe(recipe, stuff, ModSubtypes.INFINITY);
 				}
 			}
 			
@@ -63,30 +65,32 @@ public class MCSRecipe {
 					recipe.add3x3AllRecipes(stuff.getStack(), baseItem);
 					// 解压
 					recipe.add1x1Recipes(JiuUtils.item.copyStack(baseItem, 9, false), stuff.getStack());
-					for(int meta = 1; meta < 16; meta++) {
+					for(int meta = 1; meta < ModSubtypes.MAX; meta++) {
+						if(meta > 15 && stuff.isBlock()) break;
 						// 压缩
 						recipe.add3x3AllRecipes(stuff.getStack(meta), stuff.getStack(meta - 1));
 						// 解压
 						recipe.add1x1Recipes(stuff.getStack(9, meta - 1), stuff.getStack(meta));
 					}
 					if(stuff.isItem() && Configs.enable_infinite_recipe) {
-						recipe.add3x3AllRecipes(stuff.getStack(32766), stuff.getStack(15));
-						recipe.add1x1Recipes(stuff.getStack(9, 15), stuff.getStack(32766));
+						recipe.add3x3AllRecipes(stuff.getStack(32766), stuff.getStack(ModSubtypes.MAX-1));
+						recipe.add1x1Recipes(stuff.getStack(9, ModSubtypes.MAX-1), stuff.getStack(32766));
 					}
 				}else {
 					// 压缩
 					recipe.add2x2AllRecipes(stuff.getStack(), baseItem);
 					// 解压
 					recipe.add1x1Recipes(JiuUtils.item.copyStack(baseItem, 4, false), stuff.getStack());
-					for(int meta = 1; meta < 16; meta++) {
+					for(int meta = 1; meta < ModSubtypes.MAX; meta++) {
+						if(meta > 15 && stuff.isBlock()) break;
 						// 压缩
 						recipe.add2x2AllRecipes(stuff.getStack(meta), stuff.getStack((meta - 1)));
 						// 解压
 						recipe.add1x1Recipes(stuff.getStack(4, meta - 1), stuff.getStack(meta));
 					}
 					if(stuff.isItem() && Configs.enable_infinite_recipe) {
-						recipe.add2x2AllRecipes(stuff.getStack(32766), stuff.getStack(15));
-						recipe.add1x1Recipes(stuff.getStack(4, 15), stuff.getStack(1, 32766));
+						recipe.add2x2AllRecipes(stuff.getStack(32766), stuff.getStack(ModSubtypes.MAX-1));
+						recipe.add1x1Recipes(stuff.getStack(4, ModSubtypes.MAX-1), stuff.getStack(1, 32766));
 					}
 				}
 			}
@@ -101,7 +105,7 @@ public class MCSRecipe {
 				new ItemStack(Blocks.GOLD_BLOCK), new ItemStack(Items.GOLDEN_APPLE), new ItemStack(Blocks.GOLD_BLOCK),
 				new ItemStack(Blocks.GOLD_BLOCK), new ItemStack(MCSBlocks.minecraft.normal.C_GOLD_B), new ItemStack(Blocks.GOLD_BLOCK));
 
-		for(int meta = 0; meta < 16; meta++) {
+		for(int meta = 0; meta < ModSubtypes.MAX; meta++) {
 			ItemStack gold_apple = new ItemStack(MCSBlocks.minecraft.normal.C_GOLD_B);
 			recipe.addShapedRecipes(new ItemStack(MCSItems.minecraft.food.C_ENCHANTED_GOLD_APPLE_F, 1, meta),
 					gold_apple, gold_apple, gold_apple,
@@ -109,52 +113,7 @@ public class MCSRecipe {
 					gold_apple, gold_apple, gold_apple);
 		}
 	}
-/*
- * remove in 3.0.4
-	private static void smelting() {
-		
-		addSmelting(MCSItems.minecraft.food.C_BEEF_F, MCSItems.minecraft.food.C_COOKED_BEEF_F);
-		addSmelting(MCSItems.minecraft.food.C_CHICKEN_F, MCSItems.minecraft.food.C_COOKED_CHICKEN_F);
-		addSmelting(MCSItems.minecraft.food.C_FISH_F, MCSItems.minecraft.food.C_COOKED_FISH_F);
-		addSmelting(MCSItems.minecraft.food.C_MUTTON_F, MCSItems.minecraft.food.C_COOKED_MUTTON_F);
-		addSmelting(MCSItems.minecraft.food.C_PORKCHOP_F, MCSItems.minecraft.food.C_COOKED_PORKCHOP_F);
-		addSmelting(MCSItems.minecraft.food.C_RABBIT_F, MCSItems.minecraft.food.C_COOKED_RABBIT_F);
-		addSmelting(MCSItems.minecraft.food.C_SALMON_FISH_F, MCSItems.minecraft.food.C_COOKED_SALMON_FISH_F);
-		addSmelting(MCSItems.minecraft.food.C_POTATO_F, MCSItems.minecraft.food.C_BAKED_POTATO_F);
-		 
-		if(Configs.Custom.Mod_Stuff.DraconicEvolution) addSmelting(MCSItems.draconic_evolution.normal.C_DRACONIUM_DUST_I, MCSBlocks.draconic_evolution.normal.C_DRACONIUM_BLOCK_B, 1);
-
-		// dust to block
-		if(Configs.Custom.Mod_Stuff.ThermalFoundation) {
-			addSmelting(MCSItems.thermal_foundation.normal.C_DUST_SIGNALUM_I, MCSBlocks.thermal_foundation.normal.C_SIGNALUM_B, 1);
-			addSmelting(MCSItems.thermal_foundation.normal.C_DUST_MITHRIL_I, MCSBlocks.thermal_foundation.normal.C_MITHRIL_B, 1);
-			addSmelting(MCSItems.thermal_foundation.normal.C_DUST_LUMIUM_I, MCSBlocks.thermal_foundation.normal.C_LUMIUM_B, 1);
-			addSmelting(MCSItems.thermal_foundation.normal.C_DUST_ENDERIUM_I, MCSBlocks.thermal_foundation.normal.C_ENDERIUM_B, 1);
-		}
-		
-		addSmelting(MCSItems.ore_stuff.dust.C_dust_aluminum_I, MCSBlocks.ore_stuff.block.C_aluminum_B, 1);
-		addSmelting(MCSItems.ore_stuff.dust.C_dust_bronze_I, MCSBlocks.ore_stuff.block.C_bronze_B, 1);
-		addSmelting(MCSItems.ore_stuff.dust.C_dust_constantan_I, MCSBlocks.ore_stuff.block.C_constantan_B, 1);
-		addSmelting(MCSItems.ore_stuff.dust.C_dust_copper_I, MCSBlocks.ore_stuff.block.C_copper_B, 1);
-		addSmelting(MCSItems.ore_stuff.dust.C_dust_electrum_I, MCSBlocks.ore_stuff.block.C_electrum_B, 1);
-		addSmelting(MCSItems.ore_stuff.dust.C_dust_gold_I, MCSBlocks.minecraft.normal.C_GOLD_B, 1);
-		addSmelting(MCSItems.ore_stuff.dust.C_dust_invar_I, MCSBlocks.ore_stuff.block.C_invar_B, 1);
-		addSmelting(MCSItems.ore_stuff.dust.C_dust_iridium_I, MCSBlocks.ore_stuff.block.C_iridium_B, 1);
-		addSmelting(MCSItems.ore_stuff.dust.C_dust_iron_I, MCSBlocks.minecraft.normal.C_IRON_B, 1);
-		addSmelting(MCSItems.ore_stuff.dust.C_dust_lead_I, MCSBlocks.ore_stuff.block.C_lead_B, 1);
-		addSmelting(MCSItems.ore_stuff.dust.C_dust_nickel_I, MCSBlocks.ore_stuff.block.C_nickel_B, 1);
-		addSmelting(MCSItems.ore_stuff.dust.C_dust_platinum_I, MCSBlocks.ore_stuff.block.C_platinum_B, 1);
-		addSmelting(MCSItems.ore_stuff.dust.C_dust_silver_I, MCSBlocks.ore_stuff.block.C_silver_B, 1);
-		addSmelting(MCSItems.ore_stuff.dust.C_dust_steel_I, MCSBlocks.ore_stuff.block.C_steel_B, 1);
-		addSmelting(MCSItems.ore_stuff.dust.C_dust_tin_I, MCSBlocks.ore_stuff.block.C_tin_B, 1);
-		
-		if(Configs.Custom.Mod_Stuff.AppliedEnergistics2) {
-			addSmelting(MCSItems.ae.normal.C_certus_dust_I, MCSItems.ae.normal.C_silicon_I);
-			addSmelting(MCSItems.ae.normal.C_nether_quartz_dust_I, MCSItems.ae.normal.C_silicon_I);
-			addSmelting(MCSBlocks.ae2.normal.C_sky_stone_block_B, MCSBlocks.ae2.normal.C_smooth_sky_stone_block_B);
-		}
-	}
-*/
+	
 	private static void item() {
 		recipe.addShapedRecipes(new ItemStack(MCSItems.normal.CAT_INGOT),
 				new ItemStack(MCSItems.normal.CAT_HAIR), new ItemStack(MCSItems.normal.CAT_HAIR), new ItemStack(MCSItems.normal.CAT_HAIR),
@@ -188,15 +147,15 @@ public class MCSRecipe {
 				new ItemStack(Blocks.OBSIDIAN), new ItemStack(Items.ENDER_PEARL), new ItemStack(Blocks.OBSIDIAN),
 				new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.OBSIDIAN));
 
-		if(Configs.Custom.Mod_Stuff.IndustrialCraft) {
+		if(Configs.Custom.Enable_Mod_Stuff && Configs.Custom.Mod_Stuff.IndustrialCraft) {
 			MCS.getLogOS().info("Start register ic2 item recipe");
 			icCompressedItemCrafting();
 		}
-		if(Configs.Custom.Mod_Stuff.AppliedEnergistics2) {
+		if(Configs.Custom.Enable_Mod_Stuff && Configs.Custom.Mod_Stuff.AppliedEnergistics2) {
 			MCS.getLogOS().info("Start register ae2 item recipe");
 			aeCompressedItemCrafting();
 		}
-		if(Configs.Custom.Mod_Stuff.Torcherino) {
+		if(Configs.Custom.Enable_Mod_Stuff && Configs.Custom.Mod_Stuff.Torcherino) {
 			torcherinoCompressedItemCrafting();
 		}
 	}
@@ -220,7 +179,7 @@ public class MCSRecipe {
 		IGrinderRecipeBuilder grinderRecipeBuilder = AEApi.instance().registries().grinder().builder();
 		long t = System.currentTimeMillis();
 		
-		for(int meta = 0; meta < 16; meta++) {
+		for(int meta = 0; meta < ModSubtypes.MAX; meta++) {
 			ItemStack pure_certus_crystal = items.C_pure_certus_crystal_I.getStack(meta);
 			ItemStack certus_quartz_crystal = items.C_certus_quartz_crystal_I.getStack(meta);
 			ItemStack certus_quartz_crystal_charged = items.C_certus_quartz_crystal_charged_I.getStack(meta);
@@ -375,7 +334,7 @@ public class MCSRecipe {
 		long t = System.currentTimeMillis();
 		ItemStack forge_hammer = new ItemStack(Item.getByNameOrId("ic2:forge_hammer"), 1, Short.MAX_VALUE);
 		
-		for(int meta = 0; meta < 16; meta++) {
+		for(int meta = 0; meta < ModSubtypes.MAX; meta++) {
 			// 装罐机
 			Recipes.cannerBottle.addRecipe(getICInput(ic2.C_MOX_I.getStack(meta)), getICInput(ic2.C_fuel_rod_I.getStack(meta)), ic2.C_MOX_FUEL_ROD_I.getStack(meta), false);
 			Recipes.cannerBottle.addRecipe(getICInput(ic2.C_URANIUM_I.getStack(meta)), getICInput(ic2.C_fuel_rod_I.getStack(meta)), ic2.C_URANIUM_FUEL_ROD_I.getStack(meta), false);
@@ -598,10 +557,10 @@ public class MCSRecipe {
 
 			ores = JiuUtils.item.getOreDict(oreItem.plate.C_plate_bronze_I.getStack(meta));
 			if(ores.isEmpty()) {
-				recipe.addShapedlessRecipe(ic2.C_casing_copper_I.getStack(2, meta), forge_hammer, oreItem.plate.C_plate_bronze_I.getStack(meta));
+				recipe.addShapedlessRecipe(ic2.C_casing_bronze_I.getStack(2, meta), forge_hammer, oreItem.plate.C_plate_bronze_I.getStack(meta));
 			}else {
 				for(String oredict : ores) {
-					recipe.addShapedlessRecipe(ic2.C_casing_copper_I.getStack(2, meta), forge_hammer, oredict);
+					recipe.addShapedlessRecipe(ic2.C_casing_bronze_I.getStack(2, meta), forge_hammer, oredict);
 				}
 			}
 

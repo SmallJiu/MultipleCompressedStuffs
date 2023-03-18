@@ -17,7 +17,7 @@ public class MCSFuelTick {
 			if(TileEntityFurnace.isItemFuel(MCSUtil.item.getUnCompressed(stack))) {
 				int baseBurnTime = MCSUtil.item.getUnCompressedBurnTime(stack);
 				if(baseBurnTime > 1) {
-					double burnTime = baseBurnTime + (baseBurnTime * ((stack.getMetadata() + 1) * 0.794));
+					double burnTime = MCSUtil.item.getMetaValue(baseBurnTime, stack.getMetadata());
 					if(burnTime <= 20) {
 						return;
 					}

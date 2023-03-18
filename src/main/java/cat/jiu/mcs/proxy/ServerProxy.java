@@ -10,8 +10,7 @@ import com.sci.torcherino.TorcherinoRegistry;
 import appeng.api.AEApi;
 import appeng.api.definitions.IBlockDefinition;
 import appeng.api.definitions.IDefinitions;
-
-import cat.jiu.core.util.JiuCoreEvents;
+import cat.jiu.core.api.IProxy;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.blocks.net.GuiHandler;
@@ -25,34 +24,28 @@ import cat.jiu.mcs.blocks.tileentity.TileEntityCreativeEnergy;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.exception.ItemNotFoundException;
 import cat.jiu.mcs.recipes.MCSRecipe;
-import cat.jiu.mcs.util.TestModel;
 import cat.jiu.mcs.util.base.sub.BaseCompressedBlock;
 import cat.jiu.mcs.util.client.waila.WailaPluginRegistry;
-import cat.jiu.mcs.util.event.CatEvent;
-import cat.jiu.mcs.util.event.OtherModBlockChange;
+import cat.jiu.mcs.util.init.CraftCompressedStuffTrigger;
 import cat.jiu.mcs.util.init.InitCustom;
 import cat.jiu.mcs.util.init.MCSBlocks;
 import cat.jiu.mcs.util.init.MCSItems;
 import cat.jiu.mcs.util.init.MCSOreDict;
-
 import moze_intel.projecte.gameObjs.items.TimeWatch;
 import moze_intel.projecte.gameObjs.tiles.DMPedestalTile;
-
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
 
-public class ServerProxy {
+public class ServerProxy implements IProxy<ServerProxy, ClientProxy> {
 	public long startrecipe;
 	public long startore;
 	public long startblock;
@@ -60,7 +53,6 @@ public class ServerProxy {
 	public long startcustom;
 
 	public void preInit(FMLPreInitializationEvent event) {
-		PreInit.preInit();
 		GuiHandler.register();
 
 		long i = System.currentTimeMillis();
@@ -75,10 +67,6 @@ public class ServerProxy {
 		new MCSItems();
 		this.startitem = System.currentTimeMillis() - i;
 
-		JiuCoreEvents.addEvent(new CatEvent());
-		JiuCoreEvents.addEvent(new TestModel());
-		JiuCoreEvents.addEvent(new OtherModBlockChange());
-
 		NetworkHandler.registerMessages();
 		
 		GameRegistry.registerTileEntity(TileEntityChangeBlock.class, new ResourceLocation(MCS.MODID + ":" + "change_block"));
@@ -89,6 +77,7 @@ public class ServerProxy {
 		if(Loader.isModLoaded("torcherino")) {
 			GameRegistry.registerTileEntity(TileEntityCompressedTorcherino.class, new ResourceLocation(MCS.MODID + ":" + "compressed_torcherino"));
 		}
+		CriteriaTriggers.register(CraftCompressedStuffTrigger.instance);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -212,14 +201,6 @@ public class ServerProxy {
 				TimeWatch.blacklist(TileEntityCompressedTorcherino.class);
 			}
 		}
-	}
-
-	public World getClientWorld() {
-		return null;
-	}
-
-	public Side getSide() {
-		return FMLCommonHandler.instance().getEffectiveSide();
 	}
 	
 	public boolean isClient() {return !(this instanceof ServerProxy);}

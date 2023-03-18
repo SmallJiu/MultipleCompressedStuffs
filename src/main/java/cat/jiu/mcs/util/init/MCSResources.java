@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import cat.jiu.core.util.JiuUtils;
+import cat.jiu.core.util.base.BaseItemTool;
 import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.util.base.sub.*;
 import cat.jiu.mcs.util.base.sub.tool.*;
@@ -54,9 +55,30 @@ public final class MCSResources {
 	
 	public static List<BaseCompressedItem> getNormals() {
 		List<BaseCompressedItem> items = Lists.newArrayList();
-		ITEMS.stream()
-			.filter(e -> e instanceof BaseCompressedItem)
-			.forEach(e -> items.add((BaseCompressedItem) e));
+		compressed_stuff.entrySet().stream()
+			.filter(e -> e.getValue() instanceof BaseCompressedItem)
+			.forEach(e -> items.add(e.getValue().getAsCompressedItem()));
+		return items;
+	}
+	public static List<BaseCompressedBlock> getNormalBlocks() {
+		List<BaseCompressedBlock> items = Lists.newArrayList();
+		compressed_stuff.entrySet().stream()
+			.filter(e -> e.getValue().isBlock())
+			.forEach(e -> items.add(e.getValue().getAsCompressedBlock()));
+		return items;
+	}
+	public static List<Block> getBlocks() {
+		List<Block> items = Lists.newArrayList();
+		compressed_stuff.entrySet().stream()
+			.filter(e -> e.getValue().isBlock())
+			.forEach(e -> items.add(e.getValue().getAsBlock()));
+		return items;
+	}
+	public static List<Item> getItems() {
+		List<Item> items = Lists.newArrayList();
+		compressed_stuff.entrySet().stream()
+			.filter(e -> e.getValue().isItem())
+			.forEach(e -> items.add(e.getValue().getAsItem()));
 		return items;
 	}
 	public static List<BaseCompressedFood> getFoods() {
@@ -99,6 +121,15 @@ public final class MCSResources {
 		ITEMS.stream()
 			.filter(e -> e instanceof BaseCompressedHoe)
 			.forEach(e -> items.add((BaseCompressedHoe) e));
+		return items;
+	}
+	public static List<BaseItemTool.MetaTool> getTools() {
+		List<BaseItemTool.MetaTool> items = Lists.newArrayList();
+		items.addAll(getSwords());
+		items.addAll(getPickaxes());
+		items.addAll(getShovels());
+		items.addAll(getAxes());
+		items.addAll(getHoes());
 		return items;
 	}
 }
