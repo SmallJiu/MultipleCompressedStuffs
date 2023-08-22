@@ -32,6 +32,7 @@ public abstract class AEStorageCell<T extends IAEStack<T>> extends BaseCompresse
 		}else {
 			throw new RuntimeException(baseItem.toString() + " is NOT AEStorageCell");
 		}
+		super.setCanShowBaseStackInfo(false);
 	}
 
 	public AEStorageCell(String name, IItemDefinition item) {

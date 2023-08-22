@@ -2,8 +2,6 @@ package cat.jiu.mcs.recipes;
 
 import java.util.List;
 
-import cat.jiu.core.util.JiuUtils;
-
 import cat.jiu.mcs.util.MCSUtil;
 import net.minecraft.item.ItemStack;
 import cat.jiu.core.util.crafting.Recipes;
@@ -106,9 +104,9 @@ public class MCSRecipeUtils extends Recipes {
 		if(ores.isEmpty()) {
 			super.add1x1Recipes(out, in);
 		}else {
-			for(String ore : JiuUtils.item.getOreDict(in)) {
-				super.add1x1RecipesWithOreDictionary(out, ore);
-			}
+			ores.forEach(ore->
+				super.add1x1RecipesWithOreDictionary(out, ore)
+			);
 		}
 	}
 
@@ -118,9 +116,9 @@ public class MCSRecipeUtils extends Recipes {
 		if(ores.isEmpty()) {
 			super.add2x2AllRecipes(output, input);
 		}else {
-			for(String ore : JiuUtils.item.getOreDict(input)) {
-				super.add2x2AllRecipesWithOreDictionary(output, ore);
-			}
+			ores.forEach(ore->
+				super.add2x2AllRecipesWithOreDictionary(output, ore)
+			);
 		}
 	}
 
@@ -130,9 +128,9 @@ public class MCSRecipeUtils extends Recipes {
 		if(ores.isEmpty()) {
 			super.add3x3AllRecipes(output, input);
 		}else {
-			for(String ore : JiuUtils.item.getOreDict(input)) {
-				super.add3x3AllRecipesWithOreDictionary(output, ore);
-			}
+			ores.forEach(ore->
+				super.add3x3AllRecipesWithOreDictionary(output, ore)
+			);
 		}
 	}
 }

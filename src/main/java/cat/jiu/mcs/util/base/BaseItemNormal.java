@@ -55,7 +55,7 @@ public class BaseItemNormal extends Item implements IHasModel {
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void getItemModel() {
-		new RegisterModel(MCS.MODID).registerItemModel(this, "normal/items", this.name);
+	public void getItemModel(RegisterModel util) {
+		util.registerItemModel(this, "normal/items", this.name);
 	}
 }

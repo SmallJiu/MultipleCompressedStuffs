@@ -16,7 +16,7 @@ public class CompressorRenderItem extends RenderItem {
 	@Override
 	public void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text) {
 		if(!stack.isEmpty()) {
-			if(stack.getCount() > 1000) {
+			if(stack.getCount() >= 1000) {
 				String s = JiuUtils.big_integer.format(JiuUtils.big_integer.create(String.valueOf(stack.getCount())), 1).toString();
 				super.renderItemOverlayIntoGUI(fr, stack, xPosition - 1, yPosition - 1, s);
 			}else {

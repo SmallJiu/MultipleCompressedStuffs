@@ -8,8 +8,8 @@ import com.google.gson.JsonElement;
 import com.sci.torcherino.TorcherinoRegistry;
 
 import appeng.api.AEApi;
-import appeng.api.definitions.IBlockDefinition;
 import appeng.api.definitions.IDefinitions;
+
 import cat.jiu.core.api.IProxy;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.mcs.MCS;
@@ -21,6 +21,7 @@ import cat.jiu.mcs.blocks.tileentity.TileEntityCompressedTorcherino;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCompressor;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCompressorSlave;
 import cat.jiu.mcs.blocks.tileentity.TileEntityCreativeEnergy;
+import cat.jiu.mcs.blocks.tileentity.ic.TileEntityCompressedCable;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.exception.ItemNotFoundException;
 import cat.jiu.mcs.recipes.MCSRecipe;
@@ -74,37 +75,39 @@ public class ServerProxy implements IProxy<ServerProxy, ClientProxy> {
 		GameRegistry.registerTileEntity(TileEntityCompressorSlave.class, new ResourceLocation(MCS.MODID + ":" + "compressor_slave"));
 		GameRegistry.registerTileEntity(TileEntityCreativeEnergy.class, new ResourceLocation(MCS.MODID + ":" + "creative_energy"));
 		GameRegistry.registerTileEntity(TileEntityCompressedChest.class, new ResourceLocation(MCS.MODID + ":" + "compressed_chest"));
-		if(Loader.isModLoaded("torcherino")) {
+		if(Loader.isModLoaded("torcherino") && Configs.Custom.Mod_Stuff.Torcherino) {
 			GameRegistry.registerTileEntity(TileEntityCompressedTorcherino.class, new ResourceLocation(MCS.MODID + ":" + "compressed_torcherino"));
+		}
+		if(Loader.isModLoaded("ic2") && Configs.Custom.Mod_Stuff.IndustrialCraft) {
+			GameRegistry.registerTileEntity(TileEntityCompressedCable.class, new ResourceLocation(MCS.MODID + ":" + "compressed_cable"));
 		}
 		CriteriaTriggers.register(CraftCompressedStuffTrigger.instance);
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	public void postInit(FMLPostInitializationEvent event) {
-		if(Configs.Custom.Enable_Mod_Stuff) {
-			this.setUnStack();
+		this.setUnStack();
+		
+		if(!InitCustom.unRegisterCustom.isEmpty()) {
+			HashMap<String, JsonElement> entrys = (HashMap<String, JsonElement>) InitCustom.unRegisterCustom.clone();
+			for(Entry<String, JsonElement> res : entrys.entrySet()) {
+				ItemStack unItem = JiuUtils.item.toStack(res.getValue());
+				BaseCompressedBlock b = InitCustom.unSetUnItem.get(res.getKey());
+				if(unItem != null && !unItem.isEmpty()) {
+					b.setUnCompressed(unItem);
+				}
+				if(b.getUnCompressedStack() != null && !b.getUnCompressedStack().isEmpty()) {
+					InitCustom.unSetUnItem.remove(res.getKey());
+					InitCustom.unRegisterCustom.remove(res.getKey());
+				}
+			}
 			if(!InitCustom.unRegisterCustom.isEmpty()) {
-				HashMap<String, JsonElement> entrys = (HashMap<String, JsonElement>) InitCustom.unRegisterCustom.clone();
-				for(Entry<String, JsonElement> res : entrys.entrySet()) {
-					ItemStack unItem = JiuUtils.item.toStack(res.getValue());
-					BaseCompressedBlock b = InitCustom.unSetUnItem.get(res.getKey());
-					if(unItem != null && !unItem.isEmpty()) {
-						b.setUnCompressed(unItem);
-					}
-					if(b.getUnCompressedStack() != null && !b.getUnCompressedStack().isEmpty()) {
-						InitCustom.unSetUnItem.remove(res.getKey());
-						InitCustom.unRegisterCustom.remove(res.getKey());
-					}
+				String crashMsg = "\n\ncustom.json -> unknown item:";
+				for(Entry<String, JsonElement> res : InitCustom.unRegisterCustom.entrySet()) {
+					String name = res.getValue().isJsonObject() ? res.getValue().getAsJsonObject().get("name").getAsString() : res.getValue().getAsString();
+					crashMsg += "\n  -> ID: \"" + res.getKey() + "\", unItem: \"" + name + "\"";
 				}
-				if(!InitCustom.unRegisterCustom.isEmpty()) {
-					String crashMsg = "\n\ncustom.json -> unknown item:";
-					for(Entry<String, JsonElement> res : InitCustom.unRegisterCustom.entrySet()) {
-						String name = res.getValue().isJsonObject() ? res.getValue().getAsJsonObject().get("name").getAsString() : res.getValue().getAsString();
-						crashMsg += "\n  -> ID: \"" + res.getKey() + "\", unItem: \"" + name + "\"";
-					}
-					throw new ItemNotFoundException(crashMsg + "\n");
-				}
+				throw new ItemNotFoundException(crashMsg + "\n");
 			}
 		}
 		
@@ -125,6 +128,7 @@ public class ServerProxy implements IProxy<ServerProxy, ClientProxy> {
 			throw new RuntimeException(e);
 		}
 	}
+	
 //	private void registerWailaPlugin() {
 //		WailaPluginRegister.addWailaPlugin(Layout.BODY, new ChangeBlockPlugin(), TileEntityChangeBlock.class, true);
 //		WailaPluginRegister.addWailaPlugin(Layout.BODY, new CompressorPlugin(), TileEntityCompressor.class, true);
@@ -134,12 +138,12 @@ public class ServerProxy implements IProxy<ServerProxy, ClientProxy> {
 		if(Configs.Custom.Mod_Stuff.AppliedEnergistics2) {
 			IDefinitions ae = AEApi.instance().definitions();
 			MCSBlocks.AppliedEnergistics2.Normal ae2 = MCSBlocks.ae2.normal;
-			ae2.C_certus_quartz_glass_B.setUnCompressed(this.getAEStack(ae.blocks().quartzGlass()));
-			ae2.C_certus_quartz_block_B.setUnCompressed(this.getAEStack(ae.blocks().quartzBlock()));
-			ae2.C_certus_quartz_vibrant_glass_B.setUnCompressed(this.getAEStack(ae.blocks().quartzVibrantGlass()));
-			ae2.C_fluix_block_B.setUnCompressed(this.getAEStack(ae.blocks().fluixBlock()));
-			ae2.C_sky_stone_block_B.setUnCompressed(this.getAEStack(ae.blocks().skyStoneBlock()));
-			ae2.C_smooth_sky_stone_block_B.setUnCompressed(this.getAEStack(ae.blocks().smoothSkyStoneBlock()));
+			ae2.C_certus_quartz_glass_B.setUnCompressed(ae.blocks().quartzGlass().maybeStack(1).get());
+			ae2.C_certus_quartz_block_B.setUnCompressed(ae.blocks().quartzBlock().maybeStack(1).get());
+			ae2.C_certus_quartz_vibrant_glass_B.setUnCompressed(ae.blocks().quartzVibrantGlass().maybeStack(1).get());
+			ae2.C_fluix_block_B.setUnCompressed(ae.blocks().fluixBlock().maybeStack(1).get());
+			ae2.C_sky_stone_block_B.setUnCompressed(ae.blocks().skyStoneBlock().maybeStack(1).get());
+			ae2.C_smooth_sky_stone_block_B.setUnCompressed(ae.blocks().smoothSkyStoneBlock().maybeStack(1).get());
 		}
 		if(Configs.Custom.Mod_Stuff.Botania) {
 			MCSBlocks.BotaniaBlock.Normal bot = MCSBlocks.botania.normal;
@@ -239,10 +243,6 @@ public class ServerProxy implements IProxy<ServerProxy, ClientProxy> {
 
 	private ItemStack getBotStack(String name, int meta) {
 		return this.getStack("botania", name, meta);
-	}
-
-	private ItemStack getAEStack(IBlockDefinition aeBlock) {
-		return aeBlock.maybeStack(1).get();
 	}
 
 	private ItemStack getStack(String modid, String name, int meta) {

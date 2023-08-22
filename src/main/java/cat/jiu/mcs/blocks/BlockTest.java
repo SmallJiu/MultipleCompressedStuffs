@@ -2,7 +2,6 @@ package cat.jiu.mcs.blocks;
 
 import cat.jiu.core.util.base.BaseBlock;
 import cat.jiu.mcs.MCS;
-import cat.jiu.mcs.util.init.MCSResources;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -16,7 +15,6 @@ import net.minecraft.world.World;
 public class BlockTest extends BaseBlock.Normal {
 	public BlockTest() {
 		super(MCS.MODID, "test_block", CreativeTabs.TOOLS);
-		MCSResources.BLOCKS.add(this);
 	}
 
 	@Override

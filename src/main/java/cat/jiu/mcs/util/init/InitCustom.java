@@ -38,6 +38,7 @@ import cat.jiu.mcs.util.type.CustomType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextComponentTranslation;
 
 public class InitCustom {
 	private static final Logger log = LogManager.getLogger();
@@ -139,12 +140,12 @@ public class InitCustom {
 			block.setInfoStack(InfoStackMap);
 		}
 
-		Map<Integer, List<String>> infos = InitCustomItem.initInfos(json);
+		Map<Integer, List<TextComponentTranslation>> infos = InitCustomItem.initInfos(json);
 		if(infos != null) {
 			block.setCustemInformation(infos);
 		}
 
-		Map<Integer, List<String>> shiftInfos = InitCustomItem.initShiftInfos(json);
+		Map<Integer, List<TextComponentTranslation>> shiftInfos = InitCustomItem.initShiftInfos(json);
 		if(shiftInfos != null) {
 			block.setCustemShiftInformation(shiftInfos);
 		}
@@ -201,12 +202,12 @@ public class InitCustom {
 			item.setInfoStack(InfoStackMap);
 		}
 
-		Map<Integer, List<String>> infos = InitCustomItem.initInfos(json);
+		Map<Integer, List<TextComponentTranslation>> infos = InitCustomItem.initInfos(json);
 		if(infos != null) {
 			item.setCustemInformation(infos);
 		}
 
-		Map<Integer, List<String>> shiftInfos = InitCustomItem.initShiftInfos(json);
+		Map<Integer, List<TextComponentTranslation>> shiftInfos = InitCustomItem.initShiftInfos(json);
 		if(shiftInfos != null) {
 			item.setCustemShiftInformation(shiftInfos);
 		}
@@ -252,12 +253,12 @@ public class InitCustom {
 			item.setInfoStack(InfoStackMap);
 		}
 
-		Map<Integer, List<String>> infos = InitCustomItem.initInfos(json);
+		Map<Integer, List<TextComponentTranslation>> infos = InitCustomItem.initInfos(json);
 		if(infos != null) {
 			item.addCustemInformation(infos);
 		}
 
-		Map<Integer, List<String>> shiftInfos = InitCustomItem.initShiftInfos(json);
+		Map<Integer, List<TextComponentTranslation>> shiftInfos = InitCustomItem.initShiftInfos(json);
 		if(shiftInfos != null) {
 			item.addCustemShiftInformation(shiftInfos);
 		}
@@ -308,12 +309,12 @@ public class InitCustom {
 			item.setInfoStack(InfoStackMap);
 		}
 
-		Map<Integer, List<String>> infos = InitCustomItem.initInfos(json);
+		Map<Integer, List<TextComponentTranslation>> infos = InitCustomItem.initInfos(json);
 		if(infos != null) {
 			item.addCustemInformation(infos);
 		}
 
-		Map<Integer, List<String>> shiftInfos = InitCustomItem.initShiftInfos(json);
+		Map<Integer, List<TextComponentTranslation>> shiftInfos = InitCustomItem.initShiftInfos(json);
 		if(shiftInfos != null) {
 			item.addCustemShiftInformation(shiftInfos);
 		}
@@ -360,12 +361,12 @@ public class InitCustom {
 			item.setInfoStack(InfoStackMap);
 		}
 
-		Map<Integer, List<String>> infos = InitCustomItem.initInfos(json);
+		Map<Integer, List<TextComponentTranslation>> infos = InitCustomItem.initInfos(json);
 		if(infos != null) {
 			item.addCustemInformation(infos);
 		}
 
-		Map<Integer, List<String>> shiftInfos = InitCustomItem.initShiftInfos(json);
+		Map<Integer, List<TextComponentTranslation>> shiftInfos = InitCustomItem.initShiftInfos(json);
 		if(shiftInfos != null) {
 			item.addCustemShiftInformation(shiftInfos);
 		}
@@ -432,12 +433,12 @@ public class InitCustom {
 			item.setInfoStack(InfoStackMap);
 		}
 
-		Map<Integer, List<String>> infos = InitCustomItem.initInfos(json);
+		Map<Integer, List<TextComponentTranslation>> infos = InitCustomItem.initInfos(json);
 		if(infos != null) {
 			item.addCustemInformation(infos);
 		}
 
-		Map<Integer, List<String>> shiftInfos = InitCustomItem.initShiftInfos(json);
+		Map<Integer, List<TextComponentTranslation>> shiftInfos = InitCustomItem.initShiftInfos(json);
 		if(shiftInfos != null) {
 			item.addCustemShiftInformation(shiftInfos);
 		}
@@ -494,12 +495,12 @@ public class InitCustom {
 			item.setInfoStack(InfoStackMap);
 		}
 
-		Map<Integer, List<String>> infos = InitCustomItem.initInfos(json);
+		Map<Integer, List<TextComponentTranslation>> infos = InitCustomItem.initInfos(json);
 		if(infos != null) {
 			item.addCustemInformation(infos);
 		}
 
-		Map<Integer, List<String>> shiftInfos = InitCustomItem.initShiftInfos(json);
+		Map<Integer, List<TextComponentTranslation>> shiftInfos = InitCustomItem.initShiftInfos(json);
 		if(shiftInfos != null) {
 			item.addCustemShiftInformation(shiftInfos);
 		}
@@ -556,12 +557,12 @@ public class InitCustom {
 			item.setInfoStack(InfoStackMap);
 		}
 
-		Map<Integer, List<String>> infos = InitCustomItem.initInfos(json);
+		Map<Integer, List<TextComponentTranslation>> infos = InitCustomItem.initInfos(json);
 		if(infos != null) {
 			item.addCustemInformation(infos);
 		}
 
-		Map<Integer, List<String>> shiftInfos = InitCustomItem.initShiftInfos(json);
+		Map<Integer, List<TextComponentTranslation>> shiftInfos = InitCustomItem.initShiftInfos(json);
 		if(shiftInfos != null) {
 			item.addCustemShiftInformation(shiftInfos);
 		}

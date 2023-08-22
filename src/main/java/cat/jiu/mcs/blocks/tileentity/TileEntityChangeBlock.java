@@ -52,8 +52,7 @@ public class TileEntityChangeBlock extends TileEntity implements ITickable {
 	public void update() {
 		if(this.world.isRemote) return;
 		if(this.isAlive && this.time != null && this.world.getBlockState(pos).getBlock() != Blocks.AIR) {
-			this.markDirty();
-
+			
 			if(this.time.getTicks() >= 0 && this.isAlive) {
 				// MCS.instance.log.info("M:" + m + " S:" + s + " Tick:" + tick + " | AllTick: " + allTick);
 
@@ -111,7 +110,6 @@ public class TileEntityChangeBlock extends TileEntity implements ITickable {
 //				System.out.println(this.time.getTicks() + " == " + ((this.time.getTicks() / 5) * 4) + ": " + (this.time.getTicks() == ((this.time.getTicks() / 5) * 4)));
 				
 				this.time.update();
-				this.markDirty();
 			}else {
 				this.isAlive = false;
 				this.world.removeTileEntity(this.pos);

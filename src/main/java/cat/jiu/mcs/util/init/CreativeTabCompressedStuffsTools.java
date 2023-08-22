@@ -1,11 +1,11 @@
 package cat.jiu.mcs.util.init;
 
-import cat.jiu.core.api.ITimer;
 import cat.jiu.core.util.base.BaseItemTool;
-import cat.jiu.core.util.timer.Timer;
+import cat.jiu.core.util.timer.MillisTimer;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
 import cat.jiu.mcs.config.Configs;
+import cat.jiu.mcs.util.ModSubtypes;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
@@ -26,7 +26,7 @@ public class CreativeTabCompressedStuffsTools extends CreativeTabs {
 			return super.getBackgroundImage();
 		}
 	}
-	private ITimer time = new Timer(0,15,0);
+	private MillisTimer time = new MillisTimer(5,0).start();
 	private ItemStack stack;
 	
 	@Override
@@ -36,9 +36,8 @@ public class CreativeTabCompressedStuffsTools extends CreativeTabs {
 	@Override
 	public ItemStack getTabIconItem() {
 		if(!MCSResources.ITEMS.isEmpty()) {
-			time.update();
 			if(time.isDone()) {
-				time.setTicks(Timer.parseTick(15, 0));
+				time.reset();
 				this.stack = getStack();
 			}
 			if(this.stack==null || this.stack.isEmpty()) 
@@ -53,7 +52,7 @@ public class CreativeTabCompressedStuffsTools extends CreativeTabs {
 		while(true) {
 			Item b = MCSResources.ITEMS.get(CreativeTabCompressedStuffsBlocks.rand.nextInt(MCSResources.ITEMS.size()));
 			if(b instanceof BaseItemTool.MetaTool && b instanceof ICompressedStuff) {
-				return ((ICompressedStuff) b).getStack(CreativeTabCompressedStuffsBlocks.rand.nextInt(15));
+				return ((ICompressedStuff) b).getStack(CreativeTabCompressedStuffsBlocks.rand.nextInt(ModSubtypes.MAX));
 			}
 		}
 	}

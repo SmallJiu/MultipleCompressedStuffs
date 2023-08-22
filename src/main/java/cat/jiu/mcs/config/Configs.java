@@ -52,7 +52,12 @@ public class Configs {
 			"dirt", "chestWood"
 	};
 	
-	public static final CustomCompressedBlock Custom = new CustomCompressedBlock();
+	@Config.LangKey("config.mcs.custom")
+	@Config.Comment("Custon stuff")
+	public static final CustomCompressed Custom = new CustomCompressed();
+	
+	@Config.LangKey("config.mcs.tooltip")
+	@Config.Comment("Tooltip Information")
 	public static final TooltipInformation Tooltip_Information = new TooltipInformation();
 //	public static final MaxCompressed Max_Compressed = new MaxCompressed();
 	
@@ -70,7 +75,6 @@ public class Configs {
 	}
 	
 	public static class TooltipInformation {
-		public final CustemnInformation CustemInfo = new CustemnInformation();
 		@Config.LangKey("config.mcs.show_owner_type")
 		@Config.Comment("show the item owner type")
 		public boolean show_owner_type = true;

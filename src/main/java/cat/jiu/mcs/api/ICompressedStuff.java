@@ -65,7 +65,7 @@ public interface ICompressedStuff {
 	}
 	
 	default ItemStack getStack() {
-		return this.getStack(0);
+		return this.getStack(1, 0);
 	}
 
 	default ItemStack getStack(int meta) {

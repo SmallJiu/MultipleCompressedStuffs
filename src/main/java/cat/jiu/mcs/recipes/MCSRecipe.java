@@ -147,15 +147,15 @@ public class MCSRecipe {
 				new ItemStack(Blocks.OBSIDIAN), new ItemStack(Items.ENDER_PEARL), new ItemStack(Blocks.OBSIDIAN),
 				new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.OBSIDIAN));
 
-		if(Configs.Custom.Enable_Mod_Stuff && Configs.Custom.Mod_Stuff.IndustrialCraft) {
+		if(Configs.Custom.Mod_Stuff.IndustrialCraft) {
 			MCS.getLogOS().info("Start register ic2 item recipe");
 			icCompressedItemCrafting();
 		}
-		if(Configs.Custom.Enable_Mod_Stuff && Configs.Custom.Mod_Stuff.AppliedEnergistics2) {
+		if(Configs.Custom.Mod_Stuff.AppliedEnergistics2) {
 			MCS.getLogOS().info("Start register ae2 item recipe");
 			aeCompressedItemCrafting();
 		}
-		if(Configs.Custom.Enable_Mod_Stuff && Configs.Custom.Mod_Stuff.Torcherino) {
+		if(Configs.Custom.Mod_Stuff.Torcherino) {
 			torcherinoCompressedItemCrafting();
 		}
 	}
@@ -394,9 +394,9 @@ public class MCSRecipe {
 			Recipes.compressor.addRecipe(getICInput(ic2.C_ic_alloy_ingot_I.getStack(meta)), null, false, ic2.C_plate_alloy_I.getStack(meta));
 			Recipes.compressor.addRecipe(getICInput(ic2.C_dust_lapis_I.getStack(meta)), null, false, ic2.C_plate_lapis_I.getStack(meta));
 			Recipes.compressor.addRecipe(getICInput(mc.normal.C_SAND_B.getStack(4, meta)), null, false, mc.normal.C_sandstone_B.getStack(meta));
-			Recipes.compressor.addRecipe(getICInput(oreItem.dust.C_dust_obsidian_I.getStack(4, meta)), null, false, ic2.C_plate_obsidian_I.getStack(meta));
 			Recipes.compressor.addRecipe(getICInput(MCSItems.minecraft.normal.C_brick_I.getStack(4, meta)), null, false, mc.normal.C_BRICK_BLOCK_B.getStack(meta));
 
+			Recipes.compressor.addRecipe(getICInput(oreItem.dust.C_dust_obsidian_I.getStack(meta)), null, false, ic2.C_plate_obsidian_I.getStack(meta));
 			Recipes.compressor.addRecipe(getICInput(oreItem.dust.C_dust_gold_I.getStack(meta)), null, false, oreItem.plate.C_plate_gold_I.getStack(meta));
 			Recipes.compressor.addRecipe(getICInput(oreItem.dust.C_dust_bronze_I.getStack(meta)), null, false, oreItem.plate.C_plate_bronze_I.getStack(meta));
 			Recipes.compressor.addRecipe(getICInput(oreItem.dust.C_dust_copper_I.getStack(meta)), null, false, oreItem.plate.C_plate_copper_I.getStack(meta));
@@ -404,9 +404,11 @@ public class MCSRecipe {
 			Recipes.compressor.addRecipe(getICInput(ic2.C_dust_lapis_I.getStack(meta)), null, false, ic2.C_plate_lapis_I.getStack(meta));
 			Recipes.compressor.addRecipe(getICInput(oreItem.dust.C_dust_lead_I.getStack(meta)), null, false, oreItem.plate.C_plate_lead_I.getStack(meta));
 			Recipes.compressor.addRecipe(getICInput(oreItem.dust.C_dust_obsidian_I.getStack(meta)), null, false, ic2.C_plate_obsidian_I.getStack(meta));
-			Recipes.compressor.addRecipe(getICInput(oreItem.dust.C_dust_steel_I.getStack(meta)), null, false, oreItem.plate.C_plate_steel_I.getStack(meta));
+			if(oreItem.dust.C_dust_steel_I != null) {
+				Recipes.compressor.addRecipe(getICInput(oreItem.dust.C_dust_steel_I.getStack(meta)), null, false, oreItem.plate.C_plate_steel_I.getStack(meta));
+			}
 			Recipes.compressor.addRecipe(getICInput(oreItem.dust.C_dust_tin_I.getStack(meta)), null, false, oreItem.plate.C_plate_tin_I.getStack(meta));
-
+			
 			Recipes.compressor.addRecipe(getICInput(ic2.C_plate_lapis_I.getStack(meta)), null, false, ic2.C_dense_plate_lapis_I.getStack(meta - 1));
 			Recipes.compressor.addRecipe(getICInput(oreItem.plate.C_plate_tin_I.getStack(meta)), null, false, ic2.C_dense_plate_tin_I.getStack(meta - 1));
 			Recipes.compressor.addRecipe(getICInput(oreItem.plate.C_plate_copper_I.getStack(meta)), null, false, ic2.C_dense_plate_copper_I.getStack(meta - 1));

@@ -78,29 +78,27 @@ public class MCSBlocks {
 	public static Torcherino torcherino = null;
 
 	public MCSBlocks() {
-		if(Configs.Custom.Enable_Mod_Stuff) {
-			thermal_foundation = Configs.Custom.Mod_Stuff.ThermalFoundation ? new ThermalFoundationBlock() : null;
-			draconic_evolution = Configs.Custom.Mod_Stuff.DraconicEvolution ? new DraconicEvolutionBlock() : null;
-			avaritia = Configs.Custom.Mod_Stuff.Avaritia ? new AvaritiaBlock() : null;
-			ic2 = Configs.Custom.Mod_Stuff.IndustrialCraft ? new IndustrialCraft() : null;
-			ae2 = Configs.Custom.Mod_Stuff.AppliedEnergistics2 ? new AppliedEnergistics2() : null;
-			
-			torcherino = Configs.Custom.Mod_Stuff.Torcherino ? new Torcherino() : null;
-			enderio = Configs.Custom.Mod_Stuff.EnderIO ? new EnderIOBlock() : null;
-			projecte = Configs.Custom.Mod_Stuff.ProjectE ? new ProjectEBlock() : null;
-			environmental_tech = Configs.Custom.Mod_Stuff.EnvironmentalTech ? new EnvironmentalTechBlock() : null;
-			tconstruct = Configs.Custom.Mod_Stuff.Tconstruct ? new TconstructBlock() : null;
-			botania = Configs.Custom.Mod_Stuff.Botania ? new BotaniaBlock() : null;
-		}
+		thermal_foundation = Configs.Custom.Mod_Stuff.ThermalFoundation ? new ThermalFoundationBlock() : null;
+		draconic_evolution = Configs.Custom.Mod_Stuff.DraconicEvolution ? new DraconicEvolutionBlock() : null;
+		avaritia = Configs.Custom.Mod_Stuff.Avaritia ? new AvaritiaBlock() : null;
+		ic2 = Configs.Custom.Mod_Stuff.IndustrialCraft ? new IndustrialCraft() : null;
+		ae2 = Configs.Custom.Mod_Stuff.AppliedEnergistics2 ? new AppliedEnergistics2() : null;
+		
+		torcherino = Configs.Custom.Mod_Stuff.Torcherino ? new Torcherino() : null;
+		enderio = Configs.Custom.Mod_Stuff.EnderIO ? new EnderIOBlock() : null;
+		projecte = Configs.Custom.Mod_Stuff.ProjectE ? new ProjectEBlock() : null;
+		environmental_tech = Configs.Custom.Mod_Stuff.EnvironmentalTech ? new EnvironmentalTechBlock() : null;
+		tconstruct = Configs.Custom.Mod_Stuff.Tconstruct ? new TconstructBlock() : null;
+		botania = Configs.Custom.Mod_Stuff.Botania ? new BotaniaBlock() : null;
 	}
 
-	public static final void registerOreDict() {
+	public static void registerOreDict() {
 		for(Block sblock : MCSResources.BLOCKS) {
 			if(sblock instanceof BaseCompressedBlock) {
 				BaseCompressedBlock block = (BaseCompressedBlock) sblock;
 				if(block.createOreDictionary()) {
-					if(!block.getOtherOreDictionary().isEmpty()) {
-						List<String> ores = block.getOtherOreDictionary();
+					List<String> ores = block.getOtherOreDictionary();
+					if(!ores.isEmpty()) {
 						for(int i = 0; i < 16; i++) {
 							String ore = ores.get(i);
 							OreDictionary.registerOre((i + 1) + "x" + ore, new ItemStack(block, 1, i));

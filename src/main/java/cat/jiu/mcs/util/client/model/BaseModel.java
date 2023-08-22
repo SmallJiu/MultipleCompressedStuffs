@@ -28,10 +28,10 @@ public abstract class BaseModel {
 		this.owner = owner;
 		this.name = name;
 		this.i = i;
-		if(defaultParent != null) this.stateJson.addProperty("parent", defaultParent);
+		if(defaultParent != null) this.setParent(defaultParent);
 	}
 	
-	protected void addParent(String parent) {
+	protected void setParent(String parent) {
 		this.stateJson.addProperty("parent", parent);
 	}
 	
@@ -40,7 +40,7 @@ public abstract class BaseModel {
 	public final InputStream toStream() throws IOException {
 		this.genData(this.stateJson);
 		if(this.stateJson.entrySet().isEmpty()) {
-			throw new IOException(String.format("Not model data found. owner: %s, name: %s", this.owner, this.name));
+			throw new IOException(String.format("No model data found. owner: %s, name: %s", this.owner, this.name));
 		}
 		InputStream steam = new ByteArrayInputStream(this.stateJson.toString().getBytes(StandardCharsets.UTF_8));
 		MCS.startmodel += System.currentTimeMillis() - i;

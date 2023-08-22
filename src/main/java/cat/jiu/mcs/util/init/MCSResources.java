@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.HashMap;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -20,7 +20,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public final class MCSResources {
-	private static final Map<ItemStack, ICompressedStuff> compressed_stuff = Maps.newHashMap();
+	private static final HashMap<ItemStack, ICompressedStuff> compressed_stuff = Maps.newHashMap();
 	public static ICompressedStuff putCompressedStuff(ItemStack unCompressed, ICompressedStuff stuff) {
 		if(unCompressed == null || stuff == null) throw new NullPointerException();
 		return compressed_stuff.put(unCompressed, stuff);

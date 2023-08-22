@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
@@ -16,6 +17,7 @@ import cat.jiu.core.util.RegisterModel;
 import cat.jiu.core.util.base.BaseItemTool;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.api.ITooltipString;
 import cat.jiu.mcs.api.recipe.IToolRecipe;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.exception.NonToolException;
@@ -40,6 +42,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
@@ -316,44 +319,44 @@ public class BaseCompressedPickaxe extends BaseItemTool.MetaPickaxe implements I
 		return super.hasEffect(stack);
 	}
 
-	private List<String> shiftInfos = new ArrayList<String>();
+	private List<TextComponentTranslation> shiftInfos = new ArrayList<TextComponentTranslation>();
 
-	public BaseCompressedPickaxe addCustemShiftInformation(String... custemInfo) {
+	public BaseCompressedPickaxe addCustemShiftInformation(TextComponentTranslation... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
 			shiftInfos.add(custemInfo[i]);
 		}
 		return this;
 	}
 
-	public BaseCompressedPickaxe addCustemShiftInformation(List<String> infos) {
+	public BaseCompressedPickaxe addCustemShiftInformation(List<TextComponentTranslation> infos) {
 		this.shiftInfos = infos;
 		return this;
 	}
 
-	private Map<Integer, List<String>> metaShiftInfos = Maps.newHashMap();
+	private Map<Integer, List<TextComponentTranslation>> metaShiftInfos = Maps.newHashMap();
 
-	public BaseCompressedPickaxe addCustemShiftInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedPickaxe addCustemShiftInformation(Map<Integer, List<TextComponentTranslation>> infos) {
 		this.metaShiftInfos = infos;
 		return this;
 	}
 
-	private List<String> infos = new ArrayList<String>();
+	private List<TextComponentTranslation> infos = new ArrayList<TextComponentTranslation>();
 
-	public BaseCompressedPickaxe addCustemInformation(String... custemInfo) {
+	public BaseCompressedPickaxe addCustemInformation(TextComponentTranslation... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
 			infos.add(custemInfo[i]);
 		}
 		return this;
 	}
 
-	public BaseCompressedPickaxe addCustemInformation(List<String> infos) {
+	public BaseCompressedPickaxe addCustemInformation(List<TextComponentTranslation> infos) {
 		this.infos = infos;
 		return this;
 	}
 
-	private Map<Integer, List<String>> metaInfos = Maps.newHashMap();
+	private Map<Integer, List<TextComponentTranslation>> metaInfos = Maps.newHashMap();
 
-	public BaseCompressedPickaxe addCustemInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedPickaxe addCustemInformation(Map<Integer, List<TextComponentTranslation>> infos) {
 		this.metaInfos = infos;
 		return this;
 	}
@@ -371,13 +374,27 @@ public class BaseCompressedPickaxe extends BaseItemTool.MetaPickaxe implements I
 		this.infoStacks = infoStacks;
 		return this;
 	}
+	private List<ITooltipString> infoHandler;
+	public BaseCompressedPickaxe addInfoHandler(ITooltipString handler) {
+		if(this.infoHandler==null) this.infoHandler = Lists.newArrayList();
+		this.infoHandler.add(handler);
+		return this;
+	}
+	
+	protected boolean canShowBaseStackInfo = true;
+	public BaseCompressedPickaxe setCanShowBaseStackInfo(boolean canShow) {
+		this.canShowBaseStackInfo = canShow;
+		return this;
+	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
 		int meta = stack.getMetadata();
-
-		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.baseToolStack, this.infoStacks);
+		
+		if(this.canShowBaseStackInfo && !MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, infoStacks)) {
+			this.getUnCompressedStack().getItem().addInformation(getUnCompressedStack(), world, tooltip, advanced);
+		}
 		MCSUtil.info.addCompressedInfo(meta, tooltip, this.getUnCompressedItemLocalizedName(), this);
 
 		if(Configs.Tooltip_Information.show_owner_mod) {
@@ -390,6 +407,7 @@ public class BaseCompressedPickaxe extends BaseItemTool.MetaPickaxe implements I
 
 		MCSUtil.info.addMetaInfo(meta, tooltip, this.infos, this.metaInfos);
 		MCSUtil.info.addShiftInfo(meta, tooltip, this.shiftInfos, this.metaShiftInfos);
+		MCSUtil.info.addHandlerString(tooltip, this.infoHandler, stack, world, advanced);
 	}
 
 	@Override

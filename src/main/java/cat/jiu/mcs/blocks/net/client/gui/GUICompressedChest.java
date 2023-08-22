@@ -22,7 +22,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GUICompressedChest extends BaseUI.BaseGui<ContainerCompressedChest, TileEntity> {
+public class GUICompressedChest extends BaseUI.BaseTitleEntityGui<ContainerCompressedChest, TileEntity> {
 	private static ResourceLocation TEXTURE = new ResourceLocation(MCS.MODID + ":textures/gui/container/compressed_chest.png");
 	private float currentScroll;
 	private int selectRows = 0;

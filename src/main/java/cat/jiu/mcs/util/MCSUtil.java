@@ -3,13 +3,16 @@ package cat.jiu.mcs.util;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+
+import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.core.util.helpers.JsonUtil;
 import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.api.ITooltipString;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.util.base.BaseCompressedBlockItem;
 import cat.jiu.mcs.util.base.sub.BaseCompressedFood;
@@ -27,6 +30,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
@@ -39,18 +43,43 @@ public class MCSUtil {
 
 	public static class ItemUtil {
 		public List<String> getOreDict(ItemStack stack){
-			return JiuUtils.item.getOreDict(stack).stream().filter(o -> !JiuUtils.other.containKey(Configs.cancel_oredict_for_recipe, o)).collect(Collectors.toList());
+			List<String> ores = Lists.newArrayList();
+			for(String ore : JiuUtils.item.getOreDict(stack)) {
+				if(this.test(ore)) {
+					ores.add(ore);
+				}
+			}
+			return ores;
+		}
+		private boolean test(String ore) {
+			boolean flag = false;
+			for(String ores : Configs.cancel_oredict_for_recipe) {
+				if(ores.equalsIgnoreCase(ore)) {
+					flag = true;
+					break;
+				}
+			}
+			return !flag;
 		}
 		
 		public double getMetaValue(double baseValue, ItemStack stack) {
 			return this.getMetaValue(baseValue, stack.getMetadata());
 		}
-
+		
 		public double getMetaValue(double baseValue, int meta) {
 			double value = baseValue + (baseValue * ((meta + 1) * 1.527));
 			return value > Integer.MAX_VALUE ? Integer.MAX_VALUE : value;
 		}
-
+		
+		public double getMetaValue(double baseValue, ItemStack stack, double custom) {
+			return this.getMetaValue(baseValue, stack.getMetadata(), custom);
+		}
+		
+		public double getMetaValue(double baseValue, int meta, double custom) {
+			double value = baseValue * ((meta + 1) * custom);
+			return value > Integer.MAX_VALUE ? Integer.MAX_VALUE : value;
+		}
+		
 		public void getSubItems(ICompressedStuff compitem, CreativeTabs tab, NonNullList<ItemStack> items) {
 			Item item = compitem.getAsItem();
 			if(item == null || item == Items.AIR) return;
@@ -160,26 +189,26 @@ public class MCSUtil {
 
 	public static class InfoUtil {
 		@SideOnly(Side.CLIENT)
-		public void addMetaInfo(int meta, List<String> tooltip, List<String> infos, Map<Integer, List<String>> metaInfos) {
+		public void addMetaInfo(int meta, List<String> tooltip, List<TextComponentTranslation> infos, Map<Integer, List<TextComponentTranslation>> metaInfos) {
 			if(infos != null && !infos.isEmpty()) {
-				for(String info : infos) {
-					tooltip.add(info);
+				for(TextComponentTranslation info : infos) {
+					tooltip.add(I18n.format(info.getKey(), this.format(info.getFormatArgs())));
 				}
 			}else if(metaInfos != null && !metaInfos.isEmpty()) {
 				if(metaInfos.containsKey(meta)) {
-					for(String str : metaInfos.get(meta)) {
-						tooltip.add(str);
+					for(TextComponentTranslation info : metaInfos.get(meta)) {
+						tooltip.add(I18n.format(info.getKey(), this.format(info.getFormatArgs())));
 					}
 				}
 			}
 		}
 
 		@SideOnly(Side.CLIENT)
-		public void addShiftInfo(int meta, List<String> tooltip, List<String> shiftInfos, Map<Integer, List<String>> metaShiftInfos) {
+		public void addShiftInfo(int meta, List<String> tooltip, List<TextComponentTranslation> shiftInfos, Map<Integer, List<TextComponentTranslation>> metaShiftInfos) {
 			if(shiftInfos != null && !shiftInfos.isEmpty()) {
 				if(GuiScreen.isShiftKeyDown()) {
-					for(String info : shiftInfos) {
-						tooltip.add(info);
+					for(TextComponentTranslation info : shiftInfos) {
+						tooltip.add(I18n.format(info.getKey(), this.format(info.getFormatArgs())));
 					}
 				}else {
 					tooltip.add(I18n.format("info.mcs.shift"));
@@ -187,8 +216,8 @@ public class MCSUtil {
 			}else if(metaShiftInfos != null && !metaShiftInfos.isEmpty()) {
 				if(metaShiftInfos.containsKey(meta)) {
 					if(GuiScreen.isShiftKeyDown()) {
-						for(String info : metaShiftInfos.get(meta)) {
-							tooltip.add(info);
+						for(TextComponentTranslation info : metaShiftInfos.get(meta)) {
+							tooltip.add(I18n.format(info.getKey(), this.format(info.getFormatArgs())));
 						}
 					}else {
 						tooltip.add(I18n.format("info.mcs.shift"));
@@ -201,18 +230,17 @@ public class MCSUtil {
 		}
 
 		@SideOnly(Side.CLIENT)
-		public void addInfoStackInfo(int meta, ItemStack infoStack, World world, List<String> tooltip, ITooltipFlag advanced, ItemStack baseToolStack, Map<Integer, ItemStack> infoStacks) {
+		public boolean addInfoStackInfo(int meta, ItemStack infoStack, World world, List<String> tooltip, ITooltipFlag advanced, Map<Integer, ItemStack> infoStacks) {
 			if(infoStack != null) {
 				infoStack.getItem().addInformation(infoStack, world, tooltip, advanced);
-				return;
+				return true;
 			}else if(infoStacks != null && !infoStacks.isEmpty()) {
 				if(infoStacks.containsKey(meta) && infoStacks.get(meta) != null) {
 					infoStacks.get(meta).getItem().addInformation(infoStacks.get(meta), world, tooltip, advanced);
-					return;
+					return true;
 				}
 			}
-			baseToolStack.getItem().addInformation(baseToolStack, world, tooltip, advanced);
-			return;
+			return false;
 		}
 
 		@SideOnly(Side.CLIENT)
@@ -389,11 +417,30 @@ public class MCSUtil {
 			}
 		}
 		
+		public void addHandlerString(List<String> tooltip, List<ITooltipString> handlers, ItemStack stack, @Nullable World world, ITooltipFlag advanced) {
+			if(handlers != null) {
+				handlers.forEach(handler -> {
+					String s = handler.get(stack, world, advanced);
+					if(s!=null) tooltip.add(s);
+				});
+			}
+		}
+		
 		public String getStuffDisplayName(ICompressedStuff stuff, int meta) {
 			if(meta >= ModSubtypes.INFINITY) {
 				return I18n.format("tile.mcs.compressed_infinity.name", stuff.getUnCompressedStack().getDisplayName());
 			}
 			return I18n.format("tile.mcs.compressed.name", meta+1, stuff.getUnCompressedStack().getDisplayName());
+		}
+		
+		public Object[] format(Object[] arg) {
+			for(int i = 0; i < arg.length; i++) {
+				if(arg[i] instanceof TextComponentTranslation) {
+					TextComponentTranslation s = (TextComponentTranslation) arg[i];
+					arg[i] = I18n.format(s.getKey(), format(s.getFormatArgs()));
+				}
+			}
+			return arg;
 		}
 	}
 	

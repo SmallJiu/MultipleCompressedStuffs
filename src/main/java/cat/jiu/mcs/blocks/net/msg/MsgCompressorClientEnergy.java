@@ -18,7 +18,7 @@ public class MsgCompressorClientEnergy extends BaseMessage {
 	}
 
 	@Override
-	protected NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public NBTTagCompound write(NBTTagCompound nbt) {
 		if(nbt==null) nbt = new NBTTagCompound();
 		nbt.setInteger("x", this.pos.getX());
 		nbt.setInteger("y", this.pos.getY());
@@ -27,7 +27,7 @@ public class MsgCompressorClientEnergy extends BaseMessage {
 	}
 
 	@Override
-	protected void readFromNBT(NBTTagCompound nbt) {
+	public void read(NBTTagCompound nbt) {
 		this.pos = new BlockPos(nbt.getInteger("x"), nbt.getInteger("y"), nbt.getInteger("z"));
 	}
 	

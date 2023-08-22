@@ -17,11 +17,11 @@ public class MCSOreDict {
 		if(Configs.use_default_oredict) {
 			try {
 				mcBlock();
-				if(Configs.Custom.Enable_Mod_Stuff) {
-					itemThermalFoundation();
-					blockThermalFoundation();
-					blockBotania();
-				}
+				
+				itemThermalFoundation();
+				blockThermalFoundation();
+				blockBotania();
+				
 				MCSItems.registerOreDict();
 				MCSBlocks.registerOreDict();
 				custom();
@@ -56,16 +56,13 @@ public class MCSOreDict {
 	}
 
 	private static void itemThermalFoundation() {
-		if(Configs.Custom.Enable_Mod_Stuff) {
-			if(Loader.isModLoaded("thermalfoundation")) {
-				item.registerOre("tfDyes", Item.getByNameOrId("thermalfoundation:dye"), OreDictionary.WILDCARD_VALUE);
-			}
+		if(Loader.isModLoaded("thermalfoundation") && Configs.Custom.Mod_Stuff.ThermalFoundation) {
+			item.registerOre("tfDyes", Item.getByNameOrId("thermalfoundation:dye"), OreDictionary.WILDCARD_VALUE);
 		}
 	}
 
 	private static void blockThermalFoundation() {
-		if(Configs.Custom.Enable_Mod_Stuff) {
-			if(Loader.isModLoaded("thermalfoundation")) {
+			if(Loader.isModLoaded("thermalfoundation") && Configs.Custom.Mod_Stuff.ThermalFoundation) {
 				// String[] types = new String[] {"copper", "tin", "silver", "lead", "aluminum", "nickel", "platinum", "iridium", "mithril"};
 				// for(int i = 0; i < types.length; i++) {
 				// item.registerOre("hardenGlass", Item.getByNameOrId("thermalfoundation:glass"), i);
@@ -82,22 +79,20 @@ public class MCSOreDict {
 				// item.registerOre(types[i] + "RockWool", Item.getByNameOrId("thermalfoundation:rockwool"), i);
 				// }
 			}
-		}
+		
 	}
 
 	private static void blockBotania() {
-		if(Configs.Custom.Enable_Mod_Stuff) {
-			if(Loader.isModLoaded("botania")) {
-				for(EnumDyeColor type : EnumDyeColor.values()) {
-					String name = type.getUnlocalizedName();
-					String colorName = name.substring(0, 1).toUpperCase() + name.substring(1);
+		if(Loader.isModLoaded("botania") && Configs.Custom.Mod_Stuff.Botania) {
+			for(EnumDyeColor type : EnumDyeColor.values()) {
+				String name = type.getUnlocalizedName();
+				String colorName = name.substring(0, 1).toUpperCase() + name.substring(1);
 
-					item.registerOre("block" + colorName + "Petal", Item.getByNameOrId("botania:petalBlock"), type.getMetadata());
-				}
-				item.registerOre("petal", Item.getByNameOrId("botania:petal"), OreDictionary.WILDCARD_VALUE);
-				item.registerOre("botDye", Item.getByNameOrId("botania:dye"), OreDictionary.WILDCARD_VALUE);
-				item.registerOre("blockPetal", Item.getByNameOrId("botania:petalBlock"), OreDictionary.WILDCARD_VALUE);
+				item.registerOre("block" + colorName + "Petal", Item.getByNameOrId("botania:petalBlock"), type.getMetadata());
 			}
+			item.registerOre("petal", Item.getByNameOrId("botania:petal"), OreDictionary.WILDCARD_VALUE);
+			item.registerOre("botDye", Item.getByNameOrId("botania:dye"), OreDictionary.WILDCARD_VALUE);
+			item.registerOre("blockPetal", Item.getByNameOrId("botania:petalBlock"), OreDictionary.WILDCARD_VALUE);
 		}
 	}
 

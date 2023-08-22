@@ -116,7 +116,7 @@ public class CompressedStuffResourcePack implements IResourcePack {
 		return stream;
 	}
 	
-	protected JsonElement getOriginalTexture(String resource, List<String> list) {
+	protected JsonElement getOriginalTexture(String resource, List<String> list) throws IOException {
 		ClientProxy proxy = MCS.proxy.getAsClientProxy();
 		String name = this.getResourceName(list);
 		
@@ -139,7 +139,7 @@ public class CompressedStuffResourcePack implements IResourcePack {
 				}
 			}
 		}
-		return null;
+		throw new IOException(String.format("No model data found. owner: %s, name: %s", owner, name));
 	}
 	
 	protected boolean isItemBlock(String resource) {

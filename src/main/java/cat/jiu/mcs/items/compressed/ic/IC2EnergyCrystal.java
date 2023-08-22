@@ -51,6 +51,7 @@ public class IC2EnergyCrystal extends BaseCompressedItem implements IElectricIte
 		}else {
 			throw new RuntimeException("'" + baseItem.toString() + "' is NOT IC Energy Item");
 		}
+		this.setCanShowBaseStackInfo(false);
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 

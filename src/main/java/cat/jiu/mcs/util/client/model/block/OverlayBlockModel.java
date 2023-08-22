@@ -23,20 +23,20 @@ public class OverlayBlockModel extends BaseModel {
 	@Override
 	protected void genData(JsonObject json) {
 		JsonObject original = this.originalTexture.getAsJsonObject();
+		json.addProperty("parent", "mcs:block/overlay_model_" + original.size());
+		
 		JsonObject textures = new JsonObject();
 		textures.addProperty("all", original.get("all").getAsString());
 		
 		if(this.isHas) {
 			if(original.size() == 2) {
 				if(this.meta != 0) {
-					json.addProperty("parent", "mcs:block/overlay_model_" + original.size());
 					textures.addProperty("overlay_1", original.get("overlay_1").getAsString());
 					textures.addProperty("overlay_2", "mcs:blocks/compressed_" + (this.meta+1));
 				}else {
 					textures.addProperty("overlay", original.get("overlay_1").getAsString());
 				}
 			}else {
-				json.addProperty("parent", "mcs:block/overlay_model_" + original.size());
 				for(Entry<String, JsonElement> overlays :original.entrySet()) {
 					textures.addProperty(overlays.getKey(), overlays.getValue().getAsString());
 				}
@@ -44,11 +44,9 @@ public class OverlayBlockModel extends BaseModel {
 			}
 		}else {
 			if(original.size() == 2) {
-				json.addProperty("parent", "mcs:block/overlay_model_" + original.size());
 				textures.addProperty("overlay_1", original.get("overlay_1").getAsString());
 				textures.addProperty("overlay_2", "mcs:blocks/compressed_" + (this.meta+1));
 			}else {
-				json.addProperty("parent", "mcs:block/overlay_model_" + original.size());
 				for(Entry<String, JsonElement> overlays :original.entrySet()) {
 					textures.addProperty(overlays.getKey(), overlays.getValue().getAsString());
 				}

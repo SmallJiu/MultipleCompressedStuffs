@@ -184,6 +184,14 @@
 			}
 		},
 		"item": {
+			"compressed_copper_cable": "ic2:items/cable/copper_cable_0",
+			"compressed_glass_cable": "ic2:items/cable/glass_cable",
+			"compressed_gold_cable": "ic2:items/cable/gold_cable_0",
+			"compressed_iron_cable": "ic2:items/cable/iron_cable_0",
+			"compressed_tin_cable": "ic2:items/cable/tin_cable_0",
+			
+			"compressed_energy_storage_upgrade": "ic2:items/upgrade/energy_storage",
+			"compressed_overclocker_upgrade": "ic2:items/upgrade/overclocker",
 			"compressed_ic_alloy_ingot": "ic2:items/resource/ingot/alloy",
 			"compressed_containment_plating": "ic2:items/reactor/containment_plating",
 			"compressed_casing_bronze": "ic2:items/resource/casing/bronze",

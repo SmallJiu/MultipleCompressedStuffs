@@ -6,11 +6,13 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import cat.jiu.core.util.RegisterModel;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.api.ITooltipString;
 import cat.jiu.mcs.api.recipe.ISmeltingRecipe;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.core.api.IHasModel;
@@ -23,9 +25,15 @@ import cat.jiu.mcs.util.init.MCSResources;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.world.World;
@@ -42,7 +50,6 @@ public class BaseCompressedItem extends Item implements IHasModel, ICompressedSt
 	protected final ItemStack unCompressedItem;
 	protected final Item baseItem;
 	protected final String ownerMod;
-	protected final RegisterModel model = new RegisterModel(MCS.MODID);
 	private String model_material = null;
 
 	public BaseCompressedItem setModelMaterial(String model_material) {
@@ -129,7 +136,25 @@ public class BaseCompressedItem extends Item implements IHasModel, ICompressedSt
 	public boolean canMakeDefaultStackRecipe() {
 		return this.makeRecipe;
 	}
-
+	
+	protected IItemUse useHandler;
+	public BaseCompressedItem setUseHandler(IItemUse useHandler) {
+		this.useHandler = useHandler;
+		return this;
+	}
+	
+	@Override
+	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if(this.useHandler!=null) {
+			return this.useHandler.onItemUse(player, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+		}
+		return super.onItemUse(player, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+	}
+	
+	public static interface IItemUse {
+		EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ);
+	}
+	
 	boolean createOredict = true;
 
 	public BaseCompressedItem createOreDictionary(boolean flag) {
@@ -214,59 +239,77 @@ public class BaseCompressedItem extends Item implements IHasModel, ICompressedSt
 		MCSUtil.item.getSubItems(this, tab, items);
 	}
 
-	private List<String> shiftInfos = new ArrayList<String>();
+	private List<TextComponentTranslation> shiftInfos = new ArrayList<TextComponentTranslation>();
 
 	public BaseCompressedItem addCustemShiftInformation(String... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
-			shiftInfos.add(custemInfo[i]);
+			shiftInfos.add(new TextComponentTranslation(custemInfo[i]));
 		}
 		return this;
 	}
 
-	public BaseCompressedItem setCustemShiftInformation(List<String> infos) {
+	public BaseCompressedItem setCustemShiftInformation(List<TextComponentTranslation> infos) {
 		this.shiftInfos = infos;
 		return this;
 	}
 
-	private Map<Integer, List<String>> metaShiftInfos = Maps.newHashMap();
+	private Map<Integer, List<TextComponentTranslation>> metaShiftInfos = Maps.newHashMap();
 
-	public BaseCompressedItem setCustemShiftInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedItem setCustemShiftInformation(Map<Integer, List<TextComponentTranslation>> infos) {
 		this.metaShiftInfos = infos;
 		return this;
 	}
 
-	private List<String> infos = new ArrayList<String>();
+	private List<TextComponentTranslation> infos = new ArrayList<TextComponentTranslation>();
 
 	public BaseCompressedItem addCustemInformation(String... custemInfo) {
+		for(int i = 0; i < custemInfo.length; ++i) {
+			infos.add(new TextComponentTranslation(custemInfo[i]));
+		}
+		return this;
+	}
+	
+	public BaseCompressedItem addCustemInformation(TextComponentTranslation... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
 			infos.add(custemInfo[i]);
 		}
 		return this;
 	}
 
-	public BaseCompressedItem setCustemInformation(List<String> infos) {
+	public BaseCompressedItem setCustemInformation(List<TextComponentTranslation> infos) {
 		this.infos = infos;
 		return this;
 	}
 
-	private Map<Integer, List<String>> metaInfos = Maps.newHashMap();
+	private Map<Integer, List<TextComponentTranslation>> metaInfos = Maps.newHashMap();
 
-	public BaseCompressedItem setCustemInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedItem setCustemInformation(Map<Integer, List<TextComponentTranslation>> infos) {
 		this.metaInfos = infos;
 		return this;
 	}
 
 	ItemStack infoStack = null;
-
 	public BaseCompressedItem setInfoStack(ItemStack stack) {
 		this.infoStack = stack;
 		return this;
 	}
 
 	private Map<Integer, ItemStack> infoStacks = Maps.newHashMap();
-
 	public BaseCompressedItem setInfoStack(Map<Integer, ItemStack> infoStacks) {
 		this.infoStacks = infoStacks;
+		return this;
+	}
+	
+	private List<ITooltipString> infoHandler;
+	public BaseCompressedItem addInfoHandler(ITooltipString handler) {
+		if(this.infoHandler==null) this.infoHandler = Lists.newArrayList();
+		this.infoHandler.add(handler);
+		return this;
+	}
+	
+	protected boolean canShowBaseStackInfo = true;
+	public BaseCompressedItem setCanShowBaseStackInfo(boolean canShow) {
+		this.canShowBaseStackInfo = canShow;
 		return this;
 	}
 
@@ -274,7 +317,9 @@ public class BaseCompressedItem extends Item implements IHasModel, ICompressedSt
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
 		int meta = stack.getMetadata();
-		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.unCompressedItem, infoStacks);
+		if(this.canShowBaseStackInfo && !MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, infoStacks)) {
+			this.getUnCompressedStack().getItem().addInformation(getUnCompressedStack(), world, tooltip, advanced);
+		}
 		MCSUtil.info.addCompressedInfo(meta, tooltip, this.getUnCompressedItemLocalizedName(), this);
 
 		if(MCS.dev()) {
@@ -303,11 +348,12 @@ public class BaseCompressedItem extends Item implements IHasModel, ICompressedSt
 
 		MCSUtil.info.addMetaInfo(meta, tooltip, this.infos, this.metaInfos);
 		MCSUtil.info.addShiftInfo(meta, tooltip, this.shiftInfos, this.metaShiftInfos);
+		MCSUtil.info.addHandlerString(tooltip, this.infoHandler, stack, world, advanced);
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void getItemModel() {
+	public void getItemModel(RegisterModel model) {
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
 			if(this.model_material != null) {

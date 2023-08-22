@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import appeng.core.AppEng;
 
 import cat.jiu.core.JiuCore;
-import cat.jiu.core.JiuCore.LogOS;
+import cat.jiu.core.LogOS;
 import cat.jiu.core.api.IMod;
 import cat.jiu.core.util.JiuUtils;
 import cat.jiu.core.util.helpers.DayUtils;
@@ -20,7 +20,6 @@ import moze_intel.projecte.emc.EMCMapper;
 import moze_intel.projecte.emc.SimpleStack;
 
 import net.minecraft.block.Block;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -31,8 +30,6 @@ import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod(
 	modid = MCS.MODID,
@@ -60,22 +57,10 @@ public class MultipleCompressedStuffs implements IMod {
 	public static final String MODID = "mcs";
 	public static final String NAME = "MultipleCompressedStuffs";
 	public static final String OWNER = "small_jiu";
-	public static final String VERSION = "3.0.5-a0";
-	
-	@Deprecated
-	public static final CreativeTabs COMPERESSED_BLOCKS = MCSCreativeTab.BLOCKS;
-	@Deprecated
-	public static final CreativeTabs COMPERESSED_ITEMS = MCSCreativeTab.ITEMS;
-	@Deprecated
-	public static final CreativeTabs COMPERESSED_TOOLS = MCSCreativeTab.TOOLS;
-	@Deprecated
-	@SideOnly(Side.CLIENT)
-	public static boolean hasModTextures(String modid) {
-		return proxy.getAsClientProxy().hasModTexture(modid);
-	}
+	public static final String VERSION = "3.0.5-a2";
 	
 	private static Boolean isDev = null; // if is IDE, you can set to 'true' to enable some test stuff
-	public static final boolean dev() {
+	public static boolean dev() {
 		if(isDev == null) {
 			isDev = new File("./config/jiu/mcs_debug.jiu").exists();
 		}
@@ -83,7 +68,7 @@ public class MultipleCompressedStuffs implements IMod {
 	}
 	
 	private static boolean DevelopmentEnvironment;
-	public static final boolean isDevelopmentEnvironment() {
+	public static boolean isDevelopmentEnvironment() {
 		return DevelopmentEnvironment;
 	}
 	

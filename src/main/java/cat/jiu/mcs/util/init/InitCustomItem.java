@@ -19,6 +19,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.text.TextComponentTranslation;
 
 public class InitCustomItem {
 	private static <K, V> void put(Map<K, V> map, K k, V v) {
@@ -609,14 +610,14 @@ public class InitCustomItem {
 		return null;
 	}
 
-	public static Map<Integer, List<String>> initInfos(JsonObject obj) {
+	public static Map<Integer, List<TextComponentTranslation>> initInfos(JsonObject obj) {
 		if(obj.has("infos")) {
-			Map<Integer, List<String>> InfoMap = Maps.newHashMap();
+			Map<Integer, List<TextComponentTranslation>> InfoMap = Maps.newHashMap();
 			JsonElement objInfos = obj.get("infos");
 			if(objInfos.isJsonArray()) {
-				List<String> infoList = Lists.newArrayList();
+				List<TextComponentTranslation> infoList = Lists.newArrayList();
 				for(int i = 0; i < objInfos.getAsJsonArray().size(); i++) {
-					infoList.add(objInfos.getAsJsonArray().get(i).getAsString());
+					infoList.add(new TextComponentTranslation(objInfos.getAsJsonArray().get(i).getAsString()));
 				}
 
 				for(int meta = 0; meta < 16; meta++) {
@@ -626,9 +627,9 @@ public class InitCustomItem {
 				for(Entry<String, JsonElement> infos : objInfos.getAsJsonObject().entrySet()) {
 					int meta = Integer.parseInt(infos.getKey());
 
-					List<String> infoList = Lists.newArrayList();
+					List<TextComponentTranslation> infoList = Lists.newArrayList();
 					for(int i = 0; i < infos.getValue().getAsJsonArray().size(); i++) {
-						infoList.add(infos.getValue().getAsJsonArray().get(i).getAsString());
+						infoList.add(new TextComponentTranslation(infos.getValue().getAsJsonArray().get(i).getAsString()));
 					}
 
 					if(meta == -1) {
@@ -645,14 +646,14 @@ public class InitCustomItem {
 		return null;
 	}
 
-	public static Map<Integer, List<String>> initShiftInfos(JsonObject obj) {
+	public static Map<Integer, List<TextComponentTranslation>> initShiftInfos(JsonObject obj) {
 		if(obj.has("shiftInfos")) {
-			Map<Integer, List<String>> ShiftInfoMap = Maps.newHashMap();
+			Map<Integer, List<TextComponentTranslation>> ShiftInfoMap = Maps.newHashMap();
 			JsonElement objInfos = obj.get("shiftInfos");
 			if(objInfos.isJsonArray()) {
-				List<String> infoList = Lists.newArrayList();
+				List<TextComponentTranslation> infoList = Lists.newArrayList();
 				for(int i = 0; i < objInfos.getAsJsonArray().size(); i++) {
-					infoList.add(objInfos.getAsJsonArray().get(i).getAsString());
+					infoList.add(new TextComponentTranslation(objInfos.getAsJsonArray().get(i).getAsString()));
 				}
 
 				for(int meta = 0; meta < 16; meta++) {
@@ -662,9 +663,9 @@ public class InitCustomItem {
 				for(Entry<String, JsonElement> infos : objInfos.getAsJsonObject().entrySet()) {
 					int meta = Integer.parseInt(infos.getKey());
 
-					List<String> infoList = Lists.newArrayList();
+					List<TextComponentTranslation> infoList = Lists.newArrayList();
 					for(int i = 0; i < infos.getValue().getAsJsonArray().size(); i++) {
-						infoList.add(infos.getValue().getAsJsonArray().get(i).getAsString());
+						infoList.add(new TextComponentTranslation(infos.getValue().getAsJsonArray().get(i).getAsString()));
 					}
 
 					if(meta == -1) {

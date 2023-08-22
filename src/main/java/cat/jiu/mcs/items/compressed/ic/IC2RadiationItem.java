@@ -7,7 +7,6 @@ import cat.jiu.mcs.util.base.sub.BaseCompressedItem;
 import ic2.core.IC2Potion;
 import ic2.core.item.armor.ItemArmorHazmat;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 import net.minecraftforge.common.MinecraftForge;
@@ -39,35 +38,17 @@ public class IC2RadiationItem extends BaseCompressedItem {
 
 	@SubscribeEvent
 	public void onItemInPlayerInventoryTick(ItemInPlayerEvent.InInventory event) {
-		onItemInPlayerInventoryTick(event.getEntityPlayer(), event.stack, event.slot);
-	}
-
-	private void onItemInPlayerInventoryTick(EntityPlayer player, ItemStack invStack, int slot) {
-		if(invStack.getItem() instanceof IC2RadiationItem) {
-			if(!ItemArmorHazmat.hasCompleteHazmat(player)) {
-				IC2Potion.radiation.applyTo(player, (int) MCSUtil.item.getMetaValue(200, invStack.getMetadata()), 100);
+		if(event.stack.getItem() instanceof IC2RadiationItem) {
+			if(!ItemArmorHazmat.hasCompleteHazmat(event.getEntityPlayer())) {
+				IC2Potion.radiation.applyTo(event.getEntityPlayer(), (int) MCSUtil.item.getMetaValue(200, event.stack.getMetadata()), 100);
 			}
 		}
 	}
 
 	@SubscribeEvent
 	public void onItemInPlayerHandTick(ItemInPlayerEvent.InHand event) {
-		if(event.isMainHand) {
-			onItemInPlayerHandTick(event.getEntityPlayer(), event.stack, null);
-		}else {
-			onItemInPlayerHandTick(event.getEntityPlayer(), null, event.stack);
-		}
-	}
-
-	private void onItemInPlayerHandTick(EntityPlayer player, ItemStack mainHand, ItemStack offHand) {
-		if(mainHand != null && !mainHand.isEmpty() && mainHand.getItem() instanceof IC2RadiationItem) {
-			if(!ItemArmorHazmat.hasCompleteHazmat(player)) {
-				IC2Potion.radiation.applyTo(player, (int) MCSUtil.item.getMetaValue(200, mainHand.getMetadata()), 100);
-			}
-		}else if(offHand != null && !offHand.isEmpty() && offHand.getItem() instanceof IC2RadiationItem) {
-			if(!ItemArmorHazmat.hasCompleteHazmat(player)) {
-				IC2Potion.radiation.applyTo(player, (int) MCSUtil.item.getMetaValue(200, offHand.getMetadata()), 100);
-			}
+		if(event.stack.getItem() instanceof IC2RadiationItem && !ItemArmorHazmat.hasCompleteHazmat(event.getEntityPlayer())) {
+			IC2Potion.radiation.applyTo(event.getEntityPlayer(), (int) MCSUtil.item.getMetaValue(200, event.stack.getMetadata()), 100);
 		}
 	}
 }

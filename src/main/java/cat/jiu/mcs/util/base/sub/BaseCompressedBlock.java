@@ -17,6 +17,7 @@ import cat.jiu.core.util.base.BaseBlock;
 import cat.jiu.core.util.timer.Timer;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.api.ITooltipString;
 import cat.jiu.mcs.api.recipe.ISmeltingRecipe;
 import cat.jiu.mcs.blocks.tileentity.TileEntityChangeBlock;
 import cat.jiu.mcs.config.Configs;
@@ -54,6 +55,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
@@ -84,7 +86,7 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 		this.baseBlock = !this.isHas() ? JiuUtils.item.getBlockFromItemStack(baseItem) : Blocks.AIR;
 		this.baseState = !this.isHas() ? JiuUtils.item.getStateFromItemStack(baseItem) : Blocks.AIR.getDefaultState();
 		if(!ownerMod.equals("custom")) {
-			MCSResources.BLOCKS.add(this);
+//			MCSResources.BLOCKS.add(this);
 			MCSResources.BLOCKS_NAME.add(this.name);
 			MCSResources.STUFF_NAME.add(nameIn);
 			MCSResources.putCompressedStuff(baseItem, this);
@@ -189,14 +191,14 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 		return this.addChangeBlock(meta, new Timer(m, s, tick), canDrops, drops);
 	}
 	
-	private Map<Integer, List<String>> metaShiftInfos;
-	public BaseCompressedBlock setCustemShiftInformation(Map<Integer, List<String>> infos) {
+	private Map<Integer, List<TextComponentTranslation>> metaShiftInfos;
+	public BaseCompressedBlock setCustemShiftInformation(Map<Integer, List<TextComponentTranslation>> infos) {
 		this.metaShiftInfos = infos;
 		return this;
 	}
 
-	private Map<Integer, List<String>> metaInfos;
-	public BaseCompressedBlock setCustemInformation(Map<Integer, List<String>> infos) {
+	private Map<Integer, List<TextComponentTranslation>> metaInfos;
+	public BaseCompressedBlock setCustemInformation(Map<Integer, List<TextComponentTranslation>> infos) {
 		this.metaInfos = infos;
 		return this;
 	}
@@ -240,6 +242,13 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 	private Map<Integer, ItemStack> infoStacks = null;
 	public BaseCompressedBlock setInfoStack(Map<Integer, ItemStack> infoStacks) {
 		this.infoStacks = infoStacks;
+		return this;
+	}
+	
+	private List<ITooltipString> infoHandler;
+	public BaseCompressedBlock addInfoHandler(ITooltipString handler) {
+		if(this.infoHandler==null) this.infoHandler = Lists.newArrayList();
+		this.infoHandler.add(handler);
 		return this;
 	}
 	// Custom end
@@ -287,40 +296,38 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 		return this;
 	}
 	
-	private List<String> shiftInfos;
+	private List<TextComponentTranslation> shiftInfos;
 	public BaseCompressedBlock addCustemShiftInformation(String... custemInfo) {
 		if(this.shiftInfos == null) this.shiftInfos = Lists.newArrayList();
 		for(String str : custemInfo) {
-			this.shiftInfos.add(str);
+			this.shiftInfos.add(new TextComponentTranslation(str));
 		}
 		return this;
 	}
 
-	public BaseCompressedBlock addCustemShiftInformation(List<String> infos) {
+	public BaseCompressedBlock addCustemShiftInformation(List<TextComponentTranslation> infos) {
 		if(this.shiftInfos == null) this.shiftInfos = Lists.newArrayList();
-		for(String str : infos) {
-			this.shiftInfos.add(str);
-		}
+		
+		this.shiftInfos.addAll(infos);
+		
 		return this;
 	}
 
-	private List<String> infos;
-	public BaseCompressedBlock setCustemInformation(List<String> infos) {
+	private List<TextComponentTranslation> infos;
+	public BaseCompressedBlock setCustemInformation(List<TextComponentTranslation> infos) {
 		this.infos = infos;
 		return this;
 	}
 	public BaseCompressedBlock addCustemInformation(String... custemInfo) {
 		if(this.infos == null) this.infos = Lists.newArrayList();
 		for(String str : custemInfo) {
-			this.infos.add(str);
+			this.infos.add(new TextComponentTranslation(str));
 		}
 		return this;
 	}
-	public BaseCompressedBlock addCustemInformation(List<String> custemInfo) {
+	public BaseCompressedBlock addCustemInformation(List<TextComponentTranslation> custemInfo) {
 		if(this.infos == null) this.infos = Lists.newArrayList();
-		for(String str : custemInfo) {
-			this.infos.add(str);
-		}
+		this.infos.addAll(custemInfo);
 		return this;
 	}
 
@@ -485,13 +492,21 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 		}
 	}
 	
+	protected boolean canShowBaseStackInfo = true;
+	public BaseCompressedBlock setCanShowBaseStackInfo(boolean canShow) {
+		this.canShowBaseStackInfo = canShow;
+		return this;
+	}
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
 		int meta = stack.getMetadata();
-		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.baseItem, infoStacks);
+		if(this.canShowBaseStackInfo && !MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, infoStacks)) {
+			this.getUnCompressedStack().getItem().addInformation(getUnCompressedStack(), world, tooltip, advanced);
+		}
 		MCSUtil.info.addCompressedInfo(meta, tooltip, this.getUnCompressedItemLocalizedName(), Item.getItemFromBlock(this));
-
+		
 		if(MCS.dev()) {
 			tooltip.add("Is Has Block: " + this.isHas());
 			tooltip.add("unCompressedItem: " + this.baseItem.getItem().getRegistryName() + "." + this.baseItem.getItemDamage());
@@ -528,6 +543,7 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 
 		MCSUtil.info.addMetaInfo(meta, tooltip, this.infos, this.metaInfos);
 		MCSUtil.info.addShiftInfo(meta, tooltip, this.shiftInfos, this.metaShiftInfos);
+		MCSUtil.info.addHandlerString(tooltip, this.infoHandler, stack, world, advanced);
 	}
 	// Custom implement end
 	
@@ -729,7 +745,7 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 	public void getItemModel(RegisterModel util) {
 		String has = this.baseItem.getItem() instanceof ItemBlock ? "normal" : "has";
 		if(this.state != null) has = this.state;
-
+		
 		util.setBlockStateMapper(this, false, this.ownerMod + "/" + has + "/" + this.name);
 		for(ModSubtypes type : ModSubtypes.values(ModSubtypes.MAX <= 16 ? ModSubtypes.MAX : 16)) {
 			int meta = type.getMeta();
@@ -828,7 +844,7 @@ public class BaseCompressedBlock extends BaseBlock.Sub<ModSubtypes> implements I
 		this.smeltingOutput = stuff;
 		return this;
 	}
-	private int smeltingMetaDisparity = 0;
+	private int smeltingMetaDisparity = 1;
 	public BaseCompressedBlock setSmeltingMetaDisparity(int smeltingMetaDisparity) {
 		this.smeltingMetaDisparity = smeltingMetaDisparity;
 		return this;

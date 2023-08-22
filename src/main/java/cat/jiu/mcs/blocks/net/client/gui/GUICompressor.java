@@ -28,7 +28,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GUICompressor extends BaseUI.BaseGui<ContainerCompressor, TileEntityCompressor> {
+public class GUICompressor extends BaseUI.BaseTitleEntityGui<ContainerCompressor, TileEntityCompressor> {
 	public static final ResourceLocation TEXTURE = new ResourceLocation(MCS.MODID + ":textures/gui/container/compressor.png");
 	protected boolean isClose = false;
 	public GUICompressor(EntityPlayer player, World world, BlockPos pos) {
@@ -50,7 +50,7 @@ public class GUICompressor extends BaseUI.BaseGui<ContainerCompressor, TileEntit
 		NetworkHandler.INSTANCE.sendToServer(new MsgCompressorClientEnergy(this.pos));
 		this.itemRender = new CompressorRenderItem(this.mc.renderEngine, this.itemRender.getItemModelMesher().getModelManager(), this.mc.getItemColors());
 
-		if(this.te != null) {
+		if(this.getTileEntity() != null) {
 			this.buttonList.clear();
 			this.addButton(new GuiButton(0, (this.width / 2) + 55, (this.height / 2) - 71, 10, 10, "+") {
 				public void mouseReleased(int mouseX, int mouseY) {
@@ -66,16 +66,16 @@ public class GUICompressor extends BaseUI.BaseGui<ContainerCompressor, TileEntit
 				if(i != 0) {
 					this.addButton(new GuiButton(i + 2, (this.width / 2) - (62 - (18 * i)), (this.height / 2) - 34, 17, 7, "") {
 						public void mouseReleased(int mouseX, int mouseY) {
-							te.setActivateSlot(this.id - 2, !container.slotCanCraft(this.id - 2));
-							NetworkHandler.INSTANCE.sendToServer(new MsgCompressorSlotActivate(pos, this.id - 2, te.slotCanCraft(this.id - 2)));
+							getTileEntity().setActivateSlot(this.id - 2, !container.slotCanCraft(this.id - 2));
+							NetworkHandler.INSTANCE.sendToServer(new MsgCompressorSlotActivate(pos, this.id - 2, getTileEntity().slotCanCraft(this.id - 2)));
 						}
 					});
 				}
 
 				this.addButton(new GuiButton(i + 10, (this.width / 2) - (62 - (18 * i)), (this.height / 2) - 5, 17, 7, "") {
 					public void mouseReleased(int mouseX, int mouseY) {
-						te.setActivateSlot(this.id - 2, !container.slotCanCraft(this.id - 2));
-						NetworkHandler.INSTANCE.sendToServer(new MsgCompressorSlotActivate(pos, this.id - 2, te.slotCanCraft(this.id - 2)));
+						getTileEntity().setActivateSlot(this.id - 2, !container.slotCanCraft(this.id - 2));
+						NetworkHandler.INSTANCE.sendToServer(new MsgCompressorSlotActivate(pos, this.id - 2, getTileEntity().slotCanCraft(this.id - 2)));
 					}
 				});
 			}

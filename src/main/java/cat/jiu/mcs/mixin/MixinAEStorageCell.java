@@ -16,9 +16,7 @@ import cat.jiu.mcs.config.Configs;
 import net.minecraft.item.ItemStack;
 
 @Pseudo
-@Mixin(
-	value = AbstractCellInventory.class,
-	remap = true)
+@Mixin(value = AbstractCellInventory.class, remap = false)
 public class MixinAEStorageCell {
 	private MixinAEStorageCell() {
 		throw new RuntimeException();
@@ -44,7 +42,7 @@ public class MixinAEStorageCell {
 			value = "RETURN")},
 		method = {"<clinit>*"})
 	private static void setMaxItemTypes_Static(CallbackInfo ci) {
-		if(Configs.Custom.Enable_Mod_Stuff && Configs.Custom.Mod_Stuff.AppliedEnergistics2) {
+		if(Configs.Custom.Mod_Stuff.AppliedEnergistics2) {
 			MAX_ITEM_TYPES = 127;
 
 			ITEM_SLOT_KEYS = new String[MAX_ITEM_TYPES];
@@ -66,7 +64,7 @@ public class MixinAEStorageCell {
 			value = "RETURN")},
 		method = {"<init>*"})
 	private void setMaxItemTypes_Class(CallbackInfo ci) {
-		if(Configs.Custom.Enable_Mod_Stuff && Configs.Custom.Mod_Stuff.AppliedEnergistics2) {
+		if(Configs.Custom.Mod_Stuff.AppliedEnergistics2) {
 			this.maxItemTypes = this.cellType.getTotalTypes(this.i);
 			if(this.maxItemTypes > MAX_ITEM_TYPES) {
 				this.maxItemTypes = MAX_ITEM_TYPES;

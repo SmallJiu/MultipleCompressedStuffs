@@ -65,6 +65,7 @@ public class IC2BatteryCharge extends BaseCompressedItem implements IElectricIte
 		}
 		this.setMaxStackSize(1);
 		this.setInfoStack(ItemStack.EMPTY);
+		this.setCanShowBaseStackInfo(false);
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 

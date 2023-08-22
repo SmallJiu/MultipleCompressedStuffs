@@ -1,42 +1,68 @@
 package cat.jiu.mcs.util.init;
 
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.brandon3055.draconicevolution.DEFeatures;
+import com.google.gson.JsonArray;
 
 import appeng.api.AEApi;
 import appeng.api.definitions.IDefinitions;
 import appeng.api.definitions.IItemDefinition;
 
 import cofh.thermalfoundation.init.TFItems;
+import ic2.core.block.invslot.InvSlotConsumableItemStack;
+import ic2.core.block.machine.tileentity.TileEntityLiquidHeatExchanger;
+import ic2.core.block.wiring.CableType;
+import ic2.core.ref.BlockName;
+import ic2.core.ref.ItemName;
+import ic2.core.ref.TeBlock;
+import ic2.core.util.ItemComparableItemStack;
 import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.api.ITooltipString;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.mcs.items.*;
 import cat.jiu.mcs.items.compressed.*;
 import cat.jiu.mcs.items.compressed.ae2.*;
 import cat.jiu.mcs.items.compressed.ic.*;
+import cat.jiu.mcs.items.compressed.ic.cable.ICCable;
+import cat.jiu.mcs.items.compressed.ic.upgrade.ICEnergyStorageUpgrade;
+import cat.jiu.mcs.items.compressed.ic.upgrade.ICOverclockerUpgrade;
 import cat.jiu.core.util.JiuUtils;
+import cat.jiu.core.util.JsonParser;
 import cat.jiu.core.util.base.BaseItem;
 import cat.jiu.mcs.util.type.CustomStuffType;
+import cat.jiu.mcs.util.MCSUtil;
+import cat.jiu.mcs.util.ModSubtypes;
 import cat.jiu.mcs.util.base.*;
 import cat.jiu.mcs.util.base.sub.*;
+import cat.jiu.mcs.util.base.sub.BaseCompressedItem.IItemUse;
 import cat.jiu.mcs.util.base.sub.tool.*;
 
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 
 @SuppressWarnings("static-access")
 public class MCSItems {
-	public static final int UNBREAK = -1;
-	public static final int INT_MAX = Integer.MAX_VALUE;
-	public static final float FLOAT_MAX = Float.MAX_VALUE;
-	public static final long LONG_MAX = Long.MAX_VALUE;
-	public static final double DOUBLE_MAX = Double.MAX_VALUE;
-
 	public static final MCSItem normal = new MCSItem();
 	public static final MinecraftItem minecraft = new MinecraftItem();
 	public static final OreStuff ore_stuff = new OreStuff();
@@ -47,14 +73,11 @@ public class MCSItems {
 	public static AppliedEnergistics2 ae = null;
 
 	public MCSItems() {
-		if(Configs.Custom.Enable_Mod_Stuff) {
-			thermal_foundation = Configs.Custom.Mod_Stuff.ThermalFoundation ? new ThermalFoundationItem() : null;
-			draconic_evolution = Configs.Custom.Mod_Stuff.DraconicEvolution ? new DraconicEvolutionItems() : null;
-			avaritia = Configs.Custom.Mod_Stuff.Avaritia ? new AvaritiaItems() : null;
-			ic2 = Configs.Custom.Mod_Stuff.IndustrialCraft ? new IndustrialCraft() : null;
-			ae = Configs.Custom.Mod_Stuff.AppliedEnergistics2 ? new AppliedEnergistics2() : null;
-
-		}
+		thermal_foundation = Configs.Custom.Mod_Stuff.ThermalFoundation ? new ThermalFoundationItem() : null;
+		draconic_evolution = Configs.Custom.Mod_Stuff.DraconicEvolution ? new DraconicEvolutionItems() : null;
+		avaritia = Configs.Custom.Mod_Stuff.Avaritia ? new AvaritiaItems() : null;
+		ic2 = Configs.Custom.Mod_Stuff.IndustrialCraft ? new IndustrialCraft() : null;
+		ae = Configs.Custom.Mod_Stuff.AppliedEnergistics2 ? new AppliedEnergistics2() : null;
 	}
 
 	public static final void registerOreDict() {
@@ -155,7 +178,7 @@ public class MCSItems {
 			public final BaseCompressedFood C_PUFFER_FISH_F = new BaseCompressedFood("compressed_puffer_fish", Items.FISH, 3).addPotionEffect(new int[]{-1}, new CustomStuffType.PotionEffectType[]{new CustomStuffType.PotionEffectType(MobEffects.POISON, 2280, 3), new CustomStuffType.PotionEffectType(MobEffects.HUNGER, 570, 2), new CustomStuffType.PotionEffectType(MobEffects.NAUSEA, 570, 1)});
 			public final BaseCompressedFood C_GOLD_APPLE_F = new BaseCompressedFood("compressed_gold_apple", Items.GOLDEN_APPLE, 0).addPotionEffect(new int[]{-1}, new CustomStuffType.PotionEffectType[]{new CustomStuffType.PotionEffectType(MobEffects.REGENERATION, 220, 1), new CustomStuffType.PotionEffectType(MobEffects.ABSORPTION, 4560, 0)});
 			public final BaseCompressedFood C_ENCHANTED_GOLD_APPLE_F = new BaseCompressedFood("compressed_enchanted_gold_apple", Items.GOLDEN_APPLE, 1).addPotionEffect(new int[]{-1}, new CustomStuffType.PotionEffectType[]{new CustomStuffType.PotionEffectType(MobEffects.REGENERATION, 760, 1), new CustomStuffType.PotionEffectType(MobEffects.RESISTANCE, 11400, 0), new CustomStuffType.PotionEffectType(MobEffects.FIRE_RESISTANCE, 11400, 0), new CustomStuffType.PotionEffectType(MobEffects.ABSORPTION, 4560, 3)});
-			public final BaseCompressedFood C_SPIDER_EYE_F = new BaseCompressedFood("compressed_spider_eye", Items.SPIDER_EYE).addPotionEffect(new int[]{-1}, new CustomStuffType.PotionEffectType[]{new CustomStuffType.PotionEffectType(MobEffects.POISON, 180, 1)}).setContainer(new ItemStack(C_ENCHANTED_GOLD_APPLE_F));
+			public final BaseCompressedFood C_SPIDER_EYE_F = new BaseCompressedFood("compressed_spider_eye", Items.SPIDER_EYE).addPotionEffect(new int[]{-1}, new CustomStuffType.PotionEffectType[]{new CustomStuffType.PotionEffectType(MobEffects.POISON, 180, 1)});
 		}
 
 		public class Tool {
@@ -314,20 +337,20 @@ public class MCSItems {
 			public final BaseCompressedItem C_dust_obsidian_I = TF ? register("obsidian", TFItems.itemMaterial.dustObsidian, "thermalfoundation", null) : IC ? register("obsidian", "dust", 12, "ic2", null) : null;
 			public final BaseCompressedItem C_dust_sulfur_I = TF ? register("sulfur", TFItems.itemMaterial.dustSulfur, "thermalfoundation", null) : IC ? register("sulfur", "dust", 16, "ic2", null) : null;
 
-			private BaseCompressedItem register(String ore, String unCompressed, String ownerMod, ICompressedStuff stuff) {
-				return this.register(ore, unCompressed, 0, ownerMod, stuff);
+			private BaseCompressedItem register(String ore, String unCompressed, String ownerMod, ICompressedStuff smeltingOutput) {
+				return this.register(ore, unCompressed, 0, ownerMod, smeltingOutput);
 			}
 
-			private BaseCompressedItem register(String ore, String unCompressed, int meta, String ownerMod, ICompressedStuff stuff) {
-				return this.register(ore, new ItemStack(Item.getByNameOrId(ownerMod + ":" + unCompressed), 1, meta), ownerMod, stuff);
+			private BaseCompressedItem register(String ore, String unCompressed, int meta, String ownerMod, ICompressedStuff smeltingOutput) {
+				return this.register(ore, new ItemStack(Item.getByNameOrId(ownerMod + ":" + unCompressed), 1, meta), ownerMod, smeltingOutput);
 			}
 
-			private BaseCompressedItem register(String ore, ItemStack unCompressed, String ownerMod, ICompressedStuff stuff) {
+			private BaseCompressedItem register(String ore, ItemStack unCompressed, String ownerMod, ICompressedStuff smeltingOutput) {
 				BaseCompressedItem item = BaseCompressedItem.register("compressed_dust_" + ore, unCompressed, ownerMod);
 				if(item == null) {
 					return null;
 				}
-				return item.setModelMaterial("dust").setSmeltingOutput(stuff);
+				return item.setModelMaterial("dust").setSmeltingOutput(smeltingOutput).setSmeltingMetaDisparity(1);
 			}
 		}
 	}
@@ -366,10 +389,10 @@ public class MCSItems {
 			public final BaseCompressedItem C_GEAR_SIGNALUM_I = register("compressed_gear_signalum", TFItems.itemMaterial.gearSignalum).setModelMaterial("gear");
 
 			// Dust 金属粉
-			public final BaseCompressedItem C_DUST_LUMIUM_I = register("compressed_dust_lumium", TFItems.itemMaterial.dustLumium).setModelMaterial("dust").setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_LUMIUM_B);
-			public final BaseCompressedItem C_DUST_ENDERIUM_I = register("compressed_dust_enderium", TFItems.itemMaterial.dustEnderium).setModelMaterial("dust").setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_ENDERIUM_B);
-			public final BaseCompressedItem C_DUST_MITHRIL_I = register("compressed_dust_mithril", TFItems.itemMaterial.dustMithril).setModelMaterial("dust").setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_MITHRIL_B);
-			public final BaseCompressedItem C_DUST_SIGNALUM_I = register("compressed_dust_signalum", TFItems.itemMaterial.dustSignalum).setModelMaterial("dust").setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_SIGNALUM_B);
+			public final BaseCompressedItem C_DUST_LUMIUM_I = register("compressed_dust_lumium", TFItems.itemMaterial.dustLumium).setModelMaterial("dust").setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_LUMIUM_B).setSmeltingMetaDisparity(1);
+			public final BaseCompressedItem C_DUST_ENDERIUM_I = register("compressed_dust_enderium", TFItems.itemMaterial.dustEnderium).setModelMaterial("dust").setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_ENDERIUM_B).setSmeltingMetaDisparity(1);
+			public final BaseCompressedItem C_DUST_MITHRIL_I = register("compressed_dust_mithril", TFItems.itemMaterial.dustMithril).setModelMaterial("dust").setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_MITHRIL_B).setSmeltingMetaDisparity(1);
+			public final BaseCompressedItem C_DUST_SIGNALUM_I = register("compressed_dust_signalum", TFItems.itemMaterial.dustSignalum).setModelMaterial("dust").setSmeltingOutput(MCSBlocks.thermal_foundation.normal.C_SIGNALUM_B).setSmeltingMetaDisparity(1);
 
 		}
 
@@ -392,7 +415,7 @@ public class MCSItems {
 
 			public final BaseCompressedItem C_CHAOS_SHARD_I = register("compressed_chaos_shard", new ItemStack(DEFeatures.chaosShard));
 			public final BaseCompressedItem C_DRAGON_HEART_I = register("compressed_dragon_heart", new ItemStack(DEFeatures.dragonHeart));
-			public final BaseCompressedItem C_DRACONIUM_DUST_I = register("compressed_draconium_dust", new ItemStack(DEFeatures.draconiumDust)).setSmeltingOutput(MCSBlocks.draconic_evolution.normal.C_DRACONIUM_BLOCK_B);
+			public final BaseCompressedItem C_DRACONIUM_DUST_I = register("compressed_draconium_dust", new ItemStack(DEFeatures.draconiumDust)).setSmeltingOutput(MCSBlocks.draconic_evolution.normal.C_DRACONIUM_BLOCK_B).setSmeltingMetaDisparity(1);
 		}
 
 		private BaseCompressedItem register(String nameIn, ItemStack unCompressedItem) {
@@ -416,6 +439,17 @@ public class MCSItems {
 
 	public static class IndustrialCraft {
 		public final Normal normal = new Normal();
+		private boolean enable_heat_conductor = false;
+		public IndustrialCraft() {
+			JsonArray array = JsonParser.parse(IndustrialCraft.class.getResourceAsStream("/mcs.mixin.json")).getAsJsonObject().getAsJsonArray("mixins");
+			for(int i = 0; i < array.size(); i++) {
+				String e = array.get(i).getAsString();
+				if("MixinTileEntityLiquidHeatExchanger".equals(e)) {
+					this.enable_heat_conductor = true;
+					break;
+				}
+			}
+		}
 
 		public class Normal {
 			public final BaseCompressedItem C_URANIUM_I = register("compressed_uranium", "nuclear", true);
@@ -475,7 +509,6 @@ public class MCSItems {
 			public final BaseCompressedItem C_advanced_circuit_I = register("compressed_advanced_circuit", "crafting", 2);
 			public final BaseCompressedItem C_coil_I = register("compressed_coil", "crafting", 5);
 			public final BaseCompressedItem C_electric_motor_I = register("compressed_electric_motor", "crafting", 6);
-			public final BaseCompressedItem C_heat_conductor_I = register("compressed_heat_conductor", "crafting", 7);
 			public final BaseCompressedItem C_copper_boiler_I = register("compressed_copper_boiler", "crafting", 8);
 			public final BaseCompressedItem C_coal_chunk_I = register("compressed_coal_chunk", "crafting", 18);
 			public final BaseCompressedItem C_plant_ball_I = register("compressed_plant_ball", "crafting", 20);
@@ -487,7 +520,68 @@ public class MCSItems {
 			public final BaseCompressedItem C_slag_I = register("compressed_slag", "misc_resource", 5);
 			public final BaseCompressedItem C_iodine_I = register("compressed_iodine", "misc_resource", 6);
 			public final BaseCompressedItem C_fuel_rod_I = register("compressed_fuel_rod", "crafting", 9);
-
+			
+			// Upgrade
+			public final BaseCompressedItem C_overclocker_upgrade_I = new ICOverclockerUpgrade("compressed_overclocker_upgrade", getICStack("upgrade", 0));
+			public final BaseCompressedItem C_energy_storage_upgrade_I = new ICEnergyStorageUpgrade("compressed_energy_storage_upgrade", getICStack("upgrade", 2));
+			
+			public final BaseCompressedItem C_heat_conductor_I = register("compressed_heat_conductor", "crafting", 7).addCustemInformation(new TextComponentTranslation("info.mcs.compressed_heat_conductor", new TextComponentTranslation(BlockName.te.getItemStack(TeBlock.liquid_heat_exchanger).getUnlocalizedName()))).addInfoHandler(new ITooltipString() {
+				@Override
+				@SideOnly(Side.CLIENT)
+				public String get(ItemStack stack, World world, ITooltipFlag advanced) {
+					return I18n.format("info.mcs.compressed_heat_conductor.heat", (int)MCSUtil.item.getMetaValue(10, stack), I18n.format(enable_heat_conductor ? "info.mcs.enable" : "info.mcs.unable"));
+				}
+			}).setUseHandler(new IItemUse() {
+				public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+					if(!player.isSneaking()) {
+						return EnumActionResult.PASS;
+					}
+					
+					TileEntity tile = world.getTileEntity(pos);
+					if(tile instanceof TileEntityLiquidHeatExchanger) {
+						try {
+							Field stacksField = InvSlotConsumableItemStack.class.getDeclaredField("stacks");
+							stacksField.setAccessible(true);
+							@SuppressWarnings("unchecked")
+							Set<ItemComparableItemStack> stacks = (Set<ItemComparableItemStack>) stacksField.get(((TileEntityLiquidHeatExchanger) tile).heatexchangerslots);
+							Set<ItemStack> ss = stacks.stream().map(stack -> stack.toStack()).collect(Collectors.toSet());
+							
+							int added = 0;
+							for(int i = 0; i < C_heat_conductor_I.getLevel().maxMeta; i++) {
+								if(!this.has(ss, i)) {
+									stacks.add(new ItemComparableItemStack(C_heat_conductor_I.getStack(i), true));
+									added++;
+								}
+							}
+							if(!this.has(ss, ModSubtypes.INFINITY)) {
+								stacks.add(new ItemComparableItemStack(C_heat_conductor_I.getStack(ModSubtypes.INFINITY), true));
+								added++;
+							}
+							
+							EnumActionResult result = added > 0 ? EnumActionResult.SUCCESS : EnumActionResult.PASS;
+							if(result == EnumActionResult.SUCCESS) {
+								JiuUtils.entity.sendMessage(player, "info.mcs.compressed_heat_conductor.success", TextFormatting.GREEN);
+							}else {
+								JiuUtils.entity.sendMessage(player, "info.mcs.compressed_heat_conductor.pass", TextFormatting.YELLOW);
+							}
+							return result;
+						}catch(Exception e) {
+							e.printStackTrace();
+							JiuUtils.entity.sendMessage(player, "info.mcs.compressed_heat_conductor.fail", TextFormatting.RED);
+							return EnumActionResult.FAIL;
+						}
+					}
+					return EnumActionResult.PASS;
+				}
+				
+				private boolean has(Set<ItemStack> stacks, int meta) {
+					for(ItemStack stack : stacks) {
+						if(stack.getItem() == C_heat_conductor_I && stack.getMetadata() == meta) return true; 
+					}
+					return false;
+				}
+			});
+			
 			// Plating 隔板
 			public final BaseCompressedItem C_containment_plating_I = new IC2HeatPlating("compressed_containment_plating", "ic2:containment_plating");
 			public final BaseCompressedItem C_heat_plating_I = new IC2HeatPlating("compressed_heat_plating", "ic2:heat_plating");
@@ -547,7 +641,13 @@ public class MCSItems {
 			public final BaseCompressedItem C_heat_storage_I = new IC2HeatStorage("compressed_heat_storage", "ic2:heat_storage");
 			public final BaseCompressedItem C_tri_heat_storage_I = new IC2HeatStorage("compressed_tri_heat_storage", "ic2:tri_heat_storage");
 			public final BaseCompressedItem C_hex_heat_storage_I = new IC2HeatStorage("compressed_hex_heat_storage", "ic2:hex_heat_storage");
-
+			
+			// Cable
+			public final BaseCompressedItem C_copper_I = new ICCable("compressed_copper_cable", ItemName.cable.getItemStack(CableType.copper));
+			public final BaseCompressedItem C_glass_cable_I = new ICCable("compressed_glass_cable", ItemName.cable.getItemStack(CableType.glass));
+			public final BaseCompressedItem C_gold_cable_I = new ICCable("compressed_gold_cable", ItemName.cable.getItemStack(CableType.gold));
+			public final BaseCompressedItem C_iron_cable_I = new ICCable("compressed_iron_cable", ItemName.cable.getItemStack(CableType.iron));
+			public final BaseCompressedItem C_tin_cable_I = new ICCable("compressed_tin_cable", ItemName.cable.getItemStack(CableType.tin));
 		}
 
 		private BaseCompressedItem register(String nameIn, String unCompressedItem) {
@@ -564,10 +664,13 @@ public class MCSItems {
 
 		private BaseCompressedItem register(String nameIn, String unCompressedItem, int meta, boolean hasRadiation) {
 			if(hasRadiation) {
-				return IC2RadiationItem.register(nameIn, new ItemStack(Item.getByNameOrId("ic2:" + unCompressedItem), 1, meta), "ic2");
+				return IC2RadiationItem.register(nameIn, this.getICStack(unCompressedItem, meta), "ic2");
 			}else {
-				return BaseCompressedItem.register(nameIn, new ItemStack(Item.getByNameOrId("ic2:" + unCompressedItem), 1, meta), "ic2");
+				return BaseCompressedItem.register(nameIn, this.getICStack(unCompressedItem, meta), "ic2");
 			}
+		}
+		private ItemStack getICStack(String unCompressedItem, int meta) {
+			return new ItemStack(Item.getByNameOrId("ic2:" + unCompressedItem), 1, meta);
 		}
 	}
 

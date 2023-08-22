@@ -45,6 +45,7 @@ public class IC2ReactorAssembly extends BaseCompressedItem implements IReactorCo
 			this.baseDamageItem = null;
 			MCS.getLogOS().error(JiuUtils.item.toString(baseItem) + " has NOT Damage");
 		}
+		this.setCanShowBaseStackInfo(false);
 	}
 
 	@Override

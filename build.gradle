@@ -18,8 +18,8 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
 
-version = "1.12.2-3.0.5-a0"
-group = "cat.jiu.mcs"
+version = "1.12.2-3.0.5-a2"
+group = "cat.jiu"
 archivesBaseName = "MultipleCompressedStuffs"
 
 sourceCompatibility = targetCompatibility = '1.8'
@@ -31,8 +31,7 @@ minecraft {
     version = "1.12.2-14.23.5.2847"
     runDir = "run"
 	mappings = "snapshot_20171003"
-    
-	// makeObfSourceJar = false
+	//makeObfSourceJar = false
 }
 
 jar {
@@ -59,10 +58,6 @@ repositories {
     maven {
         name 'CurseMaven'
         url 'https://www.cursemaven.com/'
-    }
-    maven {
-        name 'DVS1 Repo'
-        url 'https://dvs1.progwml6.com/files/maven/'
     }
     maven {
         name "CoFH Maven"
@@ -102,7 +97,7 @@ repositories {
 }
 
 dependencies {
-	compile fileTree(dir:'./libs', include:['JiuCore-1.12.2-1.1.5-a0-dev-dev.jar'])
+	compile fileTree(dir:'./libs', include:['JiuCore-1.12.2-1.1.6-a1-dev.jar'])
 	
 //  deobfCompile "curse.maven:<name>-<Project ID>:<File ID>" // version
 
@@ -111,6 +106,7 @@ dependencies {
 	deobfCompile "curse.maven:Hwyla-253449:2568751" // 1.8.26-B41
 	deobfCompile 'curse.maven:baubles-227083:2518667' //1.5.2
 	deobfCompile "curse.maven:brandons-core-231382:3051539" // 2.4.19.214
+    deobfCompile "curse.maven:draconic-evolution-223565:3051542" // 2.3.27.353
 	deobfCompile "curse.maven:codechicken-lib-1-8-242818:2779848" // 3.2.3.358
 	deobfCompile 'curse.maven:cofhworld-271384:2920434'
 	deobfCompile "curse.maven:valkyrielib-245480:2691542" // 2.0.20.1
@@ -118,17 +114,18 @@ dependencies {
 	deobfCompile 'curse.maven:industrialcraft-242638:2746892'
 	deobfCompile "curse.maven:applied_energistics2-223794:2747063" //rv6-stable-7
 	deobfCompile "curse.maven:projecte-226410:2702991" //1.4.1
-    deobfCompile "curse.maven:draconic-evolution-223565:3051542" // 2.3.27.353
 	deobfCompile "curse.maven:environmental-tech-245453:2691536" // 2.0.20.1
+	deobfCompile "curse.maven:mantle-74924:2713386" // 1.12-1.3.3.55
+	deobfCompile "curse.maven:tinkers-construct-74072:2902483" // 1.12.2-2.13.0.183
 	
 	deobfCompile "zone.rong:mixinbooter:4.2"
 	deobfCompile 'cofh:ThermalFoundation:1.12.2-2.6.3.27:universal'
 	deobfCompile 'cofh:CoFHCore:1.12.2-4.6.3.27:universal'
-	deobfCompile "slimeknights.mantle:Mantle:1.12-1.3.3.56"
 	deobfCompile 'cofh:RedstoneFlux:1.12-2.1.0.7:universal'
 	deobfCompile "vazkii.botania:Botania:r1.10-363.148"
-	deobfCompile("morph.avaritia:Avaritia:1.12.2-3.3.0.33:universal") { exclude group: "codechicken" }
-    deobfCompile "slimeknights:TConstruct:1.12.2-2.13.0.184"
+	deobfCompile("morph.avaritia:Avaritia:1.12.2-3.3.0.33:universal") {
+		exclude group: "codechicken"
+	}
 }
 
 processResources {

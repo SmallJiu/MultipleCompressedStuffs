@@ -5,6 +5,10 @@ itemGroup.compressed_stuffs_tools=多重压缩-工具
 cmd.mcs.dev.gen=/mcs gen <max> <x> <y> <z> -- 生成一堆数量在<max>左右的随机物品到指定坐标
 
 info.mcs.energy=能量
+info.mcs.unfinished=未完成！
+
+info.mcs.enable=§a已启用§r
+info.mcs.unable=§c未启用§r
 
 info.mcs.warn.ic.craft_energy=警告：将不会继承合成材料的电量到成品上
 
@@ -50,6 +54,12 @@ tile.mcs.creative_energy.info.0=创造模式独享
 tile.mcs.creative_energy.info.1=最大输出：%s
 tile.mcs.compressor.name=压缩器
 tile.mcs.compressor_slave.name=压缩器传动方块
+
+info.mcs.compressed_heat_conductor=手持蹲下右击 '%s' 以使其可放入
+info.mcs.compressed_heat_conductor.heat=§b将提供 §e%s §bhU. §r(%s)
+info.mcs.compressed_heat_conductor.success=Patch成功.
+info.mcs.compressed_heat_conductor.fail=Patch失败.
+info.mcs.compressed_heat_conductor.pass=已跳过Patch.
 
 tile.mcs.block.name=块
 
@@ -107,7 +117,16 @@ advancement.mcs.compressed_16.info=合成一个十六重的压缩物品
 advancement.mcs.compressed_32766.name=我于万物之中
 advancement.mcs.compressed_32766.info=合成一个无限重的压缩物品
 
-#{
+config.mcs.custom=自定义相关
+config.mcs.custom.mod_stuff=联动物品
+
+config.mcs.custom.custem_already_stuff=自定义已压缩
+config.mcs.custom.custem_already_stuff.item=物品
+config.mcs.custom.custem_already_stuff.block=方块
+
+config.mcs.tooltip=Tooltip相关
+config.mcs.give_food_container=归还食物容器
+
 config.mcs.recipe.3x3=使用3x3合成表,反之使用2x2合成表
 config.mcs.recipe.cancel_oredict_for_recipe=不参与合成的矿词
 config.mcs.recipe.all=启用默认合成表
@@ -121,21 +140,19 @@ config.mcs.enable_mod_stuff=启用联动物品(需在ModStuff开启具体mod)
 config.mcs.enable_test_stuff=使用mod预览内容
 config.mcs.name_of_uncompressed_block=自定义压缩方块(未完之作)
 config.mcs.name_of_uncompressed_item=自定义压缩物品(也许能用)
-#	{
+
 config.mcs.ore_dict_register=矿词自定义
 config.mcs.logging_give_food=进入存档时给予食物
-#		{
+
 config.mcs.custem_can_use_wrench_break=自定义方块是否可以被扳手类破坏掉落
 config.mcs.custem_break_drop_item=自定义毁灭者右键方块所获得的物品
 config.mcs.custem_change_block=自定义压缩方块放置世界时将会改变的方块
-#		},
-#		{
+
 config.mcs.can_drop_cat_hair=豹猫可以掉落猫絮
 config.mcs.break_bedrock_chance=自定义猫猫锤破坏基岩类方块的几率
 config.mcs.drop_cat_hair_chance=自定义豹猫掉落猫絮的几率
 config.mcs.custem_eat_effect=自定义压缩食物吃掉时给予的buff
-#		}
-#	}
+
 config.mcs.can_custom_tab_background=可以改变多重压缩物品的创造物品栏的背景
 config.mcs.show_food_amount=显示压缩食物的饱食度与饱和度
 config.mcs.get_real_food_amout=显示不是科学计数法的饱食度与饱和度
@@ -145,9 +162,8 @@ config.mcs.show_specific_number=显示不是科学计数法的未压缩方块数
 config.mcs.can_custom_specific_number=可以自定义未压缩的方块数
 config.mcs.show_owner_mod=显示所属mod
 config.mcs.waila.remaining_time=固定格式显示变换方块的剩余时间
-#	{
+config.mcs.show_owner_type=显示所属类型
+
 config.mcs.custem_info.item=自定义压缩物品的tag栏内容显示
 config.mcs.custem_info.block=自定义压缩方块的tag栏内容显示
 config.mcs.custem_info.item.food=自定义压缩食物的tag栏内容显示
-#	}
-#}

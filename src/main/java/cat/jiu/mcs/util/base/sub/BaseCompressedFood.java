@@ -12,6 +12,7 @@ import com.google.common.collect.Maps;
 import cat.jiu.core.util.RegisterModel;
 import cat.jiu.mcs.MCS;
 import cat.jiu.mcs.api.ICompressedStuff;
+import cat.jiu.mcs.api.ITooltipString;
 import cat.jiu.mcs.api.recipe.ISmeltingRecipe;
 import cat.jiu.mcs.config.Configs;
 import cat.jiu.core.api.IHasModel;
@@ -32,6 +33,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
@@ -62,7 +64,6 @@ public class BaseCompressedFood extends ItemFood implements IHasModel, ICompress
 	protected final ItemStack unCompressedItem;
 	protected final String ownerMod;
 	protected final boolean baseItemIsNotFood;
-	protected final RegisterModel model = new RegisterModel(MCS.MODID);
 
 	public BaseCompressedFood(String name, Item baseFood, int meta, String ownerMod, CreativeTabs tab, float saturation, boolean isWolfFood, boolean hasSubtypes) {
 		super(8, saturation, isWolfFood);
@@ -446,44 +447,44 @@ public class BaseCompressedFood extends ItemFood implements IHasModel, ICompress
 		return false;
 	}
 
-	private List<String> shiftInfos = new ArrayList<String>();
+	private List<TextComponentTranslation> shiftInfos = new ArrayList<TextComponentTranslation>();
 
 	public BaseCompressedFood addCustemShiftInformation(String... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
-			shiftInfos.add(custemInfo[i]);
+			shiftInfos.add(new TextComponentTranslation(custemInfo[i]));
 		}
 		return this;
 	}
 
-	public BaseCompressedFood addCustemShiftInformation(List<String> infos) {
+	public BaseCompressedFood addCustemShiftInformation(List<TextComponentTranslation> infos) {
 		this.shiftInfos.addAll(infos);
 		return this;
 	}
 
-	private Map<Integer, List<String>> metaShiftInfos = Maps.newHashMap();
+	private Map<Integer, List<TextComponentTranslation>> metaShiftInfos = Maps.newHashMap();
 
-	public BaseCompressedFood addCustemShiftInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedFood addCustemShiftInformation(Map<Integer, List<TextComponentTranslation>> infos) {
 		this.metaShiftInfos = infos;
 		return this;
 	}
 
-	private List<String> infos = new ArrayList<String>();
+	private List<TextComponentTranslation> infos = new ArrayList<TextComponentTranslation>();
 
 	public BaseCompressedFood addCustemInformation(String... custemInfo) {
 		for(int i = 0; i < custemInfo.length; ++i) {
-			infos.add(custemInfo[i]);
+			infos.add(new TextComponentTranslation(custemInfo[i]));
 		}
 		return this;
 	}
 
-	public BaseCompressedFood addCustemInformation(List<String> infos) {
+	public BaseCompressedFood addCustemInformation(List<TextComponentTranslation> infos) {
 		this.infos.addAll(infos);
 		return this;
 	}
 
-	private Map<Integer, List<String>> metaInfos = null;
+	private Map<Integer, List<TextComponentTranslation>> metaInfos = null;
 
-	public BaseCompressedFood addCustemInformation(Map<Integer, List<String>> infos) {
+	public BaseCompressedFood addCustemInformation(Map<Integer, List<TextComponentTranslation>> infos) {
 		this.metaInfos = infos;
 		return this;
 	}
@@ -501,12 +502,27 @@ public class BaseCompressedFood extends ItemFood implements IHasModel, ICompress
 		this.infoStacks = infoStacks;
 		return this;
 	}
+	
+	private List<ITooltipString> infoHandler;
+	public BaseCompressedFood addInfoHandler(ITooltipString handler) {
+		if(this.infoHandler==null) this.infoHandler = Lists.newArrayList();
+		this.infoHandler.add(handler);
+		return this;
+	}
+	
+	protected boolean canShowBaseStackInfo = true;
+	public BaseCompressedFood setCanShowBaseStackInfo(boolean canShow) {
+		this.canShowBaseStackInfo = canShow;
+		return this;
+	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
 		int meta = stack.getMetadata();
-		MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, this.unCompressedItem, infoStacks);
+		if(this.canShowBaseStackInfo && !MCSUtil.info.addInfoStackInfo(meta, this.infoStack, world, tooltip, advanced, infoStacks)) {
+			this.getUnCompressedStack().getItem().addInformation(getUnCompressedStack(), world, tooltip, advanced);
+		}
 		MCSUtil.info.addCompressedInfo(meta, tooltip, this.getUnCompressedItemLocalizedName(), this);
 
 		if(MCS.dev()) {
@@ -541,10 +557,11 @@ public class BaseCompressedFood extends ItemFood implements IHasModel, ICompress
 
 		MCSUtil.info.addMetaInfo(meta, tooltip, this.infos, this.metaInfos);
 		MCSUtil.info.addShiftInfo(meta, tooltip, this.shiftInfos, this.metaShiftInfos);
+		MCSUtil.info.addHandlerString(tooltip, this.infoHandler, stack, world, advanced);
 	}
 
 	@Override
-	public void getItemModel() {
+	public void getItemModel(RegisterModel model) {
 		for(ModSubtypes type : ModSubtypes.values()) {
 			int meta = type.getMeta();
 			model.registerItemModel(this, meta, this.ownerMod +"/item/food/" + this.name, this.name + "." + meta);
